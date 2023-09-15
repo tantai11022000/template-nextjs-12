@@ -1,6 +1,8 @@
 # oricom-campaign-management-ui
 
-
+Start APP:
+ - Build: Yarn build
+ - Start: Yarn start
 
 ## Getting started Done
 
