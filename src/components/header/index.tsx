@@ -8,8 +8,8 @@ const { Header, Content, Footer } = Layout;
 
 const menuItems = [
     { label: `Home`, url: `/` },
+    { label: `Amazon`, url: `/amazon/campaign-budgets` },
     { label: `Dashboard`, url: `/dashboard/analytics` },
-    { label: `Newsletter`, url: `/newsletter` },
 ];
 
 const ActiveMenuLink = ({ children, href }: any) => {
@@ -19,13 +19,14 @@ const ActiveMenuLink = ({ children, href }: any) => {
     return (
       <Link
         href={href}
-        className={`hover:bg-gray-100 p-2 rounded block ${
-          active ||
-          (href.startsWith('/dashboard') &&
-            pathname.startsWith('/dashboard'))
-            ? 'text-black font-semibold'
-            : 'text-gray-500'
-        }`}
+        className='text-white'
+        // className={`hover:bg-gray-100 p-2 rounded block ${
+        //   active ||
+        //   (href.startsWith('/dashboard') &&
+        //     pathname.startsWith('/dashboard'))
+        //     ? 'text-black font-semibold'
+        //     : 'text-gray-500'
+        // }`}
       >
         {children}
       </Link>
@@ -39,9 +40,9 @@ function HeaderApp() {
 
   return (
     <Layout>
-      <header className="flex flex-col gap-5">
+      <header className="flex flex-col gap-5 bg-[#444]">
       <div className="py-4 flex items-center">
-        <Link href="/">
+        <Link href="/" className='w-52'>
           <Image
             width={36}
             height={36}
