@@ -4,11 +4,14 @@ import {
   PieChartOutlined,
   TeamOutlined,
   UserOutlined,
+  GoldOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useBreadcrumb } from '../breadcrumb-context';
+import styles from './index.module.scss';
 const { Header, Content, Footer, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -43,12 +46,14 @@ const items: MenuItem[] = [
   getItem('Targeting Bidding', 'targeting_bidding', '2', '/amazon/targeting-bidding', <DesktopOutlined />),
   getItem('Execution Log', 'execution_log', '3', '/amazon/execution-log', <UserOutlined />),
   getItem('Accounts', 'accounts', '4', '/amazon/accounts', <TeamOutlined />),
+  getItem('Weight Template', 'weight_template', '5', '/amazon/weight-template', <GoldOutlined />),
 ];
 
 const DashboardLayout = (props: any) => {
   const { children } = props
   const [collapsed, setCollapsed] = useState(false);
   const [currentTab, setCurrentTab] = useState<string>("campaign_budgets")
+  const { breadcrumb, setBreadcrumb } = useBreadcrumb();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -70,15 +75,17 @@ const DashboardLayout = (props: any) => {
       <Layout>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>
-              <Link href="/">Home</Link>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {items ? items.map((item: any) => {
-                const isMatched = item.value == currentTab
-                return isMatched && <Link href={item.url}>{item.label}</Link>
-              }) : null}
-            </Breadcrumb.Item>
+            {
+              breadcrumb.map((item:any, index: number) => (
+                <Breadcrumb.Item>
+                  {
+                    item.url ?  
+                    <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> :
+                    <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
+                  }
+                </Breadcrumb.Item>
+              ))
+            }
           </Breadcrumb>
           <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
             {children}

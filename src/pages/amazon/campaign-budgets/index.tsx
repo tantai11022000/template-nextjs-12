@@ -1,10 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 
 import { Input, Space } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
+import { useBreadcrumb } from '@/components/breadcrumb-context';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 
 const { Search } = Input;
 
@@ -76,7 +78,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
-
+  const { setBreadcrumb } = useBreadcrumb();
   const handleSearch = (value: any) => {
 
   }
@@ -91,6 +93,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const filterOption = (input: string, option: { label: string; value: string }) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+  useEffect(() => {
+    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
+  },[])
 
   return (
     <div className='text-black'>

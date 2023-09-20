@@ -2,6 +2,7 @@ import Layout from '@/components/layout'
 import '@/styles/globals.scss'
 import '@/styles/custom-antd.scss'
 import type { AppProps } from 'next/app'
+import { BreadcrumbProvider } from '@/components/breadcrumb-context';
 
 export default function App({ Component, pageProps }: any) {
   const renderWithLayout =
@@ -10,5 +11,10 @@ export default function App({ Component, pageProps }: any) {
       return <Layout>{page}</Layout>;
     };
 
-  return renderWithLayout(<Component {...pageProps} />);
+  return (
+    <BreadcrumbProvider>
+      {renderWithLayout(<Component {...pageProps} />)}
+    </BreadcrumbProvider>
+  )
+  
 }
