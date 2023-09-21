@@ -3,13 +3,16 @@ import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import styles from './index.module.scss'
 
 const { Header, Content, Footer } = Layout;
 
 const menuItems = [
-    { label: `Home`, url: `/` },
-    { label: `Dashboard`, url: `/dashboard/analytics` },
-    { label: `Newsletter`, url: `/newsletter` },
+    { label: `Campaigns`, url: `http://localhost:8282/#/campaigns` },
+    { label: `Users`, url: `http://localhost:8282/#/users` },
+    { label: `Biz Management`, url: `http://localhost:8282/#/masterboard/clients` },
+    { label: `3rd Tracking Tools`, url: `http://localhost:8282/#/3rd-tracking-tools` },
+    { label: `Amazon`, url: `/amazon/campaign-budgets` },
 ];
 
 const ActiveMenuLink = ({ children, href }: any) => {
@@ -19,13 +22,7 @@ const ActiveMenuLink = ({ children, href }: any) => {
     return (
       <Link
         href={href}
-        className={`hover:bg-gray-100 p-2 rounded block ${
-          active ||
-          (href.startsWith('/dashboard') &&
-            pathname.startsWith('/dashboard'))
-            ? 'text-black font-semibold'
-            : 'text-gray-500'
-        }`}
+        className={`${active ? styles.active : ''}`}
       >
         {children}
       </Link>
@@ -39,9 +36,9 @@ function HeaderApp() {
 
   return (
     <Layout>
-      <header className="flex flex-col gap-5">
-      <div className="py-4 flex items-center">
-        <Link href="/">
+      <header className="flex flex-col gap-5 bg-[#444]">
+      <div className="flex items-center h-12">
+        <Link href="/" className='w-64'>
           <Image
             width={36}
             height={36}
@@ -50,8 +47,8 @@ function HeaderApp() {
             alt="logo"
           />
         </Link>
-        <nav className="ml-8">
-          <ul className="flex flex-wrap gap-x-8 text-gray-900">
+        <nav className={styles['header-nav']}>
+          <ul>
             {menuItems.map(({ url, label }, index) => (
               <li key={index}>
                 <ActiveMenuLink href={url}>{label}</ActiveMenuLink>
