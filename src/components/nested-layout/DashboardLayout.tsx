@@ -60,9 +60,9 @@ const DashboardLayout = (props: any) => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} style={{backgroundColor: "#444"}}>
+      <Sider width={250} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sidebar-container'>
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" style={{backgroundColor: "#444"}}>
+        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" style={{backgroundColor: "#444"}} className='title-xl'>
           {items && items.map((item: any) => (
             <Menu.Item key={item.key} icon={item.icon} onClick={() => setCurrentTab(item.value)}>
               <ActiveMenuLink href={item.url}>
@@ -75,9 +75,12 @@ const DashboardLayout = (props: any) => {
       <Layout>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>
+              <Link href="/">Home</Link>
+            </Breadcrumb.Item>
             {
               breadcrumb.map((item:any, index: number) => (
-                <Breadcrumb.Item>
+                <Breadcrumb.Item key={index}>
                   {
                     item.url ?  
                     <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> :

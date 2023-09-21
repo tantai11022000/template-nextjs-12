@@ -1,9 +1,16 @@
+
+.sidebar-container {
+    background-color: #444 !important;
+}
+
 .ant-menu-item {
     border-radius: 0px !important;
     margin-inline: unset !important;
     margin-block: unset !important;
     width: 100% !important;
+    height: 55px !important;
 }
+
 .ant-menu-item-selected {
     background-color: #079A92 !important;
 }

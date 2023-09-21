@@ -1,6 +1,7 @@
 import Layout from '@/components/layout'
 import '@/styles/globals.scss'
 import '@/styles/custom-antd.scss'
+import '@/styles/common.scss'
 import type { AppProps } from 'next/app'
 import { BreadcrumbProvider } from '@/components/breadcrumb-context';
 
