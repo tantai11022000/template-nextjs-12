@@ -60,7 +60,7 @@ function WeightTemplate() {
     }
     setPagination({
       ...pagination,
-      page:1
+      current:1
     })
     updateUrlQuery(router,params)
   }
@@ -110,8 +110,8 @@ function WeightTemplate() {
         render: (_: any, record: any) => {
           return (
             <Space size="middle">
-              <DeleteOutlined className='text-lg'/>
-              <EditOutlined className='text-lg'/>
+              <DeleteOutlined className='text-lg cursor-pointer'/>
+              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`/amazon/weight-template/edit/${record.id}`)}/>
             </Space>
           )
         },
