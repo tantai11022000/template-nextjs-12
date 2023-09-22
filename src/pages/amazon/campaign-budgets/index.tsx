@@ -2,12 +2,15 @@ import React, {useEffect, useMemo, useState} from 'react';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 
-import { Input, Space, Tag } from 'antd';
+import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
 import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
+import Link from 'next/link';
+import { Button, Modal } from 'antd';
+import { useRouter } from 'next/router';
 
 const { Search } = Input;
 
@@ -75,12 +78,37 @@ const PARTNER_ACCOUNT = [
   },
 ]
 
+const DATA = [
+  {
+    id: 1,
+    campaign: "Campaign A",
+    status: "Running",
+    currentBudget: 10000,
+    imp: 1000,
+    click: 100,
+    sale: 2000,
+    roas: 1.1,
+  },
+  {
+    id: 2,
+    campaign: "Campaign B",
+    status: "Pending",
+    currentBudget: 20000,
+    imp: 2000,
+    click: 200,
+    sale: 3000,
+    roas: 1.1,
+  },
+]
+
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
+  const router = useRouter()
+  const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
-  const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
+  const [campaignBudgets, setCampaignBudgets] = useState<any[]>(DATA)
   const [page, setPage] = useState({
     page: 0,
     pageSize: 5,
@@ -98,7 +126,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const getCampaignBudgetsList = async (params: any) => {
     try {
       const result = await getCampaignBudgets(params)
-      setCampaignBudgets(result && result.data? result.data : [])
+      // setCampaignBudgets(result && result.data? result.data : [])
       setPage({
         ...page,
         page: result.page,
@@ -118,6 +146,13 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const onChange = (value: string) => {
     console.log(`selected ${value}`);
+    if (value == "update_status") {
+      setOpenModalUpdateStatus(!openModalUpdateStatus)
+    } else if (value == "schedule_status") {
+      router.push(`/amazon/campaign-budgets/update-status`)
+    } else if (value == "schedule_budget_once") {
+      router.push(`/amazon/campaign-budgets/update-budget`)
+    }
   };
   
   const onSearch = (value: string) => {
@@ -130,42 +165,93 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const columns: any = useMemo(
     () => [
       {
-        title: 'First Name',
-        dataIndex: 'first_name',
-        key: 'first_name',
-        render: (text: any) => <a>{text}</a>,
-        onFilter: (value: string, record: any) => record.first_name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.first_name.localeCompare(b.first_name),
+        title: 'Name',
+        dataIndex: 'campaign',
+        key: 'campaign',
+        render: (_: any, record: any) => {
+          const {id, campaign} = record
+
+          return (
+            <>
+              <Link href={`/amazon/campaign-budgets/${id}`}>{campaign}</Link>
+            </>
+          )
+        },
+
+        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
       },
       {
-        title: 'Last Name',
-        dataIndex: 'last_name',
-        key: 'last_name',
-        render: (text: any) => <a>{text}</a>,
+        title: <div className='text-center'>Status</div>,
+        dataIndex: 'status',
+        key: 'status',
+        render: (_: any, record: any) => {
+          return (
+            <div className='flex justify-center'>
+              <Tag>{record.status}</Tag>
+            </div>
+          );
+        },
+        sorter: (a: any, b: any) => a.status - b.status,
+      },
+      {
+        title: 'Current Budget',
+        dataIndex: 'currentBudget',
+        key: 'currentBudget',
+        render: (text: any) => <p className='text-end'>JPY {text}</p>,
+
         onFilter: (value: string, record: any) => record.last_name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.last_name.localeCompare(b.last_name),
-        defaultSortOrder: 'descend',
+        sorter: (a: any, b: any) => a.currentBudget - b.currentBudget
       },
       {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
+        title: 'IMP',
+        dataIndex: 'imp',
+        key: 'imp',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: 'Action',
+        title: 'Click',
+        dataIndex: 'click',
+        key: 'click',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.click - b.click
+      },
+      {
+        title: 'Sale',
+        dataIndex: 'sale',
+        key: 'sale',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.sale - b.sale
+      },
+      {
+        title: 'ROAS',
+        dataIndex: 'roas',
+        key: 'roas',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+        
+        sorter: (a: any, b: any) => a.roas - b.roas
+      },
+      {
+        title: <div className='text-center'>Action</div>,
         key: 'action',
         render: (_: any, record: any) => {
           return (
-            <Space size="middle">
-              <a>Invite {record.first_name}</a>
+            <Space size="middle" className='flex justify-center'>
+              <a>Edit</a>
               <a>Delete</a>
             </Space>
           )
         },
       },
-    ], [campaignBudgets])
+    ], [campaignBudgets]
+  )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log(">>> newSelectedRowKeys", newSelectedRowKeys.length)
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
@@ -179,6 +265,18 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   useEffect(() => {
     setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
   },[])
+
+  const showModal = () => {
+    setOpenModalUpdateStatus(true);
+  };
+
+  const handleOk = () => {
+    setOpenModalUpdateStatus(false);
+  };
+
+  const handleCancel = () => {
+    setOpenModalUpdateStatus(false);
+  };
 
   return (
     <div className='text-black'>
@@ -226,6 +324,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       <div>
         <TableGeneral columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={{...page, onChange:(page: any) => getCampaignBudgetsList(page)}}/>
       </div>
+      {openModalUpdateStatus && (
+        <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
+          <p>Update {selectedRowKeys && selectedRowKeys.length ? selectedRowKeys.length : 0} selected campaign(s) to status: <Switch defaultChecked /></p>
+        </Modal>
+      )}
     </div>
   );
 }
