@@ -1,13 +1,13 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import Link from 'next/link';
 
 import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
 import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
-import Link from 'next/link';
+import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 
@@ -158,16 +158,17 @@ export default function Accounts (props: IAccountsProps) {
 
 
   useEffect(() => {
-    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
+    setBreadcrumb([BREADCRUMB_ACCOUNT])
   },[])
 
   return (
     <div className='text-black'>
-      <div className='grid grid-cols-4 items-center'>
-        <Space direction="vertical">
-          <Search placeholder="input search text" onSearch={handleSearch} style={{ width: 200 }} />
-        </Space>
-      </div>
+      <Space direction="vertical" className='flex flex-row justify-between'>
+        <Search placeholder="input search text" onSearch={handleSearch} style={{ width: 200 }} />
+        <Button type="primary" className='bg-primary'>
+          <Link href={`/amazon/accounts/add`}>Add</Link>
+        </Button>
+      </Space>
       <div>
         <TableGeneral columns={columns} data={accounts}/>
       </div>
