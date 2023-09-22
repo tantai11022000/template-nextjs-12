@@ -14,11 +14,12 @@ interface TableProps {
   data: any;
   columns: DataType[],
   pagination?: any,
-  rowSelection?: any
+  rowSelection?: any,
+  handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
 }
 
 const TableGeneral = (props: TableProps) => {
-  const {data, columns, pagination, rowSelection} = props
+  const {data, columns, pagination, rowSelection, handleOnChangeTable} = props
   return (
     <div>
       <Table
@@ -31,6 +32,7 @@ const TableGeneral = (props: TableProps) => {
         })) : []}
         pagination={pagination}
         rowSelection={rowSelection ? rowSelection : null}
+        onChange={handleOnChangeTable}
       />
     </div>
   )

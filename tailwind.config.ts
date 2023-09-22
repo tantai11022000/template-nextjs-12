@@ -21,6 +21,7 @@ const config: Config = {
       'white': "#ffffff",
       'underline': "#E6E6E6",
       'field': "#F7F7F7",
+      'blue': "#87CEFA"
     },
   },
   plugins: [],
