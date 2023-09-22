@@ -15,7 +15,7 @@ const fakeDataForm = {
 function AddWeightTemplate() {
     const { setBreadcrumb } = useBreadcrumb();
     const router = useRouter()
-    const [isEdit, setIsEdit] = useState<boolean>(router.query && Array.isArray(router.query.type) && router.query.type[0] === 'edit' ? true : false)
+    const [isEdit, setIsEdit] = useState<boolean>(false)
     const [form]:any = Form.useForm();
     const handleMapEditData = () => {
       form.setFieldsValue(fakeDataForm)
@@ -27,11 +27,17 @@ function AddWeightTemplate() {
       console.log('e :>> ', e);
     }
     useEffect(() => {
-        setBreadcrumb([BREADCRUMB_WEIGHT_TEMPLATE,isEdit ? BREADCRUMB_EDIT : BREADCRUMB_ADD])
-        if (isEdit) {
+        const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
+        setIsEdit(valueEdit)
+        setBreadcrumb([BREADCRUMB_WEIGHT_TEMPLATE,valueEdit ? BREADCRUMB_EDIT : BREADCRUMB_ADD])
+        if (valueEdit) {
           handleMapEditData()
+        } else {
+          form.setFieldsValue({
+            timeSlot: 1
+          })
         }
-      },[])
+      },[router])
     return (
         <>
             <Form
@@ -66,14 +72,14 @@ function AddWeightTemplate() {
                   name="timeSlot"
                   label="Time slot"
                 >
-                  <Radio.Group defaultValue={1}>
+                  <Radio.Group>
                     <Radio value={1}>1 hour</Radio>
                     <Radio value={2}>30 mins</Radio>
                   </Radio.Group>
                 </Form.Item>
 
                 <Form.Item className='flex justify-end'>
-                  <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5'>Cancel</Button>
+                  <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
                   <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
                   <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>
                 </Form.Item>
