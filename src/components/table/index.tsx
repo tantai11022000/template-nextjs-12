@@ -22,6 +22,7 @@ const TableGeneral = (props: TableProps) => {
   return (
     <div>
       <Table
+        bordered
         rowKey="id"
         className='mt-6'
         dataSource={data}

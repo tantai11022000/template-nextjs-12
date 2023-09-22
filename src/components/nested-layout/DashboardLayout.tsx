@@ -73,22 +73,20 @@ const DashboardLayout = (props: any) => {
         </Menu>
       </Sider>
       <Layout>
+        {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
             <Breadcrumb.Item>
               <Link href="/">Home</Link>
             </Breadcrumb.Item>
-            {
-              breadcrumb.map((item:any, index: number) => (
-                <Breadcrumb.Item key={index}>
-                  {
-                    item.url ?  
-                    <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> :
-                    <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
-                  }
-                </Breadcrumb.Item>
-              ))
-            }
+              {breadcrumb ? breadcrumb.map((item:any, index: number) => (
+                  <Breadcrumb.Item key={index}>
+                    {item.url 
+                      ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> 
+                      :  <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
+                    }
+                  </Breadcrumb.Item>
+              )) : null}
           </Breadcrumb>
           <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
             {children}
