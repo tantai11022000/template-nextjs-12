@@ -8,6 +8,7 @@ interface DataType {
   key: string;
   sortBy?: any,
   onChangeSort?: () => void,
+  align?: string
 }
 
 interface TableProps {
@@ -16,16 +17,17 @@ interface TableProps {
   pagination?: any,
   rowSelection?: any,
   handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
+  customCss?: string
 }
 
 const TableGeneral = (props: TableProps) => {
-  const {data, columns, pagination, rowSelection, handleOnChangeTable} = props
+  const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss} = props
   return (
     <div>
       <Table
         bordered
         rowKey="id"
-        className='mt-6'
+        className={`mt-6 ${customCss}`}
         dataSource={data}
         columns={columns ? columns.map((column: any) => ({
           ...column,
