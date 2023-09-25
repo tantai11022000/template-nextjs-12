@@ -5,6 +5,11 @@ import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 import { useRouter } from 'next/router'
 import { Button, Form, Input, Radio } from 'antd';
+import FText from '@/components/form/FText';
+import FTextArea from '@/components/form/FTextArea';
+import FRatio from '@/components/form/FRatio';
+import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
+import FSwitch from '@/components/form/FSwitch';
 
 const fakeDataForm = {
   name: "fake data",
@@ -12,10 +17,37 @@ const fakeDataForm = {
   timeSlot: 2
 }
 
+const options = [
+  {
+    value: 1,
+    label: '1 hour'
+  },
+  {
+    value: 2,
+    label: '30 mins'
+  },
+]
+
+const DATA = [
+  {
+    id: 1,
+    value: 'A'
+  },
+  {
+    id: 2,
+    value: 'B'
+  },
+  {
+    id: 3,
+    value: 'C'
+  },
+]
+
 function AddWeightTemplate() {
     const { setBreadcrumb } = useBreadcrumb();
     const router = useRouter()
     const [isEdit, setIsEdit] = useState<boolean>(false)
+    const [checkedList, setCheckedList] = useState<any[]>(DATA);
     const [form]:any = Form.useForm();
     const handleMapEditData = () => {
       form.setFieldsValue(fakeDataForm)
@@ -38,45 +70,27 @@ function AddWeightTemplate() {
           })
         }
       },[router])
+
+    const onChangeCheck = (value: any) => {
+      console.log(">>> value", value)
+    }
+    
     return (
         <>
             <Form
             form= {form}
-            onFinish={handleFinish} 
+            onFinish={handleFinish}
             onFinishFailed={handleFinishFailed}
             labelCol={{ span: 2 }}
             // wrapperCol={{ span: 16 }}
             layout='vertical'
             >
-                <Form.Item
-                  name="name"
-                  label="Name"
-                  rules={[{
-                    required: true, message: 'Please input your name'
-                  }]}
-                >
-                  <Input />
-                </Form.Item>
+                <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
+                <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
+                <FRatio name={"timeSlot"} label={'Time slot'} options={options} />
+                <FSwitch name={"rememberMe"} label={'Remember Me'} errorMessage={'This field must be ON mode'} required/>
+                <FMultipleCheckbox name={"favorite"} label={""} errorMessage={'Please select AT LEAST ONE'} required data={checkedList} onChange={onChangeCheck}/>
 
-                <Form.Item
-                  name="description"
-                  label="Description"
-                  rules={[{
-                    required: true, message: 'Please input your description'
-                  }]}
-                >
-                  <Input.TextArea rows={5}/>
-                </Form.Item>
-                
-                <Form.Item
-                  name="timeSlot"
-                  label="Time slot"
-                >
-                  <Radio.Group>
-                    <Radio value={1}>1 hour</Radio>
-                    <Radio value={2}>30 mins</Radio>
-                  </Radio.Group>
-                </Form.Item>
 
                 <Form.Item className='flex justify-end'>
                   <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
