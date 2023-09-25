@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useBreadcrumb } from '@/components/breadcrumb-context';
@@ -8,8 +8,7 @@ import { Button, Form, Input, Radio } from 'antd';
 import FText from '@/components/form/FText';
 import FTextArea from '@/components/form/FTextArea';
 import FRatio from '@/components/form/FRatio';
-import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
-import FSwitch from '@/components/form/FSwitch';
+import TableGeneral from '@/components/table';
 
 const fakeDataForm = {
   name: "fake data",
@@ -43,12 +42,58 @@ const DATA = [
   },
 ]
 
+const templateRecord = {
+  time: '',
+  weight: 0
+}
+
+interface iRecordTable {
+  time: number,
+  weight: number,
+}
+
 function AddWeightTemplate() {
     const { setBreadcrumb } = useBreadcrumb();
     const router = useRouter()
     const [isEdit, setIsEdit] = useState<boolean>(false)
+    const [dataOneHour, setDataOneHour] = useState<iRecordTable[]>([])
+    const [dataThirtyMins, setDataThirtyMins] = useState<iRecordTable[]>([])
+    const [timeSlot, setTimeSlot] = useState<number>(1)
     const [checkedList, setCheckedList] = useState<any[]>(DATA);
     const [form]:any = Form.useForm();
+
+    const initDataDefaultTable = () => {
+      const defaultDataOneHour = Array.from({ length: 24 }, (_, index) => ({
+        ...templateRecord,
+        time: index,
+      }));
+      const defaultDataThirtyMins = Array.from({ length: 48 }, (_, index) => ({
+        ...templateRecord,
+        time: index * 30,
+      }));
+      setDataOneHour(defaultDataOneHour);
+      setDataThirtyMins(defaultDataThirtyMins);
+    }
+
+    const handleOnChangeForm = (changedValues:any) => {
+      if (changedValues.hasOwnProperty('timeSlot')) {
+        setTimeSlot(+changedValues.timeSlot)
+      }
+    }
+
+    const handleChangeValueTable = (e:any,row: number) => {
+      const {name, value} = e.target;
+      if (timeSlot === 1) {
+        const newData = {...dataOneHour[row],[name]: +value}
+        dataOneHour[row] = newData;
+        setDataOneHour(dataOneHour);
+      } else {
+        const newData = {...dataThirtyMins[row],[name]: +value}
+        dataThirtyMins[row] = newData;
+        setDataThirtyMins(dataThirtyMins);
+      }
+    }
+
     const handleMapEditData = () => {
       form.setFieldsValue(fakeDataForm)
     }
@@ -58,7 +103,25 @@ function AddWeightTemplate() {
     const handleFinishFailed = (e:any) => {
       console.log('e :>> ', e);
     }
+    const columns: any = useMemo(
+      () => [
+        {
+          title: `Time ${timeSlot === 1 ? '(Hours)' : '(Mins)'}`,
+          dataIndex: 'time',
+          key: 'time',
+          align: 'center',
+          render: (text: any) => <span>{text}</span>
+        },
+        {
+          title: 'Weight (%)',
+          dataIndex: 'weight',
+          key: 'weight',
+          align: 'center',
+          render: (text: any, index:number) => <Input name='weight' defaultValue={text} onChange={(e:any) => handleChangeValueTable(e,index)} className='flex justify-center' />,
+        },
+      ], [dataOneHour, dataThirtyMins, timeSlot])
     useEffect(() => {
+        initDataDefaultTable()
         const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
         setIsEdit(valueEdit)
         setBreadcrumb([BREADCRUMB_WEIGHT_TEMPLATE,valueEdit ? BREADCRUMB_EDIT : BREADCRUMB_ADD])
@@ -68,31 +131,31 @@ function AddWeightTemplate() {
           form.setFieldsValue({
             timeSlot: 1
           })
+          setTimeSlot(1)
         }
       },[router])
 
     const onChangeCheck = (value: any) => {
       console.log(">>> value", value)
     }
-    
+
     return (
         <>
             <Form
             form= {form}
+            onValuesChange={handleOnChangeForm}
             onFinish={handleFinish}
             onFinishFailed={handleFinishFailed}
             labelCol={{ span: 2 }}
-            // wrapperCol={{ span: 16 }}
             layout='vertical'
             >
                 <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
                 <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
                 <FRatio name={"timeSlot"} label={'Time slot'} options={options} />
-                <FSwitch name={"rememberMe"} label={'Remember Me'} errorMessage={'This field must be ON mode'} required/>
-                <FMultipleCheckbox name={"favorite"} label={""} errorMessage={'Please select AT LEAST ONE'} required data={checkedList} onChange={onChangeCheck}/>
 
+                <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'max-h-80 w-[50%] m-auto overflow-y-auto'} />
 
-                <Form.Item className='flex justify-end'>
+                <Form.Item className='flex justify-end mt-5'>
                   <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
                   <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
                   <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>

@@ -59,7 +59,7 @@ const DashboardLayout = (props: any) => {
   } = theme.useToken();
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout>
       <Sider width={250} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sidebar-container'>
         <div className="demo-logo-vertical" />
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" style={{backgroundColor: "#444"}} className='title-xl'>
@@ -92,7 +92,6 @@ const DashboardLayout = (props: any) => {
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©2023 Created by Ant UED</Footer>
       </Layout>
     </Layout>
   );
