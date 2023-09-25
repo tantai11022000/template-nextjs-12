@@ -135,26 +135,22 @@ function WeightTemplate() {
     mapFirstQuery()
     fetchWeightTemplate();
   },[])
-    return (
-        <>
-          <Layout className='px-5 pt-5' >
-            <div className='flex justify-between'>
-              <Space>
-                <Input.Search value={keyword} name="keyword" placeholder="Search by name" 
-                onChange={(e:any) => setKeyword(e.target.value)} onSearch={handleOnSearch} className='w-96'/>
-              </Space>
-              <Space>
-                <Link href={'/amazon/weight-template/add'}>
-                  <Button className='bg-primary text-white w-28 cursor-pointer'>Add</Button>
-                </Link>
-              </Space>
-            </div>
-          </Layout>
-          <Layout className='p-5'>
-            <TableGeneral columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
-          </Layout>
-        </>
-    );
+  return (
+    <>
+      <div className='flex justify-between'>
+        <Space>
+          <Input.Search value={keyword} name="keyword" placeholder="Search by name" 
+          onChange={(e:any) => setKeyword(e.target.value)} onSearch={handleOnSearch} className='w-96'/>
+        </Space>
+        <Space>
+          <Link href={'/amazon/weight-template/add'}>
+            <Button className='bg-primary text-white w-28 cursor-pointer'>Add</Button>
+          </Link>
+        </Space>
+      </div>
+      <TableGeneral columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>        
+    </>
+  );
 }
 
 WeightTemplate.getLayout = (page: any) => (
