@@ -96,6 +96,7 @@ function AddWeightTemplate() {
 
     const handleMapEditData = () => {
       form.setFieldsValue(fakeDataForm)
+      setTimeSlot(+fakeDataForm.timeSlot)
     }
     const handleFinish = (value:any) => {
       console.log('value :>> ', value);
