@@ -5,3 +5,7 @@ export const BREADCRUMB_WEIGHT_TEMPLATE = {label: 'Weight Template' , url: '/ama
 export const BREADCRUMB_EXECUTION_LOG = {label: 'Execution Log' , url: '/amazon/execution-log'}
 export const BREADCRUMB_ADD = {label: 'Add' , url: ''}
 export const BREADCRUMB_EDIT = {label: 'Edit' , url: ''}
+export const BREADCRUMB_UPDATE = {label: 'Update' , url: ''}
+export const BREADCRUMB_UPDATE_SCHEDULE = {label: 'Update Schedule' , url: ''}
+export const BREADCRUMB_UPDATE_STATUS = {label: 'Update Status' , url: ''}
+export const BREADCRUMB_HISTORY = {label: 'history' , url: ''}

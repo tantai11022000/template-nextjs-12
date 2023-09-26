@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
+import qs from 'query-string';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 
@@ -11,6 +12,7 @@ import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
+import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 
 const { Search } = Input;
 
@@ -25,13 +27,23 @@ const STATUSES = [
   },
   {
     id: 2,
-    value: "running",
-    label: "Running"
+    value: "deliver",
+    label: "In Deliver"
   },
   {
     id: 3,
-    value: "upcomming",
-    label: "Upcomming"
+    value: "stopped",
+    label: "Stopped"
+  },
+  {
+    id: 4,
+    value: "paused",
+    label: "Paused"
+  }, 
+  {
+    id: 5,
+    value: "out_budget",
+    label: "Out Budget"
   }, 
 ]
 
@@ -39,27 +51,32 @@ const BULK_ACTION = [
   {
     id: 1,
     value: "update_status",
-    label: "Update Status"
+    label: "Update Status",
+    url: ''
   },
   {
     id: 2,
     value: "schedule_status",
-    label: "Schedule Status"
+    label: "Schedule Status",
+    url: '/amazon/campaign-budgets/update-status'
   },
   {
     id: 3,
     value: "schedule_budget_once",
-    label: "Schedule Budget Once"
+    label: "Schedule Budget Once",
+    url: '/amazon/campaign-budgets/update-budget'
   }, 
   {
     id: 4,
     value: "schedule_budget_with_weight",
-    label: "Schedule Budget With Weight"
+    label: "Schedule Budget With Weight",
+    url: ''
   }, 
   {
     id: 5,
     value: "export_schedule",
-    label: "Export Schedule"
+    label: "Export Schedule",
+    url: ''
   }, 
 ]
 
@@ -82,41 +99,74 @@ const DATA = [
   {
     id: 1,
     campaign: "Campaign A",
-    status: "Running",
+    status: "In Deliver",
     currentBudget: 10000,
     imp: 1000,
     click: 100,
-    sale: 2000,
+    sale: 1000,
     roas: 1.1,
+    portfolio: 'Portfolio 1'
   },
   {
     id: 2,
     campaign: "Campaign B",
-    status: "Pending",
+    status: "Paused",
     currentBudget: 20000,
     imp: 2000,
     click: 200,
+    sale: 2000,
+    roas: 2.2,
+    portfolio: 'Portfolio 2'
+  },
+  {
+    id: 3,
+    campaign: "Campaign C",
+    status: "Out Budget",
+    currentBudget: 30000,
+    imp: 3000,
+    click: 300,
     sale: 3000,
-    roas: 1.1,
+    roas: 3.3,
+    portfolio: 'Portfolio 2'
+  },
+  {
+    id: 4,
+    campaign: "Campaign D",
+    status: "Stopped",
+    currentBudget: 30000,
+    imp: 3000,
+    click: 300,
+    sale: 3000,
+    roas: 3.3,
+    portfolio: 'Portfolio 2'
   },
 ]
 
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
+  const { setBreadcrumb } = useBreadcrumb();
+
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>(DATA)
-  const [page, setPage] = useState({
-    page: 0,
-    pageSize: 5,
-    total: 0
-});
+  const [keyword, setKeyword] = useState<string>("");
+
+  const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
+
+  const [pagination, setPagination] = useState<any>({
+    pageSize: 2,
+    current: 1,
+    showSizeChanger: true,
+    showQuickJumper: true,
+  })
 
   useEffect(() => {
-    init()
+    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
+    mapFirstQuery()
+    init();
   }, [])
 
   const init = () => {
@@ -127,21 +177,22 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     try {
       const result = await getCampaignBudgets(params)
       // setCampaignBudgets(result && result.data? result.data : [])
-      setPage({
-        ...page,
-        page: result.page,
-        pageSize: result.per_page,
-        total: result.total
-      })
     } catch (error) {
       console.log(">>> error", error)
     }
   }
   
-
-  const { setBreadcrumb } = useBreadcrumb();
-  const handleSearch = (value: any) => {
-
+  const handleSearch= async(value:string) => {
+    setKeyword(value)
+    const params = {
+      keyword: value,
+      page: 1
+    }
+    setPagination({
+      ...pagination,
+      current: 1
+    })
+    updateUrlQuery(router, params)
   }
 
   const onChange = (value: string) => {
@@ -155,12 +206,32 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }
   };
   
-  const onSearch = (value: string) => {
+  const onSearchInFilter = (value: string) => {
     console.log('search:', value);
   };
 
   const filterOption = (input: string, option: any) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
+
+  const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+    const { current } = pagination
+    changeNextPageUrl(router, current)
+    setPagination(pagination)
+  }
+
+  const mapFirstQuery = () => {
+    const query = qs.parse(window.location.search);
+    const {page, keyword} = query
+    if (page) {
+      setPagination({
+        ...pagination,
+        current: +page
+      })
+    }
+    if (keyword) {
+      setKeyword(keyword.toString())
+    }
+  }
 
   const columns: any = useMemo(
     () => [
@@ -182,6 +253,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
       },
       {
+        title: 'Portfolio',
+        dataIndex: 'portfolio',
+        key: 'portfolio',
+        render: (text: any) => <p>{text}</p>,
+      },
+      {
         title: <div className='text-center'>Status</div>,
         dataIndex: 'status',
         key: 'status',
@@ -198,10 +275,20 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: 'Current Budget',
         dataIndex: 'currentBudget',
         key: 'currentBudget',
-        render: (text: any) => <p className='text-end'>JPY {text}</p>,
-
-        onFilter: (value: string, record: any) => record.last_name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.currentBudget - b.currentBudget
+        render: (text: any) => {
+          const handleChangeBudget = () => {
+            if (isEditBudget) setIsEditBudget(false)
+            else setIsEditBudget(true)
+          }
+          return (
+            <div className='flex'>
+              {!isEditBudget 
+                ? <span>JPY {text}</span>
+                : <Input type='number' min={0}/>}
+              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? 'Save' : 'Edit'}</a>
+            </div>
+          )
+        }
       },
       {
         title: 'IMP',
@@ -247,7 +334,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           )
         },
       },
-    ], [campaignBudgets]
+    ], [campaignBudgets, isEditBudget]
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -257,17 +344,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
-  };
-
-  const handleChangePage = (page: any) => {
-
-  }
-  useEffect(() => {
-    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
-  },[])
-
-  const showModal = () => {
-    setOpenModalUpdateStatus(true);
   };
 
   const handleOk = () => {
@@ -282,16 +358,18 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     <div className='text-black'>
       <div className='grid grid-cols-4 items-center'>
         <Space direction="vertical">
-          <Search placeholder="input search text" onSearch={handleSearch} style={{ width: 200 }} />
+          <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         </Space>
         <div className='flex items-center'>
           <p className='mr-2'>Status</p>
           <Select
+            style={{ width: 120 }}
+            defaultValue="all"
             showSearch
             placeholder="Select status"
             optionFilterProp="children"
             onChange={onChange}
-            onSearch={onSearch}
+            onSearch={onSearchInFilter}
             filterOption={filterOption}
             options={statuses}
           />
@@ -299,11 +377,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         <div className='flex items-center'>
           <p className='mr-2'>Bulk Action</p>
           <Select
+            style={{ width: 200 }}
             showSearch
             placeholder="Select action"
             optionFilterProp="children"
             onChange={onChange}
-            onSearch={onSearch}
+            onSearch={onSearchInFilter}
             filterOption={filterOption}
             options={bulkAction}
           />
@@ -315,14 +394,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             placeholder="Select partner"
             optionFilterProp="children"
             onChange={onChange}
-            onSearch={onSearch}
+            onSearch={onSearchInFilter}
             filterOption={filterOption}
             options={partnerAccount}
           />
         </div>
       </div>
       <div>
-        <TableGeneral columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={{...page, onChange:(page: any) => getCampaignBudgetsList(page)}}/>
+        <TableGeneral columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
@@ -334,7 +413,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 }
 
 CampaignBudgets.getLayout = (page: any) => (
-    <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
-    </RootLayout>
+  <RootLayout>
+    <DashboardLayout>{page}</DashboardLayout>
+  </RootLayout>
 );

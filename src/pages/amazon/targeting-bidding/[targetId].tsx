@@ -7,11 +7,11 @@ import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from "moment";
 import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
 
 const { Title } = Typography;
 
-export interface ICampaignDetailProps {
+export interface ITargetDetailProps {
 }
 
 const BUDGET_UPDATE_LOG = [
@@ -53,15 +53,15 @@ const BUDGET_UPDATE_LOG = [
   },
 ]
 
-export default function CampaignDetail (props: ICampaignDetailProps) {
+export default function TargetDetail (props: ITargetDetailProps) {
   const { setBreadcrumb } = useBreadcrumb();
   const router = useRouter()
   const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
-  const id = router && router.query && router.query.campaignId ? router.query.campaignId : ""
+  const id = router && router.query && router.query.targetId ? router.query.targetId : ""
 
   useEffect(() => {
     if (id) {
-      setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, {label: id.toString(), url: ''}])
+      setBreadcrumb([BREADCRUMB_TARGETING_BIDDING, {label: id.toString(), url: ''}])
     }
   }, [router])
   
@@ -207,7 +207,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   return (
     <div className='text-black'>
       <div>
-        <Title level={4}>Budget Update Log</Title>
+        <Title level={4}>Schedule Adtran log: Target A - Campaign A</Title>
         <TableGeneral columns={columnsBudgetLog} data={budgetLog}/>
       </div>
       <div>
@@ -218,7 +218,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   );
 }
 
-CampaignDetail.getLayout = (page: any) => (
+TargetDetail.getLayout = (page: any) => (
   <RootLayout>
     <DashboardLayout>{page}</DashboardLayout>
   </RootLayout>

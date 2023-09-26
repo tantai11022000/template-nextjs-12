@@ -10,6 +10,7 @@ import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
+import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 
 const { Search } = Input;
 
@@ -80,21 +81,46 @@ const PARTNER_ACCOUNT = [
 const DATA = [
   {
     id: 1,
-    name: "name A",
+    name: "Phan Nhat Minh",
     status: "Running",
   },
   {
     id: 2,
-    name: "name B",
+    name: "Trinh Vu Trong Bao",
+    status: "Running",
+  },
+  {
+    id: 3,
+    name: "Nguyen Tan Tai",
+    status: "Pending",
+  },
+  {
+    id: 4,
+    name: "Huynh Ngoc Tho",
+    status: "Pending",
+  },
+  {
+    id: 5,
+    name: "Le Cao Huy",
     status: "Pending",
   },
 ]
 
 export default function Accounts (props: IAccountsProps) {
   const router = useRouter()
+  const { setBreadcrumb } = useBreadcrumb();
+
   const [accounts, setAccounts] = useState<any[]>(DATA)
+  const [keyword, setKeyword] = useState<string>("")
+  const [pagination, setPagination] = useState<any>({
+    pageSize: 2,
+    current: 1,
+    showSizeChanger: true,
+    showQuickJumper: true,
+  })
 
   useEffect(() => {
+    setBreadcrumb([BREADCRUMB_ACCOUNT])
     init()
   }, [])
 
@@ -102,9 +128,18 @@ export default function Accounts (props: IAccountsProps) {
   }
   
 
-  const { setBreadcrumb } = useBreadcrumb();
-  const handleSearch = (value: any) => {
-
+ 
+  const handleSearch= async(value:string) => {
+    setKeyword(value)
+    const params = {
+      keyword: value,
+      page: 1
+    }
+    setPagination({
+      ...pagination,
+      current: 1
+    })
+    updateUrlQuery(router, params)
   }
 
   const onSearch = (value: string) => {
@@ -117,13 +152,13 @@ export default function Accounts (props: IAccountsProps) {
         title: 'No.',
         dataIndex: 'id',
         key: 'id',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p>{text}</p>,
       },
       {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
@@ -147,7 +182,7 @@ export default function Accounts (props: IAccountsProps) {
         render: (_: any, record: any) => {
           return (
             <Space size="middle" className='flex justify-center'>
-              <a>Edit</a>
+              <a onClick={() => router.push(`/amazon/accounts/edit/${record.id}`)}>Edit</a>
               <a>Delete</a>
             </Space>
           )
@@ -156,21 +191,22 @@ export default function Accounts (props: IAccountsProps) {
     ], [accounts]
   )
 
-
-  useEffect(() => {
-    setBreadcrumb([BREADCRUMB_ACCOUNT])
-  },[])
+  const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+    const { current } = pagination
+    changeNextPageUrl(router, current)
+    setPagination(pagination)
+  }
 
   return (
     <div className='text-black'>
       <Space direction="vertical" className='flex flex-row justify-between'>
-        <Search placeholder="input search text" onSearch={handleSearch} style={{ width: 200 }} />
+        <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         <Button type="primary" className='bg-primary'>
           <Link href={`/amazon/accounts/add`}>Add</Link>
         </Button>
       </Space>
       <div>
-        <TableGeneral columns={columns} data={accounts}/>
+        <TableGeneral columns={columns} data={accounts} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
     </div>
   );
