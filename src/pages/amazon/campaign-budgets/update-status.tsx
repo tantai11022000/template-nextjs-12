@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 import Title from 'antd/es/typography/Title';
@@ -7,6 +7,8 @@ import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
+import { useBreadcrumb } from '@/components/breadcrumb-context';
+import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_UPDATE_STATUS } from '@/components/breadcrumb-context/constant';
 
 export interface IUpdateCampaignStatusProps {
 }
@@ -75,9 +77,14 @@ const FILES = [
 ]
 
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
+  const {setBreadcrumb} = useBreadcrumb()
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
   const [previewFile, setPreviewFile] = useState<any[]>(FILES)
+
+  useEffect(() => {
+    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_UPDATE_STATUS])
+  }, [])
 
   const onChange = (value: string) => {
     console.log(`selected ${value}`);

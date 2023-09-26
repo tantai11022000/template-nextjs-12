@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
+import { useBreadcrumb } from '@/components/breadcrumb-context';
+import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_HISTORY } from '@/components/breadcrumb-context/constant';
+import { useRouter } from 'next/router';
 
 const { Title } = Typography;
 
@@ -74,7 +77,15 @@ const BUDGET_HISTORY = [
 ]
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
+  const router = useRouter()
+  console.log(">>> router", router)
+  const { setBreadcrumb } = useBreadcrumb()
   const [budgetHistory, setBudgetHistory] = useState<any[]>(BUDGET_HISTORY)
+
+  useEffect(() => {
+    // setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, {label: 1, url: ''}, BREADCRUMB_HISTORY])
+  }, [])
+  
 
   const columnsBudgetLog: any = useMemo(
     () => [

@@ -74,8 +74,8 @@ const DashboardLayout = (props: any) => {
       </Sider>
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
+        <Content className='mx-4'>
+          <Breadcrumb className='my-4'>
             <Breadcrumb.Item>
               <Link href="/">Home</Link>
             </Breadcrumb.Item>
@@ -88,7 +88,7 @@ const DashboardLayout = (props: any) => {
                   </Breadcrumb.Item>
               )) : null}
           </Breadcrumb>
-          <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
+          <div className='p-6 h-screen bg' style={{background: colorBgContainer }}>
             {children}
           </div>
         </Content>

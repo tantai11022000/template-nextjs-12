@@ -1,8 +1,13 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
+interface IBreadcrumb {
+  label: string | number,
+  url: string
+}
+
 interface BreadcrumbContextType {
-  breadcrumb: { label: string; url: string }[];
-  setBreadcrumb: React.Dispatch<React.SetStateAction<{ label: string; url: string }[]>>;
+  breadcrumb: IBreadcrumb[];
+  setBreadcrumb: React.Dispatch<React.SetStateAction<IBreadcrumb[]>>;
 }
 
 const BreadcrumbContext = createContext<BreadcrumbContextType | undefined>(undefined);
@@ -12,7 +17,7 @@ interface BreadcrumbProviderProps {
 }
 
 export function BreadcrumbProvider({ children }: BreadcrumbProviderProps) {
-  const [breadcrumb, setBreadcrumb] = useState<{ label: string; url: string }[]>([]);
+  const [breadcrumb, setBreadcrumb] = useState<IBreadcrumb[]>([]);
 
   return (
     <BreadcrumbContext.Provider value={{ breadcrumb, setBreadcrumb }}>
