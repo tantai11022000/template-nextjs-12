@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
 import testReducer from './test/slice'
+import globalReducer from './GlobalActions/slice'
 export const store = configureStore({
   reducer: {
-    test : testReducer
+    test : testReducer,
+    globalActions: globalReducer
   },
 });
 

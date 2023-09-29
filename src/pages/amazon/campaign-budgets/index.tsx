@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import store from '@/store';
+import { setGlobalActions } from '@/store/GlobalActions/slice';
 
 const { Search } = Input;
 
@@ -165,8 +167,22 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   useEffect(() => {
     setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
+    store.dispatch(setGlobalActions({data: [
+      {
+        options: STATUSES,
+        placeholder: "Select Status"
+      },
+      {
+        options: PARTNER_ACCOUNT,
+        placeholder: "Select partner account"
+      }
+    ]}))
     mapFirstQuery()
     init();
+    return () => {
+      setBreadcrumb([]);
+      store.dispatch(setGlobalActions({data:  []}))
+    }
   }, [])
 
   const init = () => {

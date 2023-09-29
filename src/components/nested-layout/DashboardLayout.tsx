@@ -6,12 +6,14 @@ import {
   UserOutlined,
   GoldOutlined
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
+import { MenuProps, Select } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useBreadcrumb } from '../breadcrumb-context';
 import styles from './index.module.scss';
+import { useAppSelector } from '@/store/hook';
+import { getGlobalAction } from '@/store/GlobalActions/slice';
 const { Header, Content, Footer, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -54,6 +56,8 @@ const DashboardLayout = (props: any) => {
   const [collapsed, setCollapsed] = useState(false);
   const [currentTab, setCurrentTab] = useState<string>("campaign_budgets")
   const { breadcrumb, setBreadcrumb } = useBreadcrumb();
+  const globalActions = useAppSelector(getGlobalAction)
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -75,19 +79,37 @@ const DashboardLayout = (props: any) => {
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
         <Content className='mx-4'>
-          <Breadcrumb className='my-4'>
-            <Breadcrumb.Item>
-              <Link href="/">Home</Link>
-            </Breadcrumb.Item>
-              {breadcrumb ? breadcrumb.map((item:any, index: number) => (
-                  <Breadcrumb.Item key={index}>
-                    {item.url 
-                      ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> 
-                      :  <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
-                    }
-                  </Breadcrumb.Item>
-              )) : null}
-          </Breadcrumb>
+          <div className='flex justify-between my-4'>
+            <Breadcrumb>
+              <Breadcrumb.Item>
+                <Link href="/">Home</Link>
+              </Breadcrumb.Item>
+                {breadcrumb ? breadcrumb.map((item:any, index: number) => (
+                    <Breadcrumb.Item key={index}>
+                      {item.url 
+                        ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> 
+                        :  <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
+                      }
+                    </Breadcrumb.Item>
+                )) : null}
+            </Breadcrumb>
+            <div className='flex gap-3'>
+              {
+                globalActions && globalActions.length > 0 && globalActions.map((item:any) => (
+                  <Select
+                  style={{ width: 120 }}
+                  showSearch
+                  placeholder={item.placeholder}
+                  optionFilterProp="children"
+                  // onChange={onChange}
+                  // onSearch={onSearchInFilter}
+                  // filterOption={filterOption}
+                  options={item.options}
+                  />
+                ))
+              }
+            </div>
+          </div>
           <div className='p-6 h-screen bg' style={{background: colorBgContainer }}>
             {children}
           </div>

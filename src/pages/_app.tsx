@@ -4,6 +4,9 @@ import '@/styles/custom-antd.scss'
 import '@/styles/common.scss'
 import type { AppProps } from 'next/app'
 import { BreadcrumbProvider } from '@/components/breadcrumb-context';
+import { Provider } from 'react-redux';
+import store from '@/store'
+
 
 export default function App({ Component, pageProps }: any) {
   const renderWithLayout =
@@ -13,9 +16,11 @@ export default function App({ Component, pageProps }: any) {
     };
 
   return (
-    <BreadcrumbProvider>
-      {renderWithLayout(<Component {...pageProps} />)}
-    </BreadcrumbProvider>
+    <Provider store={store} >
+      <BreadcrumbProvider>
+          {renderWithLayout(<Component {...pageProps} />)}
+      </BreadcrumbProvider>
+    </Provider>
   )
   
 }
