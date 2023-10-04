@@ -1,15 +1,28 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
 import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from "moment";
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
-
 const { Title } = Typography;
+import { GetServerSideProps } from 'next';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { campaignId } = context.query;
+
+  const breadcrumb = [
+    { label: 'Campaign Budgets', url: '/amazon/campaign-budgets' },
+    { label: campaignId ? campaignId : "Detail", url: `/amazon/campaign-budgets/${campaignId}` },
+  ];
+
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
 
 export interface ICampaignDetailProps {
 }
@@ -54,17 +67,8 @@ const BUDGET_UPDATE_LOG = [
 ]
 
 export default function CampaignDetail (props: ICampaignDetailProps) {
-  const { setBreadcrumb } = useBreadcrumb();
-  const router = useRouter()
+  const router = useRouter() 
   const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
-  const id = router && router.query && router.query.campaignId ? router.query.campaignId : ""
-
-  useEffect(() => {
-    if (id) {
-      setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, {label: id.toString(), url: ''}])
-    }
-  }, [router])
-  
 
   const columnsBudgetLog: any = useMemo(
     () => [
@@ -129,7 +133,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`/amazon/campaign-budgets/${id}/history`}>Edit</Link>
+                    <Link href={`/amazon/campaign-budgets/${router.query.campaignId}/history/${id}`}>Edit</Link>
                     <a>Delete</a>
                 </Space>
             )
@@ -218,8 +222,11 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   );
 }
 
-CampaignDetail.getLayout = (page: any) => (
-  <RootLayout>
-    <DashboardLayout>{page}</DashboardLayout>
-  </RootLayout>
-);
+CampaignDetail.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
+  return (
+    <RootLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+    </RootLayout>
+  );
+};

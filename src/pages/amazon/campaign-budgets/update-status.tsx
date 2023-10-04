@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Title from 'antd/es/typography/Title';
 import { Button, Select, Space, Tag } from 'antd';
 import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_UPDATE_STATUS } from '@/components/breadcrumb-context/constant';
 
 export interface IUpdateCampaignStatusProps {
 }
@@ -77,14 +75,9 @@ const FILES = [
 ]
 
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
-  const {setBreadcrumb} = useBreadcrumb()
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
   const [previewFile, setPreviewFile] = useState<any[]>(FILES)
-
-  useEffect(() => {
-    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_UPDATE_STATUS])
-  }, [])
 
   const onChange = (value: string) => {
     console.log(`selected ${value}`);
@@ -201,8 +194,14 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
   );
 }
 
-UpdateCampaignStatus.getLayout = (page: any) => (
+UpdateCampaignStatus.getLayout = (page: any) => {
+  const breadcrumb = [
+    {label: 'Campaign Budgets' , url: '/amazon/campaign-budgets'},
+    {label: 'Update Campaign Status' , url: ''}
+  ]
+  return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
-);
+  )
+};

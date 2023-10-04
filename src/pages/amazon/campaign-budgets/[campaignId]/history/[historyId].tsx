@@ -1,17 +1,33 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Space, Switch, Tag, Typography } from 'antd';
+import { Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_HISTORY } from '@/components/breadcrumb-context/constant';
-import { useRouter } from 'next/router';
-
 const { Title } = Typography;
 
 export interface IBudgetHistoryProps {
 }
+
+import { GetServerSideProps } from 'next';
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
+  const historyId = context && context.query && context.query.historyId ? context.query.historyId : ""
+
+  const breadcrumb = [
+    { label: 'Campaign Budgets', url: '/amazon/campaign-budgets'},
+    { label: campaignId ? campaignId : "Detail", url: `/amazon/campaign-budgets/${campaignId}`},
+  ];
+
+  if (historyId) breadcrumb.push({ label: 'History', url: ''}, { label: historyId, url: ''})
+
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
 
 const BUDGET_HISTORY = [
   {
@@ -77,15 +93,7 @@ const BUDGET_HISTORY = [
 ]
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
-  const router = useRouter()
-  console.log(">>> router", router)
-  const { setBreadcrumb } = useBreadcrumb()
   const [budgetHistory, setBudgetHistory] = useState<any[]>(BUDGET_HISTORY)
-
-  useEffect(() => {
-    // setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET, {label: 1, url: ''}, BREADCRUMB_HISTORY])
-  }, [])
-  
 
   const columnsBudgetLog: any = useMemo(
     () => [
@@ -168,8 +176,11 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   );
 }
 
-BudgetHistory.getLayout = (page: any) => (
-  <RootLayout>
-    <DashboardLayout>{page}</DashboardLayout>
-  </RootLayout>
-);
+BudgetHistory.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
+  return (
+    <RootLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+    </RootLayout>
+  );
+};

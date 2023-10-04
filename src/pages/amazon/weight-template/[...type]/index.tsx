@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 import { useRouter } from 'next/router'
 import { Button, Form, Input, Radio } from 'antd';
 import FText from '@/components/form/FText';
 import FTextArea from '@/components/form/FTextArea';
 import FRatio from '@/components/form/FRatio';
 import TableGeneral from '@/components/table';
+import { GetServerSideProps } from 'next';
 
 const fakeDataForm = {
   name: "fake data",
@@ -52,8 +51,25 @@ interface iRecordTable {
   weight: number,
 }
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
+  const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
+
+  let breadcrumb = [
+    { label: 'Weight Template', url: '/amazon/weight-template' },
+  ];
+
+  if (type == "add") breadcrumb.push({ label: "Add", url: `/amazon/weight-template/add`})
+  else if (type == "edit") breadcrumb.push({ label: id, url: '' })
+
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
+
 function AddWeightTemplate() {
-    const { setBreadcrumb } = useBreadcrumb();
     const router = useRouter()
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [dataOneHour, setDataOneHour] = useState<iRecordTable[]>([])
@@ -125,7 +141,6 @@ function AddWeightTemplate() {
         initDataDefaultTable()
         const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
         setIsEdit(valueEdit)
-        setBreadcrumb([BREADCRUMB_WEIGHT_TEMPLATE,valueEdit ? BREADCRUMB_EDIT : BREADCRUMB_ADD])
         if (valueEdit) {
           handleMapEditData()
         } else {
@@ -166,10 +181,13 @@ function AddWeightTemplate() {
     );
 }
 
-AddWeightTemplate.getLayout = (page: any) => (
+AddWeightTemplate.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
+  return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
-);
+  )
+};
 
 export default AddWeightTemplate;

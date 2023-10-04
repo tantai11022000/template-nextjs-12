@@ -3,8 +3,6 @@ import qs from 'query-string';
 import RootLayout from '../../../components/layout';
 import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 import Link from 'next/link';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 import { Space, Input, Layout, Button } from 'antd';
 import TableGeneral from '@/components/table';
 import {
@@ -49,7 +47,6 @@ function WeightTemplate() {
     showSizeChanger: true,
     showQuickJumper: true,
   })
-  const { setBreadcrumb } = useBreadcrumb();
   const [data, setData] = useState<any>([]);
   const [keyword, setKeyword] = useState<string>("");
   const handleOnSearch = async(value:string) => {
@@ -131,7 +128,6 @@ function WeightTemplate() {
     }
   }
   useEffect(() => {
-    setBreadcrumb([BREADCRUMB_WEIGHT_TEMPLATE])
     mapFirstQuery()
     fetchWeightTemplate();
   },[])
@@ -153,10 +149,13 @@ function WeightTemplate() {
   );
 }
 
-WeightTemplate.getLayout = (page: any) => (
+WeightTemplate.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Weight Template' , url: '/amazon/weight-template'}]
+  return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
-);
+  )
+};
 
 export default WeightTemplate;

@@ -6,7 +6,6 @@ import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
 import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import Link from 'next/link';
@@ -135,7 +134,6 @@ const DATA = [
 
 export default function TargetingBidding (props: ITargetingBiddingProps) {
   const router = useRouter()
-  const { setBreadcrumb } = useBreadcrumb();
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -156,7 +154,6 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   })
 
   useEffect(() => {
-    setBreadcrumb([BREADCRUMB_TARGETING_BIDDING])
     mapFirstQuery()
     init();
   }, [])
@@ -373,8 +370,11 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   );
 }
 
-TargetingBidding.getLayout = (page: any) => (
-  <RootLayout>
-    <DashboardLayout>{page}</DashboardLayout>
-  </RootLayout>
-);
+TargetingBidding.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Targeting Bidding' , url: '/amazon/targeting-bidding'}]
+  return (
+    <RootLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+    </RootLayout>
+  )
+};
