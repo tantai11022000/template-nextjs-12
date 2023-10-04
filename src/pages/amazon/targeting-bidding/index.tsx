@@ -314,48 +314,51 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 
   return (
     <div className='text-black'>
-      <div className='grid grid-cols-4 items-center'>
+      <div className='grid grid-cols-3 items-center'>
         <Space direction="vertical">
           <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         </Space>
-        <div className='flex items-center'>
-          <p className='mr-2'>Status</p>
-          <Select
-            style={{ width: 120 }}
-            defaultValue="all"
-            showSearch
-            placeholder="Select status"
-            optionFilterProp="children"
-            onChange={onChange}
-            onSearch={onSearchInFilter}
-            filterOption={filterOption}
-            options={statuses}
-          />
-        </div>
-        <div className='flex items-center'>
-          <p className='mr-2 text-black'>Campaign</p>
-          <Select
-            showSearch
-            placeholder="Select Campaign"
-            optionFilterProp="children"
-            onChange={onChange}
-            onSearch={onSearchInFilter}
-            filterOption={filterOption}
-            options={campaigns}
-          />
-        </div>
-        <div className='flex items-center'>
-          <p className='mr-2 text-black'>Bulk Action</p>
-          <Select
-            style={{ width: 200 }}
-            showSearch
-            placeholder="Select action"
-            optionFilterProp="children"
-            onChange={onChange}
-            onSearch={onSearchInFilter}
-            filterOption={filterOption}
-            options={bulkAction}
-          />
+        <div className='col-span-2 flex justify-around items-center gap-4'>
+          <div className='flex items-center'>
+            <p className='mr-2'>Status</p>
+            <Select
+              style={{ width: 200 }}
+              defaultValue="all"
+              showSearch
+              placeholder="Select status"
+              optionFilterProp="children"
+              onChange={onChange}
+              onSearch={onSearchInFilter}
+              filterOption={filterOption}
+              options={statuses}
+            />
+          </div>
+          <div className='flex items-center'>
+            <p className='mr-2 text-black'>Campaign</p>
+            <Select
+              style={{ width: 200 }}
+              showSearch
+              placeholder="Select Campaign"
+              optionFilterProp="children"
+              onChange={onChange}
+              onSearch={onSearchInFilter}
+              filterOption={filterOption}
+              options={campaigns}
+            />
+          </div>
+          <div className='flex items-center'>
+            <p className='mr-2 text-black'>Bulk Action</p>
+            <Select
+              style={{ width: 200 }}
+              showSearch
+              placeholder="Select action"
+              optionFilterProp="children"
+              onChange={onChange}
+              onSearch={onSearchInFilter}
+              filterOption={filterOption}
+              options={bulkAction}
+            />
+          </div>
         </div>
       </div>
       <div>

@@ -110,7 +110,7 @@ const DashboardLayout = (props: any) => {
       </Sider>
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <div className='h-screen bg' style={{background: colorBgContainer }}>
+        <div className='min-h-screen bg' style={{background: colorBgContainer }}>
           <Content className=''>
             <div className='flex justify-between p-4' style={{background: "#f5f5f5"}}>
               <Breadcrumb>
