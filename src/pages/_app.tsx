@@ -17,9 +17,9 @@ export default function App({ Component, pageProps }: any) {
 
   return (
     <Provider store={store} >
-      <BreadcrumbProvider>
+      {/* <BreadcrumbProvider> */}
           {renderWithLayout(<Component {...pageProps} />)}
-      </BreadcrumbProvider>
+      {/* </BreadcrumbProvider> */}
     </Provider>
   )
   

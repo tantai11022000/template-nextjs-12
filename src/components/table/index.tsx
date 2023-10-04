@@ -1,6 +1,7 @@
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
+import styles from './index.module.scss'
 
 interface DataType {
   title: string;

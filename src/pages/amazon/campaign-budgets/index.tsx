@@ -1,13 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
 import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import Link from 'next/link';
 import { Button, Modal } from 'antd';
@@ -15,6 +13,7 @@ import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { setGlobalActions } from '@/store/GlobalActions/slice';
+import { GetServerSideProps } from 'next';
 
 const { Search } = Input;
 
@@ -146,7 +145,6 @@ const DATA = [
 
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
-  const { setBreadcrumb } = useBreadcrumb();
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -166,7 +164,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   })
 
   useEffect(() => {
-    setBreadcrumb([BREADCRUMB_CAMPAIGN_BUDGET])
     store.dispatch(setGlobalActions({data: [
       {
         options: STATUSES,
@@ -180,7 +177,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     mapFirstQuery()
     init();
     return () => {
-      setBreadcrumb([]);
       store.dispatch(setGlobalActions({data:  []}))
     }
   }, [])
@@ -257,7 +253,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         key: 'campaign',
         render: (_: any, record: any) => {
           const {id, campaign} = record
-
           return (
             <>
               <Link href={`/amazon/campaign-budgets/${id}`}>{campaign}</Link>
@@ -428,8 +423,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   );
 }
 
-CampaignBudgets.getLayout = (page: any) => (
-  <RootLayout>
-    <DashboardLayout>{page}</DashboardLayout>
-  </RootLayout>
-);
+
+CampaignBudgets.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Campaign Budgets' , url: '/amazon/campaign-budgets'}]
+  return (
+    <RootLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+    </RootLayout>
+  )
+};

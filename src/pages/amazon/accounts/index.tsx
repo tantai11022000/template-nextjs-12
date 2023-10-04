@@ -1,13 +1,11 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 
 import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
-import { useBreadcrumb } from '@/components/breadcrumb-context';
-import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
@@ -108,7 +106,6 @@ const DATA = [
 
 export default function Accounts (props: IAccountsProps) {
   const router = useRouter()
-  const { setBreadcrumb } = useBreadcrumb();
 
   const [accounts, setAccounts] = useState<any[]>(DATA)
   const [keyword, setKeyword] = useState<string>("")
@@ -120,7 +117,6 @@ export default function Accounts (props: IAccountsProps) {
   })
 
   useEffect(() => {
-    setBreadcrumb([BREADCRUMB_ACCOUNT])
     init()
   }, [])
 
@@ -212,8 +208,11 @@ export default function Accounts (props: IAccountsProps) {
   );
 }
 
-Accounts.getLayout = (page: any) => (
+Accounts.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Accounts' , url: '/amazon/accounts'}]
+  return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
-);
+  )
+};
