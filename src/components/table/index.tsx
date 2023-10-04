@@ -36,6 +36,7 @@ const TableGeneral = (props: TableProps) => {
         pagination={pagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
+        scroll={{x: true}}
       />
     </div>
   )

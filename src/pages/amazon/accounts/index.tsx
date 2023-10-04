@@ -196,7 +196,7 @@ export default function Accounts (props: IAccountsProps) {
   return (
     <div className='text-black'>
       <Space direction="vertical" className='flex flex-row justify-between'>
-        <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
+        <Search className='w-96' value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         <Button type="primary" className='bg-primary'>
           <Link href={`/amazon/accounts/add`}>Add</Link>
         </Button>

@@ -16,8 +16,7 @@ const menuItems = [
 ];
 
 const ActiveMenuLink = ({ children, href }: any) => {
-    const pathname = usePathname();
-    const active = href === pathname;
+    const active = href.includes('amazon');
   
     return (
       <Link
