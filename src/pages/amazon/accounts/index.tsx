@@ -9,6 +9,7 @@ import TableGeneral from '@/components/table';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import { getAllPartnerAccounts } from '@/services/accounts-service';
 
 const { Search } = Input;
 
@@ -61,56 +62,14 @@ const BULK_ACTION = [
   }, 
 ]
 
-const PARTNER_ACCOUNT = [
-  {
-    value: 'jack',
-    label: 'Jack',
-  },
-  {
-    value: 'lucy',
-    label: 'Lucy',
-  },
-  {
-    value: 'tom',
-    label: 'Tom',
-  },
-]
-
-const DATA = [
-  {
-    id: 1,
-    name: "Phan Nhat Minh",
-    status: "Running",
-  },
-  {
-    id: 2,
-    name: "Trinh Vu Trong Bao",
-    status: "Running",
-  },
-  {
-    id: 3,
-    name: "Nguyen Tan Tai",
-    status: "Pending",
-  },
-  {
-    id: 4,
-    name: "Huynh Ngoc Tho",
-    status: "Pending",
-  },
-  {
-    id: 5,
-    name: "Le Cao Huy",
-    status: "Pending",
-  },
-]
-
 export default function Accounts (props: IAccountsProps) {
   const router = useRouter()
 
-  const [accounts, setAccounts] = useState<any[]>(DATA)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
   const [pagination, setPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 10,
     current: 1,
     showSizeChanger: true,
     showQuickJumper: true,
@@ -121,9 +80,20 @@ export default function Accounts (props: IAccountsProps) {
   }, [])
 
   const init = () => {
+    getAllAccounts()
   }
   
-
+  const getAllAccounts = async () => {
+    setIsLoading(true)
+    try {
+      const result = await getAllPartnerAccounts()
+      setAccounts(result && result.data ? result.data : [])
+      setIsLoading(false)
+    } catch (error) {
+      console.log(">>> Get All Accounts Error", error)
+      setIsLoading(false)
+    }
+  }
  
   const handleSearch= async(value:string) => {
     setKeyword(value)
@@ -164,9 +134,10 @@ export default function Accounts (props: IAccountsProps) {
         dataIndex: 'status',
         key: 'status',
         render: (_: any, record: any) => {
+          const status = record.isActive
           return (
             <div className='flex justify-center'>
-              <Tag>{record.status}</Tag>
+              <Tag>{status == true ? "Active" : "isActive"}</Tag>
             </div>
           );
         },
