@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
-import { Button, Form } from 'antd';
+import { Button, Form, Space, Spin } from 'antd';
 import FText from '@/components/form/FText';
 import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
 import { GetServerSideProps } from 'next';
+import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccountInfo } from '@/services/accounts-service';
+import { useAppDispatch } from '@/store/hook';
+import { addAccount, editAccount } from '@/store/account/accountSlice';
+import { toast } from 'react-toastify';
 export interface IAddAccountProps {
 }
 
@@ -27,14 +31,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const fakeDataForm = {
-  name: "Name Edit",
-  clientId: "Client ID Edit",
-  secretId: "Secret ID Edit",
-  refreshToken: "Refresh Token Edit",
-  partnerAccount: ['jack', 'tom']
-}
-
 const PARTNER_ACCOUNT = [
   {
     value: 'jack',
@@ -51,14 +47,19 @@ const PARTNER_ACCOUNT = [
 ]
 
 export default function AddAccount (props: IAddAccountProps) {
-  const router = useRouter()
   const [form]:any = Form.useForm();
-
+  const router = useRouter()
+  const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
+  const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
+  const dispatch = useAppDispatch()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isEdit, setIsEdit] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
+  const [displayCreateButton, setDisplayCreateButton] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<any>("")
+  const [isFormChanged, setIsFormChanged] = useState(false);
 
   useEffect(() => {
-    const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
     setIsEdit(valueEdit)
     if (valueEdit) {
       handleMapEditData()
@@ -69,20 +70,73 @@ export default function AddAccount (props: IAddAccountProps) {
     }
   },[router])
 
-  const handleMapEditData = () => {
-    form.setFieldsValue(fakeDataForm)
+  useEffect(() => {
+    const isFormDirty = form.isFieldsTouched(true);
+    setIsFormChanged(isFormDirty);
+  }, [form]);
+
+  const handleMapEditData = async () => {
+    try {
+      const result = await getAccountInfo(id)
+      if (result && result.data) {
+        const { name, masterAccountConfig } = result.data
+        form.setFieldsValue({
+          name: name,
+          masterAccountConfig: {
+            client_id: masterAccountConfig.client_id,
+            client_secret: masterAccountConfig.client_secret,
+            refresh_token: masterAccountConfig.refresh_token,
+          }
+        })
+      }
+    } catch (error) {
+     console.log(">>> Get Account Info Error", error) 
+    }
+    
   }
 
   const onChangeCheck = (value: any) => {
     console.log(">>> value", value)
   }
 
-  const onSave = (value:any) => {
+  const onSave = async (value: any) => {
+    setIsLoading(true)
+    try {
+      if (valueEdit) {
+        await editPartnerAccount(id, value)
+        dispatch(editAccount({id, value}))
+      } else {
+        const result = await createPartnerAccount(value)
+        dispatch(addAccount({data: result && result.data ? result.data : ""}))
+      }
+      setIsLoading(false)
+      router.push(`/amazon/accounts`)
+    } catch (error) {
+      console.log(">>>> Create Account Error", error)
+      setIsLoading(false)
+      toast.error(error && error.message ? error.message : "")
+    }
+  }
+
+  const onTestValid = async () => {
+    try {
+      const values = await form.validateFields();
+      const result = await checkValidAccount(values)
+      if (result && result.data == true) {
+        setDisplayCreateButton(true)
+      }
+    } catch (error) {
+      console.log(">>> Test Valid Error", error)
+      toast.error(error && error.message ? error.message : "")
+    }
+  }
+
+  const onSaveFail = (value: any) => {
     console.log('>>> value', value);
   }
 
-  const onSaveFail = (value:any) => {
-    console.log('>>> value', value);
+  const handleChangeField = () => {
+    setIsFormChanged(true);
   }
 
   return (
@@ -98,15 +152,19 @@ export default function AddAccount (props: IAddAccountProps) {
       // size={componentSize as SizeType}
     >
       <FText name={'name'} label='Name'/>
-      <FText name={'clientId'} label='Client ID'/>
-      <FText name={'secretId'} label='Secret ID'/>
-      <FText name={'refreshToken'} label='Refresh Token'/>
+      <FText name={['masterAccountConfig', 'client_id']} label='Client ID' onChange={handleChangeField}/>
+      <FText name={['masterAccountConfig', 'client_secret']} label='Secret ID' onChange={handleChangeField}/>
+      <FText name={['masterAccountConfig', 'refresh_token']} label='Refresh Token' onChange={handleChangeField}/>
       <FMultipleCheckbox name={'partnerAccount'} label='Who can see?' data={partnerAccount} onChange={onChangeCheck}/>
-      
-      <div className='flex justify-center'>
+
+      {/* <Space size="middle" className='flex justify-center mb-3'>
+        <Button className={`${displayCreateButton ? 'bg-blue' : 'bg-primary'} text-white`} onClick={onTestValid} disabled={isLoading}>{displayCreateButton ? "Valid" : "Check"}</Button>
+      </Space> */}
+
+      <Space size="middle" className='flex justify-center'>
         <Button onClick={() => router.back()}>Cancel</Button>
-        <Button className='bg-primary' htmlType="submit">Create</Button>
-      </div>
+        <Button className='bg-primary text-white' htmlType="submit" disabled={isLoading}>{isLoading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
+      </Space>
     </Form>
   );
 }

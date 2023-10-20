@@ -159,12 +159,12 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   }, [])
 
   const init = () => {
-    getCampaignBudgetsList(1)
+    // getCampaignBudgetsList()
   }
 
   const getCampaignBudgetsList = async (params: any) => {
     try {
-      const result = await getCampaignBudgets(params)
+      // const result = await getCampaignBudgets(params)
       // setCampaignBudgets(result && result.data? result.data : [])
     } catch (error) {
       console.log(">>> error", error)

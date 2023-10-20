@@ -26,6 +26,7 @@ const TableGeneral = (props: TableProps) => {
   return (
     <div>
       <Table
+        // loading
         bordered
         rowKey="id"
         className={`mt-6 ${customCss}`}

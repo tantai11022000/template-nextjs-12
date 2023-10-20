@@ -14,6 +14,8 @@ import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { setGlobalActions } from '@/store/GlobalActions/slice';
 import { GetServerSideProps } from 'next';
+import { useAppSelector } from '@/store/hook';
+import { getCurrentAccount } from '@/store/account/accountSlice';
 
 const { Search } = Input;
 
@@ -81,114 +83,42 @@ const BULK_ACTION = [
   }, 
 ]
 
-const PARTNER_ACCOUNT = [
-  {
-    value: 'jack',
-    label: 'Jack',
-  },
-  {
-    value: 'lucy',
-    label: 'Lucy',
-  },
-  {
-    value: 'tom',
-    label: 'Tom',
-  },
-]
-
-const DATA = [
-  {
-    id: 1,
-    campaign: "Campaign A",
-    status: "In Deliver",
-    currentBudget: 10000,
-    imp: 1000,
-    click: 100,
-    sale: 1000,
-    roas: 1.1,
-    portfolio: 'Portfolio 1'
-  },
-  {
-    id: 2,
-    campaign: "Campaign B",
-    status: "Paused",
-    currentBudget: 20000,
-    imp: 2000,
-    click: 200,
-    sale: 2000,
-    roas: 2.2,
-    portfolio: 'Portfolio 2'
-  },
-  {
-    id: 3,
-    campaign: "Campaign C",
-    status: "Out Budget",
-    currentBudget: 30000,
-    imp: 3000,
-    click: 300,
-    sale: 3000,
-    roas: 3.3,
-    portfolio: 'Portfolio 2'
-  },
-  {
-    id: 4,
-    campaign: "Campaign D",
-    status: "Stopped",
-    currentBudget: 30000,
-    imp: 3000,
-    click: 300,
-    sale: 3000,
-    roas: 3.3,
-    portfolio: 'Portfolio 2'
-  },
-]
-
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
+  const currentAccount = useAppSelector(getCurrentAccount)
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
-  const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
-  const [campaignBudgets, setCampaignBudgets] = useState<any[]>(DATA)
+  const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
 
   const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
 
   const [pagination, setPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 10,
     current: 1,
     showSizeChanger: true,
     showQuickJumper: true,
   })
 
   useEffect(() => {
-    store.dispatch(setGlobalActions({data: [
-      {
-        options: STATUSES,
-        placeholder: "Select Status"
-      },
-      {
-        options: PARTNER_ACCOUNT,
-        placeholder: "Select partner account"
-      }
-    ]}))
     mapFirstQuery()
-    init();
-    return () => {
-      store.dispatch(setGlobalActions({data:  []}))
-    }
   }, [])
+  
+  useEffect(() => {
+    if (currentAccount) init();
+  }, [currentAccount])
 
   const init = () => {
-    getCampaignBudgetsList(1)
+    getCampaignBudgetsList(currentAccount)
   }
 
-  const getCampaignBudgetsList = async (params: any) => {
+  const getCampaignBudgetsList = async (partnerAccountId: any) => {
     try {
-      const result = await getCampaignBudgets(params)
-      // setCampaignBudgets(result && result.data? result.data : [])
+      const result = await getCampaignBudgets(partnerAccountId)
+      setCampaignBudgets(result && result.data? result.data : [])
     } catch (error) {
       console.log(">>> error", error)
     }
@@ -249,43 +179,43 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     () => [
       {
         title: 'Name',
-        dataIndex: 'campaign',
-        key: 'campaign',
+        dataIndex: 'name',
+        key: 'name',
         render: (_: any, record: any) => {
-          const {id, campaign} = record
+          const {campaignId, name} = record
           return (
             <>
-              <Link href={`/amazon/campaign-budgets/${id}`}>{campaign}</Link>
+              <Link href={`/amazon/campaign-budgets/${campaignId}`}>{name}</Link>
             </>
           )
         },
 
-        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
+        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
         title: 'Portfolio',
-        dataIndex: 'portfolio',
-        key: 'portfolio',
+        dataIndex: 'deliveryProfile',
+        key: 'deliveryProfile',
         render: (text: any) => <p>{text}</p>,
       },
       {
         title: <div className='text-center'>Status</div>,
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'state',
+        key: 'state',
         render: (_: any, record: any) => {
           return (
             <div className='flex justify-center'>
-              <Tag>{record.status}</Tag>
+              <Tag>{record.state}</Tag>
             </div>
           );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        sorter: (a: any, b: any) => a.state - b.state,
       },
       {
         title: 'Current Budget',
-        dataIndex: 'currentBudget',
-        key: 'currentBudget',
+        dataIndex: 'budget',
+        key: 'budget',
         render: (text: any) => {
           const handleChangeBudget = () => {
             if (isEditBudget) setIsEditBudget(false)
@@ -397,19 +327,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
               onSearch={onSearchInFilter}
               filterOption={filterOption}
               options={bulkAction}
-            />
-          </div>
-          <div className='flex items-center'>
-            <p className='mr-2'>Partner Account</p>
-            <Select
-              style={{ width: 200 }}
-              showSearch
-              placeholder="Select partner"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={partnerAccount}
             />
           </div>
         </div>

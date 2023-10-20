@@ -14,10 +14,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 // import { useBreadcrumb } from '../breadcrumb-context';
 import styles from './index.module.scss';
-import { useAppSelector } from '@/store/hook';
-import { getGlobalAction } from '@/store/GlobalActions/slice';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { useRouter } from 'next/router';
+import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/account/accountSlice';
 const { Header, Content, Footer, Sider } = Layout;
+const { Option } = Select;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -53,28 +54,15 @@ const items: MenuItem[] = [
   getItem('Weight Template', 'weight_template', '4', '/amazon/weight-template', <GoldOutlined />),
 ];
 
-const PARTNER_ACCOUNT = [
-  {
-    value: 'jack',
-    label: 'Jack',
-  },
-  {
-    value: 'lucy',
-    label: 'Lucy',
-  },
-  {
-    value: 'tom',
-    label: 'Tom',
-  },
-]
-
 const DashboardLayout = (props: any) => {
   const { children, breadcrumb } = props
   const router = useRouter()
-  const [partnerAccounts, setPartnerAccounts] = useState<any[]>(PARTNER_ACCOUNT)
+  const dispatch = useAppDispatch()
+  const accountList = useAppSelector(getAccountList);
+  const currentAccount = useAppSelector(getCurrentAccount);
+  const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [collapsed, setCollapsed] = useState(false);
   const [currentTab, setCurrentTab] = useState<string>("campaign_budgets")
-  const globalActions = useAppSelector(getGlobalAction)
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
     partnerAccount: false
   })
@@ -91,8 +79,16 @@ const DashboardLayout = (props: any) => {
   } = theme.useToken();
 
   const onChangeAccount = (account: any) => {
-    console.log(">>> account", account)
+    dispatch(setCurrentAccount({data: account.value}))
   }
+
+  useEffect(() => {
+    const option = accountList.map((account:any) => ({
+      value: account.id,
+      label: account.name
+    }))
+    setOptionAccount(option)
+  },[accountList])
 
   return (
     <Layout>
@@ -129,23 +125,22 @@ const DashboardLayout = (props: any) => {
               <div className='flex gap-3'>
                 {showGlobalButton.partnerAccount ? (
                   <Select
-                  style={{ width: 150 }}
+                  labelInValue
+                  style={{ width: 200 }}
                   showSearch
                   placeholder="Select Account"
                   optionFilterProp="children"
                   onChange={onChangeAccount}
-                  // onSearch={onSearchInFilter}
-                  // filterOption={filterOption}
-                  options={partnerAccounts}
+                  value={currentAccount}
+                  options={optionAccount}
                   />
                 ) : null}
-                
               </div>
             </div>
           </Content>
           <div className='p-6'>
             {React.Children.map(children, (child) => {
-              return React.cloneElement(child, { partnerAccounts, onPartnerAccountsChange: onChangeAccount });
+              return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
             })}
           </div>
         </div>

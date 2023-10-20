@@ -2,14 +2,15 @@ import { Form, Input } from 'antd';
 import * as React from 'react';
 
 export interface IFTextProps {
-  name: string,
+  name: string | any[],
   label: string,
   required?: boolean,
-  errorMessage?: string
+  errorMessage?: string,
+  onChange?: any
 }
 
 export default function FText (props: IFTextProps) {
-  const {name, label, required, errorMessage} = props
+  const {name, label, required, errorMessage, onChange} = props
   return (
     <Form.Item
       name={name}
@@ -19,7 +20,7 @@ export default function FText (props: IFTextProps) {
         message: errorMessage ? errorMessage : 'Please input this field',
       }]}
     >
-      <Input />
+      <Input onChange={onChange}/>
     </Form.Item>
   );
 }
