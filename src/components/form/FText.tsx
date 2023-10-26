@@ -1,5 +1,5 @@
 import { Form, Input } from 'antd';
-import * as React from 'react';
+import React from 'react';
 
 export interface IFTextProps {
   name: string | any[],

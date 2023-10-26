@@ -18,17 +18,18 @@ interface TableProps {
   pagination?: any,
   rowSelection?: any,
   handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
-  customCss?: string
+  customCss?: string,
+  loading: boolean
 }
 
 const TableGeneral = (props: TableProps) => {
-  const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss} = props
+  const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss, loading} = props
   return (
     <div>
       <Table
-        // loading
+        loading={loading}
         bordered
-        rowKey="id"
+        rowKey={(record) => record.id || record.campaignId}
         className={`mt-6 ${customCss}`}
         dataSource={data}
         columns={columns ? columns.map((column: any) => ({

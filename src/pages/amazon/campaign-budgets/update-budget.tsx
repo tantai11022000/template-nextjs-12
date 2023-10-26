@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import Title from 'antd/es/typography/Title';
-import { Button, Select, Space, Tag } from 'antd';
+import { Button, Select, Space, Tag, Typography } from 'antd';
 import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
@@ -75,9 +74,31 @@ const FILES = [
 ]
 
 export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps) {
+  const { Title } = Typography
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
   const [previewFile, setPreviewFile] = useState<any[]>(FILES)
+
+  useEffect(() => {
+   init()
+  }, [])
+
+  const init = () => {
+    uploadFile()
+  }
+
+  const uploadFile = async () => {
+    setIsLoading(true)
+    try {
+      setPreviewFile(FILES)
+      setIsLoading(false)
+    } catch (error) {
+      console.log(">>> Upload File Error", error)
+      setIsLoading(false)
+    }
+  }
+  
 
   const onChange = (value: string) => {
     console.log(`selected ${value}`);
@@ -187,7 +208,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         <>
           <Title level={4}>Update Campaign Budgets Schedule - Validate and live Edit</Title>
           <Button onClick={() => setStep(1)}>Back</Button>
-          <TableGeneral columns={columnsBudgetLog} data={previewFile}/>
+          <TableGeneral loading={isLoading} columns={columnsBudgetLog} data={previewFile}/>
         </>
       ) : null}
     </div>

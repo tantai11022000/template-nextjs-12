@@ -6,10 +6,8 @@ import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from "moment";
-import { useBreadcrumb } from '@/components/breadcrumb-context';
+// import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
-
-const { Title } = Typography;
 
 export interface ITargetDetailProps {
 }
@@ -54,14 +52,15 @@ const BUDGET_UPDATE_LOG = [
 ]
 
 export default function TargetDetail (props: ITargetDetailProps) {
-  const { setBreadcrumb } = useBreadcrumb();
+  const { Title } = Typography
+  // const { setBreadcrumb } = useBreadcrumb();
   const router = useRouter()
   const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
   const id = router && router.query && router.query.targetId ? router.query.targetId : ""
 
   useEffect(() => {
     if (id) {
-      setBreadcrumb([BREADCRUMB_TARGETING_BIDDING, {label: id.toString(), url: ''}])
+      // setBreadcrumb([BREADCRUMB_TARGETING_BIDDING, {label: id.toString(), url: ''}])
     }
   }, [router])
   

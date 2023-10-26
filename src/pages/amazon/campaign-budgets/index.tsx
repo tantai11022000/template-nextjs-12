@@ -3,7 +3,9 @@ import qs from 'query-string';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
-import { Input, Space, Switch, Tag } from 'antd';
+import { Dropdown, Input, Space, Switch, Tag } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
@@ -12,10 +14,9 @@ import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
-import { setGlobalActions } from '@/store/GlobalActions/slice';
-import { GetServerSideProps } from 'next';
 import { useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
+import { CurrencyYenIcon, DocumentCheckIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 const { Search } = Input;
 
@@ -23,11 +24,6 @@ export interface ICampaignBudgetsProps {
 }
 
 const STATUSES = [
-  {
-    id: 1,
-    value: "all",
-    label: "All"
-  },
   {
     id: 2,
     value: "deliver",
@@ -93,6 +89,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
 
@@ -116,11 +113,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }
 
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
+    setIsLoading(true)
     try {
       const result = await getCampaignBudgets(partnerAccountId)
       setCampaignBudgets(result && result.data? result.data : [])
+      setIsLoading(false)
     } catch (error) {
       console.log(">>> error", error)
+      setIsLoading(false)
     }
   }
   
@@ -144,7 +144,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     } else if (value == "schedule_status") {
       router.push(`/amazon/campaign-budgets/update-status`)
     } else if (value == "schedule_budget_once") {
-      router.push(`/amazon/campaign-budgets/update-budget`)
+      router.push(`/amazon/campaign-budgets/schedule-budget`)
+    } else if (value == "schedule_budget_with_weight") {
+      router.push({
+        pathname: `/amazon/campaign-budgets/schedule-budget`,
+        query: {isWeight: true}
+      })
     }
   };
   
@@ -155,7 +160,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const filterOption = (input: string, option: any) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
-  const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+  const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
     changeNextPageUrl(router, current)
     setPagination(pagination)
@@ -184,9 +189,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         render: (_: any, record: any) => {
           const {campaignId, name} = record
           return (
-            <>
-              <Link href={`/amazon/campaign-budgets/${campaignId}`}>{name}</Link>
-            </>
+            <Link href={`/amazon/campaign-budgets/${campaignId}`}>{name}</Link>
           )
         },
 
@@ -204,9 +207,17 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         dataIndex: 'state',
         key: 'state',
         render: (_: any, record: any) => {
+          const items = [
+            { key: '1', label: 'Action 1' },
+            { key: '2', label: 'Action 2' },
+          ];
           return (
-            <div className='flex justify-center'>
-              <Tag>{record.state}</Tag>
+            <div className='flex justify-center uppercase'>
+              <Tag>
+                <Dropdown menu={{ items }}>
+                  <a>{record.state} <DownOutlined/></a>
+                </Dropdown>
+              </Tag>
             </div>
           );
         },
@@ -222,11 +233,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             else setIsEditBudget(true)
           }
           return (
-            <div className='flex'>
+            <div className='flex items-center justify-between'>
               {!isEditBudget 
-                ? <span>JPY {text}</span>
+                ? <div className='flex items-center'>￥ <span>{text}</span></div>
                 : <Input type='number' min={0}/>}
-              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? 'Save' : 'Edit'}</a>
+              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? <DocumentCheckIcon className='w-5 h-5'/> : <PencilSquareIcon className='w-5 h-5'/>}</a>
             </div>
           )
         }
@@ -268,9 +279,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         key: 'action',
         render: (_: any, record: any) => {
           return (
-            <Space size="middle" className='flex justify-center'>
-              <a>Edit</a>
-              <a>Delete</a>
+            <Space size="middle" className='flex items-center justify-center'>
+              <PencilSquareIcon className='w-5 h-5'/>
+              <TrashIcon className='w-5 h-5'/>
             </Space>
           )
         },
@@ -279,11 +290,13 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log(">>> newSelectedRowKeys", newSelectedRowKeys.length)
+    console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
-    selectedRowKeys,
+    getCheckboxProps: (record: any) => ({
+      id: record.campaignId,
+    }),
     onChange: onSelectChange,
   };
 
@@ -332,7 +345,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         </div>
       </div>
       <div>
-        <TableGeneral columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={isLoading} columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
