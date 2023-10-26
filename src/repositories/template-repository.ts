@@ -5,7 +5,7 @@ const url = 'template-url'
 
 
 export const getTemplate = (params: any) => {
-    return guestClient.get(`${url}/get`, {params});
+    return userClient.get(`${url}/get`, {params});
 }
 
 

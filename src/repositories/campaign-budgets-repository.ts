@@ -3,5 +3,5 @@ import guestClient from '../config/api/guestClient';
 
 
 export const getCampaignBudgets = (id: any) => {
-    return guestClient.get(`/campaign-amazon/getAllCampaignsOfAccount/${id}`);
+    return userClient.get(`/campaign-amazon/get-all-campaigns-of-account/${id}`);
 }

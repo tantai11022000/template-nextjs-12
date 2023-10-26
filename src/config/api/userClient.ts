@@ -29,13 +29,16 @@ function getUrl(config: any) {
 
 userClient.interceptors.request.use(
     async (request: any) => {
-        const token = await getItem(TOKEN_KEY);
-        if (!token) {
+        const token:any = await getItem(TOKEN_KEY);
+        const obj = token ? JSON.parse(token) : ""
+        const accessToken = obj && obj.accessToken ? obj.accessToken : null
+        
+        if (!accessToken) {
             return Promise.reject("Not authorizaton");
         }
 
         if (request && request.headers) {
-            request.headers['Authorization'] = 'Bearer ' + token;
+            request.headers['Authorization'] = 'Bearer ' + accessToken;
             // request.headers["x-access-token"] = token; // for Node.js Express back-end
         }
         return request;

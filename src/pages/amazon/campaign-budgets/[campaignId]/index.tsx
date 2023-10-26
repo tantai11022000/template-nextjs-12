@@ -6,7 +6,6 @@ import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from "moment";
-const { Title } = Typography;
 import { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -67,6 +66,7 @@ const BUDGET_UPDATE_LOG = [
 ]
 
 export default function CampaignDetail (props: ICampaignDetailProps) {
+  const { Title } = Typography
   const router = useRouter() 
   const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
 

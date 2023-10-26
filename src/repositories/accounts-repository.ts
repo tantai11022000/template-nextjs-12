@@ -4,21 +4,21 @@ import guestClient from '../config/api/guestClient';
 const accountUrl = 'account'
 
 export const createPartnerAccount = (body: any) => {
-    return guestClient.post(`${accountUrl}/createAccount`, body);
+    return userClient.post(`${accountUrl}/create-account`, body);
 }
 
 export const checkValidAccount = (body: any) => {
-    return guestClient.post(`${accountUrl}/checkValidAccount`, body);
+    return userClient.post(`${accountUrl}/check-valid-account`, body);
 }
 
 export const editPartnerAccount = (id: any, body: any) => {
-    return guestClient.put(`${accountUrl}/updateAccountById/${id}`, body);
+    return userClient.put(`${accountUrl}/update-account-by-id/${id}`, body);
 }
 
 export const getAllPartnerAccounts = () => {
-    return guestClient.get(`${accountUrl}/getAllAccounts`);
+    return userClient.get(`${accountUrl}/get-all-accounts`);
 }
 
 export const getAccountInfo = (id: any) => {
-    return guestClient.get(`${accountUrl}/getAccountById/${id}`);
+    return userClient.get(`${accountUrl}/get-account-by-id/${id}`);
 }

@@ -4,7 +4,6 @@ import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
-const { Title } = Typography;
 
 export interface IBudgetHistoryProps {
 }
@@ -93,6 +92,7 @@ const BUDGET_HISTORY = [
 ]
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
+  const { Title } = Typography
   const [budgetHistory, setBudgetHistory] = useState<any[]>(BUDGET_HISTORY)
 
   const columnsBudgetLog: any = useMemo(

@@ -67,21 +67,6 @@ const BULK_ACTION = [
   }, 
 ]
 
-const PARTNER_ACCOUNT = [
-  {
-    value: 'jack',
-    label: 'Jack',
-  },
-  {
-    value: 'lucy',
-    label: 'Lucy',
-  },
-  {
-    value: 'tom',
-    label: 'Tom',
-  },
-]
-
 const CAMPAIGNS = [
   {
     value: 'campaignA',
@@ -99,7 +84,7 @@ const CAMPAIGNS = [
 
 const DATA = [
   {
-    id: 1,
+    id: 10,
     campaign: "Campaign A",
     status: "active",
     currentBidding: 10000,
@@ -107,7 +92,7 @@ const DATA = [
     portfolio: 'Portfolio 1'
   },
   {
-    id: 2,
+    id: 20,
     campaign: "Campaign B",
     status: "inactive",
     currentBidding: 20000,
@@ -115,7 +100,7 @@ const DATA = [
     portfolio: 'Portfolio 2'
   },
   {
-    id: 3,
+    id: 30,
     campaign: "Campaign C",
     status: "inactive",
     currentBidding: 30000,
@@ -123,7 +108,7 @@ const DATA = [
     portfolio: 'Portfolio 2'
   },
   {
-    id: 4,
+    id: 40,
     campaign: "Campaign D",
     status: "active",
     currentBidding: 30000,
@@ -138,7 +123,6 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
-  const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [campaigns, setCampaigns] = useState<any[]>(CAMPAIGNS)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>(DATA)
@@ -296,11 +280,13 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log(">>> newSelectedRowKeys", newSelectedRowKeys.length)
+    console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys);
   };
   const rowSelection = {
-    selectedRowKeys,
+    getCheckboxProps: (record: any) => ({
+      id: record.id,
+    }),
     onChange: onSelectChange,
   };
 

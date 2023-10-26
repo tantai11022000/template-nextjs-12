@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import {
   DesktopOutlined,
-  FileOutlined,
   PieChartOutlined,
   TeamOutlined,
-  UserOutlined,
   GoldOutlined
 } from '@ant-design/icons';
 import { MenuProps, Select } from 'antd';
@@ -17,12 +15,14 @@ import styles from './index.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { useRouter } from 'next/router';
 import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/account/accountSlice';
-const { Header, Content, Footer, Sider } = Layout;
+import { getItem, storeItem } from '@/utils/StorageUtils';
+import { CURRENT_MENU } from '@/utils/StorageKeys';
+const {  Content, Sider } = Layout;
 const { Option } = Select;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-function getItem(
+function getItems(
   label: React.ReactNode,
   value: any,
   key: React.Key,
@@ -41,28 +41,29 @@ function getItem(
 }
 
 const ActiveMenuLink = (props: any) => {
-  const { children, href } = props
+  const { children, href, isActive } = props
   return (
     <Link href={href}>{children}</Link>
   )
 };
 
 const items: MenuItem[] = [
-  getItem('Campaign Budgets', 'campaign_budgets', '1', '/amazon/campaign-budgets', <PieChartOutlined />),
-  getItem('Targeting Bidding', 'targeting_bidding', '2', '/amazon/targeting-bidding', <DesktopOutlined />),
-  getItem('Accounts', 'accounts', '3', '/amazon/accounts', <TeamOutlined />),
-  getItem('Weight Template', 'weight_template', '4', '/amazon/weight-template', <GoldOutlined />),
+  getItems('Campaign Budgets', 'campaign_budgets', 'campaign_budgets', '/amazon/campaign-budgets', <PieChartOutlined />),
+  getItems('Targeting Bidding', 'targeting_bidding', 'targeting_bidding', '/amazon/targeting-bidding', <DesktopOutlined />),
+  getItems('Accounts', 'accounts', 'accounts', '/amazon/accounts', <TeamOutlined />),
+  getItems('Weight Template', 'weight_template', 'weight_template', '/amazon/weight-template', <GoldOutlined />),
 ];
 
 const DashboardLayout = (props: any) => {
   const { children, breadcrumb } = props
   const router = useRouter()
+
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
   const currentAccount = useAppSelector(getCurrentAccount);
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [collapsed, setCollapsed] = useState(false);
-  const [currentTab, setCurrentTab] = useState<string>("campaign_budgets")
+  const [menu, setMenu] = useState<string>("campaign_budgets")
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
     partnerAccount: false
   })
@@ -73,6 +74,19 @@ const DashboardLayout = (props: any) => {
       setShowGlobalButton("")
     }
   }, [router.pathname])
+
+  useEffect(() => {
+    const option = accountList.map((account:any) => ({
+      value: account.id,
+      label: account.name
+    }))
+    setOptionAccount(option)
+  }, [accountList])
+
+  useLayoutEffect(() => {
+    const currentMenu: any = getItem(CURRENT_MENU)
+    if (currentMenu) setMenu(currentMenu);
+  }, []);
   
   const {
     token: { colorBgContainer },
@@ -82,21 +96,18 @@ const DashboardLayout = (props: any) => {
     dispatch(setCurrentAccount({data: account.value}))
   }
 
-  useEffect(() => {
-    const option = accountList.map((account:any) => ({
-      value: account.id,
-      label: account.name
-    }))
-    setOptionAccount(option)
-  },[accountList])
+  const handleClickMenu = (value: string) => {
+    setMenu(value)
+    storeItem(CURRENT_MENU, value)
+  }
 
   return (
     <Layout>
       <Sider width={250} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sidebar-container'>
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" style={{backgroundColor: "#444"}} className='title-xl'>
+        <Menu theme="dark" selectedKeys={[menu]} mode="inline" style={{backgroundColor: "#444"}} className='title-xl'>
           {items && items.map((item: any) => (
-            <Menu.Item key={item.key} icon={item.icon} onClick={() => setCurrentTab(item.value)}>
+            <Menu.Item key={item.key} icon={item.icon} onClick={() => handleClickMenu(item.value)}>
               <ActiveMenuLink href={item.url}>
                 {item.label}
               </ActiveMenuLink>
