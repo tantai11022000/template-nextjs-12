@@ -77,7 +77,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
 
   useEffect(() => {
     initDataDefaultTable()
-  }, [HOURS_DATA])
+  }, [])
   
   const onSave = async (value: any) => {
     console.log(">>> value", value)
