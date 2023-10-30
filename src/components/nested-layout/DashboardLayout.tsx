@@ -55,7 +55,6 @@ const items: MenuItem[] = [
 const DashboardLayout = (props: any) => {
   const { children, breadcrumb } = props
   const router = useRouter()
-
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
   const currentAccount = useAppSelector(getCurrentAccount);
@@ -71,7 +70,7 @@ const DashboardLayout = (props: any) => {
     } else {
       setShowGlobalButton("")
     }
-  }, [router.pathname])
+  }, [router.pathname, showGlobalButton])
 
   useEffect(() => {
     const option = accountList.map((account:any) => ({
