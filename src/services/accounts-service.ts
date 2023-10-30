@@ -31,9 +31,9 @@ export const editPartnerAccount = async (id: any, body: any) => {
     }
 }
 
-export const getAllPartnerAccounts = async () => {
+export const getAllPartnerAccounts = async (params: any) => {
     try {
-        const response = await accountsRepository.getAllPartnerAccounts();
+        const response = await accountsRepository.getAllPartnerAccounts(params);
         return handleResponse(response);
 
     } catch (error) {

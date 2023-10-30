@@ -113,7 +113,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
     try {
-      const result = await getCampaignBudgets(partnerAccountId)
+      var params = {}
+      const result = await getCampaignBudgets(partnerAccountId, params)
       setCampaignBudgets(result && result.data? result.data : [])
       setDisplayedCampaigns(result.data.slice(0, 10))
       setLoading(false)
@@ -144,11 +145,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setSelectMode(e.target.value);
   };
 
-  const handleBudgetChange = (value: number | string) => {
+  const handleBudgetChange = (value: number | string | null) => {
     console.log('changed', value);
   };
 
-  const budgetFormatter = (value: any) => {
+  const budgetFormatter = (value: number | string | undefined) => {
     if (selectMode == "exact" || selectMode == "fixed") {
       return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     } else {
@@ -156,7 +157,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     }
   };
 
-  const budgetParser = (value: any) => {
+  const budgetParser = (value: string | undefined) => {
     if (selectMode == "exact" || selectMode == "fixed") {
       return value!.replace(/\$\s?|(,*)/g, '')
     } else {

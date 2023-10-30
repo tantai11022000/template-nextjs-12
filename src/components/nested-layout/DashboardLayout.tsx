@@ -70,7 +70,7 @@ const DashboardLayout = (props: any) => {
     } else {
       setShowGlobalButton("")
     }
-  }, [router.pathname, showGlobalButton])
+  }, [router.pathname])
 
   useEffect(() => {
     const option = accountList.map((account:any) => ({

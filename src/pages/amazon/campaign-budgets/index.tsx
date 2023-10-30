@@ -96,6 +96,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
     current: 1,
+    total: 0,
     showSizeChanger: true,
     showQuickJumper: true,
   })
@@ -103,20 +104,26 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   useEffect(() => {
     mapFirstQuery()
   }, [])
-  
-  useEffect(() => {
-    if (currentAccount) init();
-  }, [currentAccount])
 
-  const init = () => {
-    getCampaignBudgetsList(currentAccount)
-  }
+  useEffect(() => {
+    if (currentAccount) getCampaignBudgetsList(currentAccount)
+  }, [currentAccount, pagination.pageSize, pagination.current])
 
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
     try {
-      const result = await getCampaignBudgets(partnerAccountId)
-      setCampaignBudgets(result && result.data? result.data : [])
+      const {pageSize, current, total} = pagination
+      var params = {
+        page: current,
+        pageSize,
+        total
+      }
+
+      const result = await getCampaignBudgets(partnerAccountId, params)
+      if (result && result.data) {
+        setCampaignBudgets(result.data)
+        setPagination({...pagination, total: result.pagination.total})
+      }
       setLoading(false)
     } catch (error) {
       console.log(">>> error", error)

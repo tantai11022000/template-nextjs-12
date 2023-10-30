@@ -68,23 +68,31 @@ export default function Accounts (props: IAccountsProps) {
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
     current: 1,
+    total: 0,
     showSizeChanger: true,
     showQuickJumper: true,
   })
 
   useEffect(() => {
-    init()
-  }, [])
-
-  const init = () => {
     getAllAccounts()
-  }
+  }, [pagination.pageSize, pagination.current])
   
   const getAllAccounts = async () => {
     setLoading(true)
     try {
-      const result = await getAllPartnerAccounts()
-      setAccounts(result && result.data ? result.data : [])
+
+      const {pageSize, current, total} = pagination
+      var params = {
+        page: current,
+        pageSize,
+        total
+      }
+
+      const result = await getAllPartnerAccounts(params)
+      if (result && result.data) {
+        setAccounts(result.data)
+        setPagination({...pagination, total: result.pagination.total})
+      }
       setLoading(false)
     } catch (error) {
       console.log(">>> Get All Accounts Error", error)

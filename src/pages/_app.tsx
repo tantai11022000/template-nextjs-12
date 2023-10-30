@@ -26,7 +26,10 @@ export default function App({ Component, pageProps }: any) {
   
   const getAllAccountList = async () => {
     try {
-      const result = await getAllPartnerAccounts()
+      var params = {
+        pageSize: 99999,
+      }
+      const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         store.dispatch(setAccountList({data: result.data}))
         store.dispatch(setCurrentAccount({data: result.data[3].id}))
