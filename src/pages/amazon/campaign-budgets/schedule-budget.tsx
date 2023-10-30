@@ -6,12 +6,13 @@ import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography } from 'antd';
-import FRatio from '@/components/form/FRatio';
 import { useRouter } from 'next/router';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import FText from '@/components/form/FText';
 import TableGeneral from '@/components/table';
-import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { EditOutlined } from '@ant-design/icons';
+import AddWeightTemplate from '../weight-template/[...type]';
+import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 
 
 export interface IScheduleBudgetProps {
@@ -83,7 +84,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const currentAccount = useAppSelector(getCurrentAccount)
 
   const [selectMode, setSelectMode] = useState<string>("exact")
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [data, setData] = useState<any[]>(DATA)
   const [modes, setModes] = useState<any[]>(MODE)
@@ -110,15 +111,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const result = await getCampaignBudgets(partnerAccountId)
       setCampaignBudgets(result && result.data? result.data : [])
       setDisplayedCampaigns(result.data.slice(0, 10))
-      setIsLoading(false)
+      setLoading(false)
     } catch (error) {
       console.log(">>> error", error)
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
@@ -147,7 +148,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     console.log('changed', value);
   };
 
-  const budgetFormatter = (value: number | string) => {
+  const budgetFormatter = (value: any) => {
     if (selectMode == "exact" || selectMode == "fixed") {
       return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     } else {
@@ -155,7 +156,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     }
   };
 
-  const budgetParser = (value: string | undefined) => {
+  const budgetParser = (value: any) => {
     if (selectMode == "exact" || selectMode == "fixed") {
       return value!.replace(/\$\s?|(,*)/g, '')
     } else {
@@ -277,8 +278,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           )}
         </div>
         <Space className='flex items-center justify-between my-6'>
-          <FRatio name={"Mode"} label={'Mode'} options={modes} />
-          <FRatio name={"withWeight"} label={''} options={[{ value: 'weight', label: 'Daily with Weight'}]} />
+          <FRadio name={"Mode"} label={'Mode'} options={modes} />
+          <FRadio name={"withWeight"} label={''} options={[{ value: 'weight', label: 'Daily with Weight'}]} />
         </Space>
         <Space className='flex items-center'>
           <Space>
@@ -353,7 +354,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
             onChange={handleChangeWeightTemplate}
             options={weights}
             />
-            <PencilSquareIcon className='w-5 h-5' onClick={handleEditWeightTemplate}/>
+            <EditOutlined className='w-5 h-5' onClick={handleEditWeightTemplate}/>
         </Space>
       </Space>
       <div className='flex justify-center mt-6'>
@@ -361,11 +362,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       </div>
       </div>
       <div>
-        <TableGeneral loading={isLoading} columns={columns} data={data}/>
+        <TableGeneral loading={loading} columns={columns} data={data}/>
       </div>
       {openModalEditWeightTemplate && (
-        <Modal title="Edit Weight Template" open={openModalEditWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
-          <p>Edit Weight Template {selectedWeight}</p>
+        <Modal width={1000} title="Set Weight for Daily Budget" open={openModalEditWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
+          <EditWeightTemplate/>
         </Modal>
       )}
     </div>

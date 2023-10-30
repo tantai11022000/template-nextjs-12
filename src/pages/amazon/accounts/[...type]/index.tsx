@@ -52,7 +52,7 @@ export default function AddAccount (props: IAddAccountProps) {
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
   const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
   const dispatch = useAppDispatch()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [isEdit, setIsEdit] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [displayCreateButton, setDisplayCreateButton] = useState<boolean>(false)
@@ -100,7 +100,7 @@ export default function AddAccount (props: IAddAccountProps) {
   }
 
   const onSave = async (value: any) => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       if (valueEdit) {
         await editPartnerAccount(id, value)
@@ -109,11 +109,11 @@ export default function AddAccount (props: IAddAccountProps) {
         const result = await createPartnerAccount(value)
         dispatch(addAccount({data: result && result.data ? result.data : ""}))
       }
-      setIsLoading(false)
+      setLoading(false)
       router.push(`/amazon/accounts`)
-    } catch (error) {
+    } catch (error: any) {
       console.log(">>>> Create Account Error", error)
-      setIsLoading(false)
+      setLoading(false)
       toast.error(error && error.message ? error.message : "")
     }
   }
@@ -125,7 +125,7 @@ export default function AddAccount (props: IAddAccountProps) {
       if (result && result.data == true) {
         setDisplayCreateButton(true)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(">>> Test Valid Error", error)
       toast.error(error && error.message ? error.message : "")
     }
@@ -158,12 +158,12 @@ export default function AddAccount (props: IAddAccountProps) {
       <FMultipleCheckbox name={'partnerAccount'} label='Who can see?' data={partnerAccount} onChange={onChangeCheck}/>
 
       {/* <Space size="middle" className='flex justify-center mb-3'>
-        <Button className={`${displayCreateButton ? 'bg-blue' : 'bg-primary'} text-white`} onClick={onTestValid} disabled={isLoading}>{displayCreateButton ? "Valid" : "Check"}</Button>
+        <Button className={`${displayCreateButton ? 'bg-blue' : 'bg-primary'} text-white`} onClick={onTestValid} disabled={loading}>{displayCreateButton ? "Valid" : "Check"}</Button>
       </Space> */}
 
       <Space size="middle" className='flex justify-center'>
         <Button onClick={() => router.back()}>Cancel</Button>
-        <Button className='bg-primary text-white' htmlType="submit" disabled={isLoading}>{isLoading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
+        <Button className='bg-primary text-white' htmlType="submit" disabled={loading}>{loading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
       </Space>
     </Form>
   );

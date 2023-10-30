@@ -3,15 +3,12 @@ import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 
-import { Input, Space, Switch, Tag } from 'antd';
-import { Select } from 'antd';
+import { Input, Space, Tag } from 'antd';
 import TableGeneral from '@/components/table';
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { getAllPartnerAccounts } from '@/services/accounts-service';
-
-const { Search } = Input;
 
 export interface IAccountsProps {
 }
@@ -63,9 +60,9 @@ const BULK_ACTION = [
 ]
 
 export default function Accounts (props: IAccountsProps) {
+  const { Search } = Input;
   const router = useRouter()
-
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
   const [pagination, setPagination] = useState<any>({
@@ -84,14 +81,14 @@ export default function Accounts (props: IAccountsProps) {
   }
   
   const getAllAccounts = async () => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const result = await getAllPartnerAccounts()
       setAccounts(result && result.data ? result.data : [])
-      setIsLoading(false)
+      setLoading(false)
     } catch (error) {
       console.log(">>> Get All Accounts Error", error)
-      setIsLoading(false)
+      setLoading(false)
     }
   }
  
@@ -173,7 +170,7 @@ export default function Accounts (props: IAccountsProps) {
         </Button>
       </Space>
       <div>
-        <TableGeneral columns={columns} data={accounts} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={accounts} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
     </div>
   );

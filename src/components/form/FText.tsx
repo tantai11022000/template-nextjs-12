@@ -6,13 +6,15 @@ export interface IFTextProps {
   label: string,
   required?: boolean,
   errorMessage?: string,
-  onChange?: any
+  onChange?: any,
+  customCss? : any
 }
 
 export default function FText (props: IFTextProps) {
-  const {name, label, required, errorMessage, onChange} = props
+  const {name, label, required, errorMessage, onChange, customCss} = props
   return (
     <Form.Item
+      className={customCss ? customCss : ''}
       name={name}
       label={label}
       rules={[{

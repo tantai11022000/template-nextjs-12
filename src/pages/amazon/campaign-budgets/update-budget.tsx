@@ -75,7 +75,7 @@ const FILES = [
 
 export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps) {
   const { Title } = Typography
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
   const [previewFile, setPreviewFile] = useState<any[]>(FILES)
@@ -89,13 +89,13 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
   }
 
   const uploadFile = async () => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       setPreviewFile(FILES)
-      setIsLoading(false)
+      setLoading(false)
     } catch (error) {
       console.log(">>> Upload File Error", error)
-      setIsLoading(false)
+      setLoading(false)
     }
   }
   
@@ -148,7 +148,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         title: 'Budget',
         dataIndex: 'budget',
         key: 'budget',
-        render: (text: any) => <p className='text-end'>{text ? `JPY ${text}` : "NA"}</p>,
+        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.budget.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.budget - b.budget,
@@ -208,7 +208,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         <>
           <Title level={4}>Update Campaign Budgets Schedule - Validate and live Edit</Title>
           <Button onClick={() => setStep(1)}>Back</Button>
-          <TableGeneral loading={isLoading} columns={columnsBudgetLog} data={previewFile}/>
+          <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile}/>
         </>
       ) : null}
     </div>
