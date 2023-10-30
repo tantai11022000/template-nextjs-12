@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
-import { Space, Switch, Tag, Typography } from 'antd';
+import { Select, Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from "moment";
 import { GetServerSideProps } from 'next';
+import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { campaignId } = context.query;
@@ -65,10 +66,45 @@ const BUDGET_UPDATE_LOG = [
   },
 ]
 
+const UPDATE_BUDGET = [
+  {
+    value: 'one_time',
+    label: 'One Time'
+  },
+  {
+    value: 'daily_with_weight',
+    label: 'Daily With Weight'
+  },
+]
+
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { Title } = Typography
   const router = useRouter() 
-  const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
+  const [budgetLog, setBudgetLog] = useState<any[]>([])
+  const [updateBudgetOptions, setUpdateBudgetOptions] = useState<any[]>(UPDATE_BUDGET)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    init()
+  }, [])
+
+  const init = () => {
+    getBudgetLog()
+  }
+  
+
+  const getBudgetLog = async () => {
+    setLoading(true)
+    try {
+      setTimeout(() => {
+        setBudgetLog(BUDGET_UPDATE_LOG)
+        setLoading(false)
+      }, 1000);
+    } catch (error) {
+      setLoading(false)
+      console.log(">>> Get Budget Log Error", error)
+    }
+  }
 
   const columnsBudgetLog: any = useMemo(
     () => [
@@ -76,7 +112,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         title: 'Before',
         dataIndex: 'before',
         key: 'before',
-        render: (text: any) => <p className='text-end'>{text ? `JPY ${text}` : "NA"}</p>,
+        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.before.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.before - b.before,
@@ -85,7 +121,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         title: 'After',
         dataIndex: 'after',
         key: 'after',
-        render: (text: any) => <p className='text-end'>{text ? `JPY ${text}` : "NA"}</p>,
+        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.after.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.after - b.after,
@@ -208,15 +244,33 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     ], [budgetLog]
   )
 
+  const handleChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
+
   return (
     <div className='text-black'>
       <div>
-        <Title level={4}>Budget Update Log</Title>
-        <TableGeneral columns={columnsBudgetLog} data={budgetLog}/>
+        <div className='flex items-center justify-between'>
+          <Title level={4}>Budget Update Log</Title>
+          <Space>
+            <RangeDatePicker/>
+            <Select
+              placeholder="Update Budget"
+              style={{ width: 150 }}
+              onChange={handleChange}
+              options={updateBudgetOptions}
+            />
+          </Space>
+        </div>
+        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog}/>
       </div>
       <div>
-        <Title level={4}>Status Update</Title>
-        <TableGeneral columns={columnsStatusUpdate} data={budgetLog}/>
+        <div className='flex items-center justify-between'>
+          <Title level={4}>Status Update</Title>
+          <RangeDatePicker/>
+        </div>
+          <TableGeneral loading={loading} columns={columnsStatusUpdate} data={budgetLog}/>
       </div>
     </div>
   );

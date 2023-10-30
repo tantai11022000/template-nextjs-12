@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Tag, Typography } from 'antd';
+import { Button, Space, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
 
@@ -9,6 +9,7 @@ export interface IBudgetHistoryProps {
 }
 
 import { GetServerSideProps } from 'next';
+import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
@@ -93,8 +94,30 @@ const BUDGET_HISTORY = [
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
   const { Title } = Typography
-  const [budgetHistory, setBudgetHistory] = useState<any[]>(BUDGET_HISTORY)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [budgetHistory, setBudgetHistory] = useState<any[]>([])
 
+  useEffect(() => {
+    init()
+  }, [])
+
+  const init = () => {
+    getBudgetHistory()
+  }
+
+  const getBudgetHistory = async () => {
+    setLoading(true)
+    try {
+      setTimeout(() => {
+        setBudgetHistory(BUDGET_HISTORY)
+        setLoading(false)
+      }, 1000);
+    } catch (error) {
+      setLoading(false)
+      console.log(">>> Get Budget History Error", error)
+    }
+  }
+  
   const columnsBudgetLog: any = useMemo(
     () => [
       {
@@ -168,10 +191,14 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   )
   return (
     <div className='text-black'>
-      <div>
-          <Title level={4}>Budget Update on 17 23rd-Aug-2023</Title>
-          <TableGeneral columns={columnsBudgetLog} data={budgetHistory}/>
+      <div className='flex items-center justify-between'>
+        <Title level={4}>Budget Update on 17 23rd-Aug-2023</Title>
+        <Space>
+          <RangeDatePicker/>
+          <Button>Export CSV</Button>
+        </Space>
       </div>
+        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetHistory}/>
     </div>
   );
 }

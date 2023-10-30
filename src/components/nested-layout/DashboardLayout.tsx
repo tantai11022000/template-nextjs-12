@@ -10,7 +10,6 @@ import { MenuProps, Select } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-// import { useBreadcrumb } from '../breadcrumb-context';
 import styles from './index.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { useRouter } from 'next/router';
@@ -18,7 +17,6 @@ import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/ac
 import { getItem, storeItem } from '@/utils/StorageUtils';
 import { CURRENT_MENU } from '@/utils/StorageKeys';
 const {  Content, Sider } = Layout;
-const { Option } = Select;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -41,7 +39,7 @@ function getItems(
 }
 
 const ActiveMenuLink = (props: any) => {
-  const { children, href, isActive } = props
+  const { children, href } = props
   return (
     <Link href={href}>{children}</Link>
   )
@@ -83,7 +81,7 @@ const DashboardLayout = (props: any) => {
     setOptionAccount(option)
   }, [accountList])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const currentMenu: any = getItem(CURRENT_MENU)
     if (currentMenu) setMenu(currentMenu);
   }, []);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { Button, Form, Input, Radio } from 'antd';
 import FText from '@/components/form/FText';
 import FTextArea from '@/components/form/FTextArea';
-import FRatio from '@/components/form/FRatio';
+import FRadio from '@/components/form/FRadio';
 import TableGeneral from '@/components/table';
 import { GetServerSideProps } from 'next';
 
@@ -167,7 +167,7 @@ function AddWeightTemplate() {
             >
                 <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
                 <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
-                <FRatio name={"timeSlot"} label={'Time slot'} options={options} />
+                <FRadio name={"timeSlot"} label={'Time slot'} options={options} />
 
                 <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'max-h-80 w-[50%] m-auto overflow-y-auto'} />
 

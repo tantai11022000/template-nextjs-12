@@ -41,6 +41,7 @@ const fakeData = [
 ]
 function WeightTemplate() {
   const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     pageSize: 2,
     current: 1,
@@ -62,8 +63,17 @@ function WeightTemplate() {
     updateUrlQuery(router,params)
   }
 
-  const fetchWeightTemplate = async() => {
-    setData(fakeData)
+  const fetchWeightTemplate = async () => {
+    setLoading(true)
+    try {
+      setTimeout(() => {
+        setData(fakeData)
+        setLoading(false)
+      }, 1000);
+    } catch (error) {
+      console.log(">>> Get Weight Template Error", error)
+      setLoading(false)
+    }
   }
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
@@ -144,7 +154,7 @@ function WeightTemplate() {
           </Link>
         </Space>
       </div>
-      <TableGeneral columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>        
+      <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>        
     </>
   );
 }

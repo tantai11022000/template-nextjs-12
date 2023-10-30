@@ -53,16 +53,31 @@ const BUDGET_UPDATE_LOG = [
 
 export default function TargetDetail (props: ITargetDetailProps) {
   const { Title } = Typography
-  // const { setBreadcrumb } = useBreadcrumb();
   const router = useRouter()
-  const [budgetLog, setBudgetLog] = useState<any[]>(BUDGET_UPDATE_LOG)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [budgetLog, setBudgetLog] = useState<any[]>([])
   const id = router && router.query && router.query.targetId ? router.query.targetId : ""
 
   useEffect(() => {
-    if (id) {
-      // setBreadcrumb([BREADCRUMB_TARGETING_BIDDING, {label: id.toString(), url: ''}])
+    init()
+  }, [])
+
+  const init = () => {
+    getBudgetLog()
+  }
+
+  const getBudgetLog = async () => {
+    setLoading(true)
+    try {
+      setTimeout(() => {
+        setBudgetLog(BUDGET_UPDATE_LOG)
+        setLoading(false)
+      }, 1000);
+    } catch (error) {
+      setLoading(false)
+      console.log(">>> Get Budget Log Error", error)
     }
-  }, [router])
+  }
   
 
   const columnsBudgetLog: any = useMemo(
@@ -71,7 +86,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         title: 'Before',
         dataIndex: 'before',
         key: 'before',
-        render: (text: any) => <p className='text-end'>{text ? `JPY ${text}` : "NA"}</p>,
+        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.before.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.before - b.before,
@@ -80,7 +95,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         title: 'After',
         dataIndex: 'after',
         key: 'after',
-        render: (text: any) => <p className='text-end'>{text ? `JPY ${text}` : "NA"}</p>,
+        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.after.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.after - b.after,
@@ -207,11 +222,11 @@ export default function TargetDetail (props: ITargetDetailProps) {
     <div className='text-black'>
       <div>
         <Title level={4}>Schedule Adtran log: Target A - Campaign A</Title>
-        <TableGeneral columns={columnsBudgetLog} data={budgetLog}/>
+        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog}/>
       </div>
       <div>
         <Title level={4}>Status Update</Title>
-        <TableGeneral columns={columnsStatusUpdate} data={budgetLog}/>
+        <TableGeneral loading={loading} columns={columnsStatusUpdate} data={budgetLog}/>
       </div>
     </div>
   );

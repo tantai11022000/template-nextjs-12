@@ -6,7 +6,7 @@ interface IOption {
   label: string | number
 }
 
-export interface IFRatioProps {
+export interface IFRadioProps {
   name: string,
   label: string,
   options: IOption[],
@@ -14,7 +14,7 @@ export interface IFRatioProps {
   errorMessage?: string,
 }
 
-export default function FRatio (props: IFRatioProps) {
+export default function FRadio (props: IFRadioProps) {
   const {name, label, options} = props
   return (
     <Form.Item

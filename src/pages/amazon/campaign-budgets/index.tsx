@@ -16,7 +16,7 @@ import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { CurrencyYenIcon, DocumentCheckIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Search } = Input;
 
@@ -89,7 +89,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
 
@@ -113,14 +113,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }
 
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
-    setIsLoading(true)
+    setLoading(true)
     try {
       const result = await getCampaignBudgets(partnerAccountId)
       setCampaignBudgets(result && result.data? result.data : [])
-      setIsLoading(false)
+      setLoading(false)
     } catch (error) {
       console.log(">>> error", error)
-      setIsLoading(false)
+      setLoading(false)
     }
   }
   
@@ -237,7 +237,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
               {!isEditBudget 
                 ? <div className='flex items-center'>￥ <span>{text}</span></div>
                 : <Input type='number' min={0}/>}
-              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? <DocumentCheckIcon className='w-5 h-5'/> : <PencilSquareIcon className='w-5 h-5'/>}</a>
+              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? <SaveOutlined className='w-5 h-5'/> : <EditOutlined className='w-5 h-5'/>}</a>
             </div>
           )
         }
@@ -280,8 +280,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         render: (_: any, record: any) => {
           return (
             <Space size="middle" className='flex items-center justify-center'>
-              <PencilSquareIcon className='w-5 h-5'/>
-              <TrashIcon className='w-5 h-5'/>
+              <EditOutlined className='w-5 h-5'/>
+              <DeleteOutlined className='w-5 h-5'/>
             </Space>
           )
         },
@@ -345,7 +345,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         </div>
       </div>
       <div>
-        <TableGeneral loading={isLoading} columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>

@@ -19,7 +19,7 @@ interface TableProps {
   rowSelection?: any,
   handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
   customCss?: string,
-  loading: boolean
+  loading?: boolean
 }
 
 const TableGeneral = (props: TableProps) => {

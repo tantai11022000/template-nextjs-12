@@ -120,12 +120,13 @@ const DATA = [
 export default function TargetingBidding (props: ITargetingBiddingProps) {
   const router = useRouter()
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [campaigns, setCampaigns] = useState<any[]>(CAMPAIGNS)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
-  const [campaignBudgets, setCampaignBudgets] = useState<any[]>(DATA)
+  const [targetBidding, setTargetBidding] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
 
   const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
@@ -143,15 +144,19 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   }, [])
 
   const init = () => {
-    // getCampaignBudgetsList()
+    getTargetBiddingList()
   }
 
-  const getCampaignBudgetsList = async (params: any) => {
+  const getTargetBiddingList = async () => {
+    setLoading(true)
     try {
-      // const result = await getCampaignBudgets(params)
-      // setCampaignBudgets(result && result.data? result.data : [])
+      setTimeout(() => {
+        setTargetBidding(DATA)
+        setLoading(false)
+      }, 1000);
     } catch (error) {
-      console.log(">>> error", error)
+      console.log(">>> Get Target Bidding List Error", error)
+      setLoading(true)
     }
   }
   
@@ -256,7 +261,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
           return (
             <div className='flex'>
               {!isEditBudget 
-                ? <span>JPY {text}</span>
+                ? <span>￥ {text}</span>
                 : <Input type='number' min={0}/>}
               <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? 'Save' : 'Edit'}</a>
             </div>
@@ -276,7 +281,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
           )
         },
       },
-    ], [campaignBudgets, isEditBudget]
+    ], [targetBidding, isEditBudget]
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -348,7 +353,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         </div>
       </div>
       <div>
-        <TableGeneral columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={targetBidding} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal title="Update Target Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
