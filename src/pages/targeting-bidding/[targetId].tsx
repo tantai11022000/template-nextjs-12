@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '../../components/layout';
+import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
 import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
@@ -143,7 +143,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`/amazon/campaign-budgets/${id}/history`}>Edit</Link>
+                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
                     <a>Delete</a>
                 </Space>
             )

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import styles from './index.module.scss'
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '../breadcrumb-context/constant';
 
 const { Header, Content, Footer } = Layout;
 
@@ -12,16 +13,14 @@ const menuItems = [
     { label: `Users`, url: `http://localhost:8282/#/users` },
     { label: `Biz Management`, url: `http://localhost:8282/#/masterboard/clients` },
     { label: `3rd Tracking Tools`, url: `http://localhost:8282/#/3rd-tracking-tools` },
-    { label: `Amazon`, url: `/amazon/campaign-budgets` },
+    { label: `Amazon`, url: BREADCRUMB_CAMPAIGN_BUDGET.url },
 ];
 
 const ActiveMenuLink = ({ children, href }: any) => {
-    const active = href.includes('amazon');
-  
     return (
       <Link
         href={href}
-        className={`${active ? styles.active : ''}`}
+        className={`${children === "Amazon" ? styles.active : ''}`}
       >
         {children}
       </Link>

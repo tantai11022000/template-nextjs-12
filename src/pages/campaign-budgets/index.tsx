@@ -1,29 +1,30 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
-import { Input, Space, Switch, Tag } from 'antd';
+import { Dropdown, Input, Space, Switch, Tag } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
 import { Select } from 'antd';
 import TableGeneral from '@/components/table';
-import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import store from '@/store';
+import { useAppSelector } from '@/store/hook';
+import { getCurrentAccount } from '@/store/account/accountSlice';
+import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 
 const { Search } = Input;
 
-export interface ITargetingBiddingProps {
+export interface ICampaignBudgetsProps {
 }
 
 const STATUSES = [
-  {
-    id: 1,
-    value: "all",
-    label: "All"
-  },
   {
     id: 2,
     value: "deliver",
@@ -57,82 +58,44 @@ const BULK_ACTION = [
     id: 2,
     value: "schedule_status",
     label: "Schedule Status",
-    url: '/amazon/targeting-bidding/update-schedule'
+    url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`
   },
   {
     id: 3,
-    value: "download",
-    label: "Download",
+    value: "schedule_budget_once",
+    label: "Schedule Budget Once",
+    url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`
+  }, 
+  {
+    id: 4,
+    value: "schedule_budget_with_weight",
+    label: "Schedule Budget With Weight",
+    url: ''
+  }, 
+  {
+    id: 5,
+    value: "export_schedule",
+    label: "Export Schedule",
     url: ''
   }, 
 ]
 
-const CAMPAIGNS = [
-  {
-    value: 'campaignA',
-    label: 'Campaign A',
-  },
-  {
-    value: 'campaignB',
-    label: 'Campaign B',
-  },
-  {
-    value: 'campaignC',
-    label: 'Campaign C',
-  },
-]
-
-const DATA = [
-  {
-    id: 10,
-    campaign: "Campaign A",
-    status: "active",
-    currentBidding: 10000,
-    target: "Target A",
-    portfolio: 'Portfolio 1'
-  },
-  {
-    id: 20,
-    campaign: "Campaign B",
-    status: "inactive",
-    currentBidding: 20000,
-    target: "Target B",
-    portfolio: 'Portfolio 2'
-  },
-  {
-    id: 30,
-    campaign: "Campaign C",
-    status: "inactive",
-    currentBidding: 30000,
-    target: "Target B",
-    portfolio: 'Portfolio 2'
-  },
-  {
-    id: 40,
-    campaign: "Campaign D",
-    status: "active",
-    currentBidding: 30000,
-    target: "Target A",
-    portfolio: 'Portfolio 2'
-  },
-]
-
-export default function TargetingBidding (props: ITargetingBiddingProps) {
+export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
+  const currentAccount = useAppSelector(getCurrentAccount)
 
-  const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
-  const [campaigns, setCampaigns] = useState<any[]>(CAMPAIGNS)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
-  const [targetBidding, setTargetBidding] = useState<any[]>([])
+  const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
 
   const [pagination, setPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 10,
     current: 1,
     showSizeChanger: true,
     showQuickJumper: true,
@@ -140,23 +103,25 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 
   useEffect(() => {
     mapFirstQuery()
-    init();
   }, [])
+  
+  useEffect(() => {
+    if (currentAccount) init();
+  }, [currentAccount])
 
   const init = () => {
-    getTargetBiddingList()
+    getCampaignBudgetsList(currentAccount)
   }
 
-  const getTargetBiddingList = async () => {
+  const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setTargetBidding(DATA)
-        setLoading(false)
-      }, 1000);
+      const result = await getCampaignBudgets(partnerAccountId)
+      setCampaignBudgets(result && result.data? result.data : [])
+      setLoading(false)
     } catch (error) {
-      console.log(">>> Get Target Bidding List Error", error)
-      setLoading(true)
+      console.log(">>> error", error)
+      setLoading(false)
     }
   }
   
@@ -173,14 +138,19 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     updateUrlQuery(router, params)
   }
 
-  const onChange = (value: string, url: string) => {
+  const onChange = (value: string) => {
     console.log(`selected ${value}`);
     if (value == "update_status") {
       setOpenModalUpdateStatus(!openModalUpdateStatus)
     } else if (value == "schedule_status") {
-      router.push(`/amazon/campaign-budgets/update-status`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == "schedule_budget_once") {
-      router.push(`/amazon/campaign-budgets/update-budget`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`)
+    } else if (value == "schedule_budget_with_weight") {
+      router.push({
+        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+        query: {isWeight: true}
+      })
     }
   };
   
@@ -191,7 +161,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   const filterOption = (input: string, option: any) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
-  const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+  const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
     changeNextPageUrl(router, current)
     setPagination(pagination)
@@ -214,74 +184,110 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   const columns: any = useMemo(
     () => [
       {
-        title: 'Target',
-        dataIndex: 'target',
-        key: 'target',
-        render: (text: any) => <p>{text}</p>,
-      },
-      {
         title: 'Name',
-        dataIndex: 'campaign',
-        key: 'campaign',
+        dataIndex: 'name',
+        key: 'name',
         render: (_: any, record: any) => {
-          const {id, campaign} = record
-
+          const {campaignId, name} = record
           return (
-            <>
-              <Link href={`/amazon/campaign-budgets/${id}`}>{campaign}</Link>
-            </>
+            <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}>{name}</Link>
           )
         },
 
-        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
+        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+      },
+      {
+        title: 'Portfolio',
+        dataIndex: 'deliveryProfile',
+        key: 'deliveryProfile',
+        render: (text: any) => <p>{text}</p>,
       },
       {
         title: <div className='text-center'>Status</div>,
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'state',
+        key: 'state',
         render: (_: any, record: any) => {
+          const items = [
+            { key: '1', label: 'Action 1' },
+            { key: '2', label: 'Action 2' },
+          ];
           return (
-            <div className='flex justify-center'>
-              <Tag>{record.status}</Tag>
+            <div className='flex justify-center uppercase'>
+              <Tag>
+                <Dropdown menu={{ items }}>
+                  <a>{record.state} <DownOutlined/></a>
+                </Dropdown>
+              </Tag>
             </div>
           );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        sorter: (a: any, b: any) => a.state - b.state,
       },
       {
-        title: 'Current Bidding',
-        dataIndex: 'currentBidding',
-        key: 'currentBidding',
+        title: 'Current Budget',
+        dataIndex: 'budget',
+        key: 'budget',
         render: (text: any) => {
           const handleChangeBudget = () => {
             if (isEditBudget) setIsEditBudget(false)
             else setIsEditBudget(true)
           }
           return (
-            <div className='flex'>
+            <div className='flex items-center justify-between'>
               {!isEditBudget 
-                ? <span>￥ {text}</span>
+                ? <div className='flex items-center'>￥ <span>{text}</span></div>
                 : <Input type='number' min={0}/>}
-              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? 'Save' : 'Edit'}</a>
+              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? <SaveOutlined className='w-5 h-5'/> : <EditOutlined className='w-5 h-5'/>}</a>
             </div>
           )
         }
       },
       {
+        title: 'IMP',
+        dataIndex: 'imp',
+        key: 'imp',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.imp - b.imp
+      },
+      {
+        title: 'Click',
+        dataIndex: 'click',
+        key: 'click',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.click - b.click
+      },
+      {
+        title: 'Sale',
+        dataIndex: 'sale',
+        key: 'sale',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.sale - b.sale
+      },
+      {
+        title: 'ROAS',
+        dataIndex: 'roas',
+        key: 'roas',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+        
+        sorter: (a: any, b: any) => a.roas - b.roas
+      },
+      {
         title: <div className='text-center'>Action</div>,
         key: 'action',
         render: (_: any, record: any) => {
-          const {id} = record
           return (
-            <Space size="middle" className='flex justify-center'>
-              <a>Edit</a>
-              <Link href={`/amazon/targeting-bidding/${id}`}>Log</Link>
+            <Space size="middle" className='flex items-center justify-center'>
+              <EditOutlined className='w-5 h-5'/>
+              <DeleteOutlined className='w-5 h-5'/>
             </Space>
           )
         },
       },
-    ], [targetBidding, isEditBudget]
+    ], [campaignBudgets, isEditBudget]
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -290,7 +296,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   };
   const rowSelection = {
     getCheckboxProps: (record: any) => ({
-      id: record.id,
+      id: record.campaignId,
     }),
     onChange: onSelectChange,
   };
@@ -325,20 +331,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
             />
           </div>
           <div className='flex items-center'>
-            <p className='mr-2 text-black'>Campaign</p>
-            <Select
-              style={{ width: 200 }}
-              showSearch
-              placeholder="Select Campaign"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={campaigns}
-            />
-          </div>
-          <div className='flex items-center'>
-            <p className='mr-2 text-black'>Bulk Action</p>
+            <p className='mr-2'>Bulk Action</p>
             <Select
               style={{ width: 200 }}
               showSearch
@@ -353,19 +346,20 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={targetBidding} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
-        <Modal title="Update Target Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
-          <p>Update {selectedRowKeys && selectedRowKeys.length ? selectedRowKeys.length : 0} selected target(s) to status: <Switch defaultChecked /></p>
+        <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
+          <p>Update {selectedRowKeys && selectedRowKeys.length ? selectedRowKeys.length : 0} selected campaign(s) to status: <Switch defaultChecked /></p>
         </Modal>
       )}
     </div>
   );
 }
 
-TargetingBidding.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Targeting Bidding' , url: '/amazon/targeting-bidding'}]
+
+CampaignBudgets.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url}]
   return (
     <RootLayout>
       <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>

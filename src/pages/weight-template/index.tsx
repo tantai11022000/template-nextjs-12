@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import qs from 'query-string';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '../../components/layout';
+import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 import { Space, Input, Layout, Button } from 'antd';
 import TableGeneral from '@/components/table';
@@ -12,6 +12,7 @@ import {
 import moment from 'moment';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 
 const fakeData = [
   {
@@ -118,7 +119,7 @@ function WeightTemplate() {
           return (
             <Space size="middle">
               <DeleteOutlined className='text-lg cursor-pointer'/>
-              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`/amazon/weight-template/edit/${record.id}`)}/>
+              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
             </Space>
           )
         },
@@ -149,7 +150,7 @@ function WeightTemplate() {
           onChange={(e:any) => setKeyword(e.target.value)} onSearch={handleOnSearch} className='w-96'/>
         </Space>
         <Space>
-          <Link href={'/amazon/weight-template/add'}>
+          <Link href={`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`}>
             <Button className='bg-primary text-white w-28 cursor-pointer'>Add</Button>
           </Link>
         </Space>
@@ -160,7 +161,7 @@ function WeightTemplate() {
 }
 
 WeightTemplate.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Weight Template' , url: '/amazon/weight-template'}]
+  const breadcrumb = [{label: 'Weight Template' , url: BREADCRUMB_WEIGHT_TEMPLATE.url}]
   return (
     <RootLayout>
       <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>

@@ -8,13 +8,14 @@ import Link from 'next/link';
 import moment from "moment";
 import { GetServerSideProps } from 'next';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { campaignId } = context.query;
 
   const breadcrumb = [
-    { label: 'Campaign Budgets', url: '/amazon/campaign-budgets' },
-    { label: campaignId ? campaignId : "Detail", url: `/amazon/campaign-budgets/${campaignId}` },
+    { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url },
+    { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}` },
   ];
 
   return {
@@ -169,7 +170,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`/amazon/campaign-budgets/${router.query.campaignId}/history/${id}`}>Edit</Link>
+                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${router.query.campaignId}/history/${id}`}>Edit</Link>
                     <a>Delete</a>
                 </Space>
             )

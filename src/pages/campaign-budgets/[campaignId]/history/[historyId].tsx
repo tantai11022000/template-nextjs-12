@@ -10,14 +10,15 @@ export interface IBudgetHistoryProps {
 
 import { GetServerSideProps } from 'next';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
   const historyId = context && context.query && context.query.historyId ? context.query.historyId : ""
 
   const breadcrumb = [
-    { label: 'Campaign Budgets', url: '/amazon/campaign-budgets'},
-    { label: campaignId ? campaignId : "Detail", url: `/amazon/campaign-budgets/${campaignId}`},
+    { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url},
+    { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`},
   ];
 
   if (historyId) breadcrumb.push({ label: 'History', url: ''}, { label: historyId, url: ''})

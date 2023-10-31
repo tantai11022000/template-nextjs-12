@@ -8,6 +8,7 @@ import FTextArea from '@/components/form/FTextArea';
 import FRadio from '@/components/form/FRadio';
 import TableGeneral from '@/components/table';
 import { GetServerSideProps } from 'next';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 
 const fakeDataForm = {
   name: "fake data",
@@ -56,10 +57,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
 
   let breadcrumb = [
-    { label: 'Weight Template', url: '/amazon/weight-template' },
+    { label: 'Weight Template', url: BREADCRUMB_WEIGHT_TEMPLATE.url },
   ];
 
-  if (type == "add") breadcrumb.push({ label: "Add", url: `/amazon/weight-template/add`})
+  if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`})
   else if (type == "edit") breadcrumb.push({ label: id, url: '' })
 
   return {

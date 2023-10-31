@@ -13,6 +13,7 @@ import TableGeneral from '@/components/table';
 import { EditOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 
 
 export interface IScheduleBudgetProps {
@@ -375,7 +376,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
 ScheduleBudget.getLayout = (page: any) => {
   const breadcrumb = [
-    {label: 'Campaign Budgets' , url: '/amazon/campaign-budgets'},
+    {label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url},
     {label: 'Schedule Budget for Campaigns' , url: ''}
   ]
   return (

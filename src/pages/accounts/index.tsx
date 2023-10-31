@@ -9,6 +9,7 @@ import { Button } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { getAllPartnerAccounts } from '@/services/accounts-service';
+import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
 
 export interface IAccountsProps {
 }
@@ -146,7 +147,7 @@ export default function Accounts (props: IAccountsProps) {
         render: (_: any, record: any) => {
           return (
             <Space size="middle" className='flex justify-center'>
-              <a onClick={() => router.push(`/amazon/accounts/edit/${record.id}`)}>Edit</a>
+              <a onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}>Edit</a>
               <a>Delete</a>
             </Space>
           )
@@ -166,7 +167,7 @@ export default function Accounts (props: IAccountsProps) {
       <Space direction="vertical" className='flex flex-row justify-between'>
         <Search className='w-96' value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         <Button type="primary" className='bg-primary'>
-          <Link href={`/amazon/accounts/add`}>Add</Link>
+          <Link href={`${BREADCRUMB_ACCOUNT.url}/add`}>Add</Link>
         </Button>
       </Space>
       <div>
@@ -177,7 +178,7 @@ export default function Accounts (props: IAccountsProps) {
 }
 
 Accounts.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Accounts' , url: '/amazon/accounts'}]
+  const breadcrumb = [{label: 'Accounts' , url:BREADCRUMB_ACCOUNT.url}]
   return (
     <RootLayout>
       <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>

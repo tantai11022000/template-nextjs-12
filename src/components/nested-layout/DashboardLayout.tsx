@@ -16,6 +16,7 @@ import { useRouter } from 'next/router';
 import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/account/accountSlice';
 import { getItem, storeItem } from '@/utils/StorageUtils';
 import { CURRENT_MENU } from '@/utils/StorageKeys';
+import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING, BREADCRUMB_WEIGHT_TEMPLATE } from '../breadcrumb-context/constant';
 const {  Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -46,10 +47,10 @@ const ActiveMenuLink = (props: any) => {
 };
 
 const items: MenuItem[] = [
-  getItems('Campaign Budgets', 'campaign_budgets', 'campaign_budgets', '/amazon/campaign-budgets', <PieChartOutlined />),
-  getItems('Targeting Bidding', 'targeting_bidding', 'targeting_bidding', '/amazon/targeting-bidding', <DesktopOutlined />),
-  getItems('Accounts', 'accounts', 'accounts', '/amazon/accounts', <TeamOutlined />),
-  getItems('Weight Template', 'weight_template', 'weight_template', '/amazon/weight-template', <GoldOutlined />),
+  getItems('Campaign Budgets', 'campaign_budgets', 'campaign_budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
+  getItems('Targeting Bidding', 'targeting_bidding', 'targeting_bidding', BREADCRUMB_TARGETING_BIDDING.url, <DesktopOutlined />),
+  getItems('Accounts', 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
+  getItems('Weight Template', 'weight_template', 'weight_template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
 ];
 
 const DashboardLayout = (props: any) => {
@@ -97,6 +98,8 @@ const DashboardLayout = (props: any) => {
     setMenu(value)
     storeItem(CURRENT_MENU, value)
   }
+
+  console.log('process.env.NEXT_PUBLIC_API_URL :>> ', process.env.NEXT_PUBLIC_API_URL);
 
   return (
     <Layout>

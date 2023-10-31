@@ -10,6 +10,7 @@ import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccount
 import { useAppDispatch } from '@/store/hook';
 import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
+import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
 export interface IAddAccountProps {
 }
 
@@ -18,10 +19,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
 
   let breadcrumb = [
-    { label: 'Accounts', url: '/amazon/accounts' },
+    { label: 'Accounts', url: BREADCRUMB_ACCOUNT.url },
   ];
 
-  if (type == "add") breadcrumb.push({ label: "Add", url: `/amazon/accounts/add`})
+  if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_ACCOUNT.url}/add`})
   else if (type == "edit") breadcrumb.push({ label: id, url: '' })
 
   return {
@@ -110,7 +111,7 @@ export default function AddAccount (props: IAddAccountProps) {
         dispatch(addAccount({data: result && result.data ? result.data : ""}))
       }
       setLoading(false)
-      router.push(`/amazon/accounts`)
+      router.push(BREADCRUMB_ACCOUNT.url)
     } catch (error: any) {
       console.log(">>>> Create Account Error", error)
       setLoading(false)
