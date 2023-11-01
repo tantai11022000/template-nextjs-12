@@ -71,7 +71,7 @@ const DashboardLayout = (props: any) => {
     } else {
       setShowGlobalButton("")
     }
-  }, [router.pathname, showGlobalButton])
+  }, [router.pathname])
 
   useEffect(() => {
     const option = accountList.map((account:any) => ({
@@ -98,8 +98,6 @@ const DashboardLayout = (props: any) => {
     setMenu(value)
     storeItem(CURRENT_MENU, value)
   }
-
-  console.log('process.env.NEXT_PUBLIC_API_URL :>> ', process.env.NEXT_PUBLIC_API_URL);
 
   return (
     <Layout>
