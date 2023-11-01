@@ -9,10 +9,10 @@ import { BREADCRUMB_CAMPAIGN_BUDGET } from '../breadcrumb-context/constant';
 const { Header, Content, Footer } = Layout;
 
 const menuItems = [
-    { label: `Campaigns`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}/#/campaigns` },
-    { label: `Users`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}/#/users` },
-    { label: `Biz Management`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}/#/masterboard/clients` },
-    { label: `3rd Tracking Tools`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}/#/3rd-tracking-tools` },
+    { label: `Campaigns`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns` },
+    { label: `Users`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users` },
+    { label: `Biz Management`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/masterboard/clients` },
+    { label: `3rd Tracking Tools`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/3rd-tracking-tools` },
     { label: `Amazon`, url: BREADCRUMB_CAMPAIGN_BUDGET.url },
 ];
 
