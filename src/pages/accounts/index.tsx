@@ -75,7 +75,6 @@ export default function Accounts (props: IAccountsProps) {
 
   useEffect(() => {
     init()
-    console.log("i am new code")
   }, [])
 
   const init = () => {
@@ -89,7 +88,6 @@ export default function Accounts (props: IAccountsProps) {
       setAccounts(result && result.data ? result.data : [])
       setLoading(false)
     } catch (error) {
-      console.log("hello world")
       console.log(">>> Get All Accounts Error", error)
       setLoading(false)
     }

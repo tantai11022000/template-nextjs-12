@@ -4,7 +4,7 @@ import guestClient from '../config/api/guestClient';
 const accountUrl = 'account'
 
 export const createPartnerAccount = (body: any) => {
-    return userClient.post(`${accountUrl}/create-account`, body);
+    return userClient.post(`${accountUrl}`, body);
 }
 
 export const checkValidAccount = (body: any) => {
@@ -12,13 +12,13 @@ export const checkValidAccount = (body: any) => {
 }
 
 export const editPartnerAccount = (id: any, body: any) => {
-    return userClient.put(`${accountUrl}/update-account-by-id/${id}`, body);
+    return userClient.put(`${accountUrl}/${id}`, body);
 }
 
 export const getAllPartnerAccounts = () => {
-    return userClient.get(`${accountUrl}/get-all-accounts`);
+    return userClient.get(`${accountUrl}/all-accounts`);
 }
 
 export const getAccountInfo = (id: any) => {
-    return userClient.get(`${accountUrl}/get-account-by-id/${id}`);
+    return userClient.get(`${accountUrl}/${id}`);
 }
