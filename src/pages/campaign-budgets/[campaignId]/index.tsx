@@ -9,21 +9,23 @@ import moment from "moment";
 import { GetServerSideProps } from 'next';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { useAppDispatch } from '@/store/hook';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { campaignId } = context.query;
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const { campaignId } = context.query;
 
-  const breadcrumb = [
-    { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url },
-    { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}` },
-  ];
+//   const breadcrumb = [
+//     { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url },
+//     { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}` },
+//   ];
 
-  return {
-    props: {
-      breadcrumb,
-    },
-  };
-};
+//   return {
+//     props: {
+//       breadcrumb,
+//     },
+//   };
+// };
 
 export interface ICampaignDetailProps {
 }
@@ -80,7 +82,9 @@ const UPDATE_BUDGET = [
 
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { Title } = Typography
-  const router = useRouter() 
+  const router = useRouter()
+  const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
+  const dispatch = useAppDispatch()
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [updateBudgetOptions, setUpdateBudgetOptions] = useState<any[]>(UPDATE_BUDGET)
   const [loading, setLoading] = useState<boolean>(false)
@@ -88,6 +92,11 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   useEffect(() => {
     init()
   }, [])
+
+  useEffect(() => {
+    if (!id) return
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: id , url: ''}]}))
+  },[id])
 
   const init = () => {
     getBudgetLog()
@@ -278,10 +287,9 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
 }
 
 CampaignDetail.getLayout = (page: any) => {
-  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   );
 };

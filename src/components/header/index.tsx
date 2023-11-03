@@ -36,12 +36,11 @@ function HeaderApp() {
     <Layout>
       <header className="flex flex-col gap-5 bg-[#444]">
       <div className="flex items-center h-12">
-        <Link href="/" className='w-64'>
-          <Image
-            width={36}
-            height={36}
-            src="/favicon.ico"
-            className="w-8 md:w-9"
+        <Link href="/" className='w-64 flex justify-center'>
+          <img
+            width={130}
+            height={40}
+            src="https://adtran-oricom-demo.s3.amazonaws.com/company_logo/logo-w.png"
             alt="logo"
           />
         </Link>
