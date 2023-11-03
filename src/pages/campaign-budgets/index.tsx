@@ -1,7 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
 import { Dropdown, Input, Space, Switch, Tag } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -81,7 +79,7 @@ const BULK_ACTION = [
   }, 
 ]
 
-export default function CampaignBudgets (props: ICampaignBudgetsProps) {
+function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
@@ -360,11 +358,4 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   );
 }
 
-
-CampaignBudgets.getLayout = (page: any) => {
-  return (
-    <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
-    </RootLayout>
-  )
-};
+export default CampaignBudgets

@@ -1,6 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 
 import { Input, Space, Tag } from 'antd';
@@ -62,7 +60,7 @@ const BULK_ACTION = [
   }, 
 ]
 
-export default function Accounts (props: IAccountsProps) {
+function Accounts (props: IAccountsProps) {
   const { Search } = Input;
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -181,10 +179,4 @@ export default function Accounts (props: IAccountsProps) {
   );
 }
 
-Accounts.getLayout = (page: any) => {
-  return (
-    <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
-    </RootLayout>
-  )
-};
+export default Accounts

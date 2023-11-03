@@ -15,6 +15,24 @@ import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 export interface IAddAccountProps {
 }
 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
+  const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
+
+  let breadcrumb = [
+    { label: 'Accounts', url: BREADCRUMB_ACCOUNT.url },
+  ];
+
+  if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_ACCOUNT.url}/add`})
+  else if (type == "edit") breadcrumb.push({ label: id, url: '' })
+
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
+
 const PARTNER_ACCOUNT = [
   {
     value: 'jack',
@@ -30,7 +48,7 @@ const PARTNER_ACCOUNT = [
   },
 ]
 
-export default function AddAccount (props: IAddAccountProps) {
+function AddAccount (props: IAddAccountProps) {
   const [form]:any = Form.useForm();
   const router = useRouter()
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
@@ -166,10 +184,4 @@ export default function AddAccount (props: IAddAccountProps) {
   );
 }
 
-AddAccount.getLayout = (page: any) => {
-  return (
-    <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
-    </RootLayout>
-  )
-};
+export default AddAccount
