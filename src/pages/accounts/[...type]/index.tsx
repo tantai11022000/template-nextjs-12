@@ -30,7 +30,7 @@ const PARTNER_ACCOUNT = [
   },
 ]
 
-function AddAccount (props: IAddAccountProps) {
+export default function AddAccount (props: IAddAccountProps) {
   const [form]:any = Form.useForm();
   const router = useRouter()
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""

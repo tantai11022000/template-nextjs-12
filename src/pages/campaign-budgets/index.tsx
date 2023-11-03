@@ -82,7 +82,7 @@ const BULK_ACTION = [
   }, 
 ]
 
-function CampaignBudgets (props: ICampaignBudgetsProps) {
+export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()

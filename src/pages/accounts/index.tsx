@@ -62,7 +62,7 @@ const BULK_ACTION = [
   }, 
 ]
 
-function Accounts (props: IAccountsProps) {
+export default function Accounts (props: IAccountsProps) {
   const { Search } = Input;
   const router = useRouter()
   const dispatch = useAppDispatch()
