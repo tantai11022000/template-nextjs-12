@@ -6,8 +6,12 @@ const nextConfig = {
   async rewrites(){
     return [
       {
-        source: `${process.env.NEXT_PUBLIC_SUB_URL}/_next/:path*`,
-        destination: '/_next/:path*'
+        source: `/_next/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_SUB_URL}/_next/:path*`
+      },
+      {
+        source: process.env.NEXT_PUBLIC_SUB_URL ? process.env.NEXT_PUBLIC_SUB_URL : '/',
+        destination: process.env.NEXT_PUBLIC_SUB_URL ? process.env.NEXT_PUBLIC_SUB_URL + '/' : '/' + `campaign-budgets`
       }
     ]
   }
