@@ -8,9 +8,7 @@ import FTextArea from '@/components/form/FTextArea';
 import FRadio from '@/components/form/FRadio';
 import TableGeneral from '@/components/table';
 import { GetServerSideProps } from 'next';
-import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { useAppDispatch } from '@/store/hook';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
 
 const fakeDataForm = {
   name: "fake data",
@@ -54,27 +52,26 @@ interface iRecordTable {
   weight: number,
 }
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
-//   const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
+  const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
 
-//   let breadcrumb = [
-//     { label: 'Weight Template', url: BREADCRUMB_WEIGHT_TEMPLATE.url },
-//   ];
+  let breadcrumb = [
+    { label: 'Weight Template', url: BREADCRUMB_WEIGHT_TEMPLATE.url },
+  ];
 
-//   if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`})
-//   else if (type == "edit") breadcrumb.push({ label: id, url: '' })
+  if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`})
+  else if (type == "edit") breadcrumb.push({ label: id, url: '' })
 
-//   return {
-//     props: {
-//       breadcrumb,
-//     },
-//   };
-// };
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
 
 function AddWeightTemplate() {
     const router = useRouter()
-    const dispatch = useAppDispatch()
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [dataOneHour, setDataOneHour] = useState<iRecordTable[]>([])
     const [dataThirtyMins, setDataThirtyMins] = useState<iRecordTable[]>([])
@@ -147,9 +144,7 @@ function AddWeightTemplate() {
         setIsEdit(valueEdit)
         if (valueEdit) {
           handleMapEditData()
-          dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_EDIT]}))
         } else {
-          dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_ADD]}))
           form.setFieldsValue({
             timeSlot: 1
           })
@@ -188,9 +183,10 @@ function AddWeightTemplate() {
 }
 
 AddWeightTemplate.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

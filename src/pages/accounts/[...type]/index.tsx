@@ -10,10 +10,27 @@ import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccount
 import { useAppDispatch } from '@/store/hook';
 import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
-import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
 export interface IAddAccountProps {
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
+  const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
+
+  let breadcrumb = [
+    { label: 'Accounts', url: BREADCRUMB_ACCOUNT.url },
+  ];
+
+  if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_ACCOUNT.url}/add`})
+  else if (type == "edit") breadcrumb.push({ label: id, url: '' })
+
+  return {
+    props: {
+      breadcrumb,
+    },
+  };
+};
 
 const PARTNER_ACCOUNT = [
   {
@@ -30,7 +47,7 @@ const PARTNER_ACCOUNT = [
   },
 ]
 
-export default function AddAccount (props: IAddAccountProps) {
+function AddAccount (props: IAddAccountProps) {
   const [form]:any = Form.useForm();
   const router = useRouter()
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
@@ -53,19 +70,6 @@ export default function AddAccount (props: IAddAccountProps) {
       })
     }
   },[router])
-
-  useEffect(() => {
-    let breadcrumb = [
-      BREADCRUMB_ACCOUNT,
-    ];
-  
-    if (valueEdit) {
-      breadcrumb.push({ label: id, url: '' })
-    } else {
-      breadcrumb.push(BREADCRUMB_ADD)
-    }
-    dispatch(setBreadcrumb({data: breadcrumb}))
-  },[valueEdit,id])
 
   useEffect(() => {
     const isFormDirty = form.isFieldsTouched(true);
@@ -167,9 +171,10 @@ export default function AddAccount (props: IAddAccountProps) {
 }
 
 AddAccount.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

@@ -1,7 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
 import { Dropdown, Input, Space, Switch, Tag } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -14,11 +12,13 @@ import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
-import { useAppDispatch, useAppSelector } from '@/store/hook';
+import { useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
+
 
 const { Search } = Input;
 
@@ -81,10 +81,9 @@ const BULK_ACTION = [
   }, 
 ]
 
-export default function CampaignBudgets (props: ICampaignBudgetsProps) {
+function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
-  const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -105,7 +104,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   useEffect(() => {
     mapFirstQuery()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET]}))
   }, [])
   
   useEffect(() => {
@@ -362,9 +360,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
 
 CampaignBudgets.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url}]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

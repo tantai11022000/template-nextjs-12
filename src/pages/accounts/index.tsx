@@ -1,6 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 
 import { Input, Space, Tag } from 'antd';
@@ -10,8 +8,8 @@ import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { getAllPartnerAccounts } from '@/services/accounts-service';
 import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { useAppDispatch } from '@/store/hook';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
 
 export interface IAccountsProps {
 }
@@ -62,10 +60,9 @@ const BULK_ACTION = [
   }, 
 ]
 
-export default function Accounts (props: IAccountsProps) {
+function Accounts (props: IAccountsProps) {
   const { Search } = Input;
   const router = useRouter()
-  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
@@ -78,7 +75,6 @@ export default function Accounts (props: IAccountsProps) {
 
   useEffect(() => {
     init()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_ACCOUNT]}))
   }, [])
 
   const init = () => {
@@ -182,9 +178,10 @@ export default function Accounts (props: IAccountsProps) {
 }
 
 Accounts.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Accounts' , url:BREADCRUMB_ACCOUNT.url}]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

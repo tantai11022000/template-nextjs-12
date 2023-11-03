@@ -12,8 +12,6 @@ import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
-import { useAppDispatch } from '@/store/hook';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const { Search } = Input;
 
@@ -121,7 +119,7 @@ const DATA = [
 
 export default function TargetingBidding (props: ITargetingBiddingProps) {
   const router = useRouter()
-  const dispatch = useAppDispatch()
+
   const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -143,7 +141,6 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   useEffect(() => {
     mapFirstQuery()
     init();
-    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
   }, [])
 
   const init = () => {
@@ -368,9 +365,10 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 }
 
 TargetingBidding.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Targeting Bidding' , url: BREADCRUMB_TARGETING_BIDDING.url}]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

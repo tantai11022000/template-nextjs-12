@@ -2,13 +2,11 @@ import { configureStore } from '@reduxjs/toolkit'
 import testReducer from './test/slice'
 import globalReducer from './globals/slice'
 import accountReducer from './account/accountSlice'
-import breadcrumbReducer from './breadcrumb/breadcrumbSlice'
 export const store = configureStore({
   reducer: {
     test : testReducer,
     globals: globalReducer,
-    account: accountReducer,
-    breadcrumb: breadcrumbReducer
+    account: accountReducer
   },
 });
 

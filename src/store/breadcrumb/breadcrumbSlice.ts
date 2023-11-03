@@ -1,15 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IBreadcrumb {
-  data: {label: string | number, url: string}[],
-  status: string,
-  error: string
+  data: {label: string | number, url: string}[]
 }
 
 const initialState: IBreadcrumb = {
-  data : [],
-  status: "idle",
-  error: ""
+  data : []
 }
 
 const slice = createSlice({
@@ -24,10 +20,6 @@ const slice = createSlice({
   }
 })
 
-export const { setBreadcrumb } = slice.actions
-
-export const getBreadcrumb = (state: any) => state.breadcrumb ? state.breadcrumb.data : null;
-
-
 export default slice.reducer;
 
+export const getBreadcrumb = (state: any) => state.breadcrumb ? state.breadcrumb.data : null;
