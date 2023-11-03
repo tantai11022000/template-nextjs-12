@@ -13,7 +13,12 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function App({ Component, pageProps }: any) {
-  
+  const renderWithLayout =
+    Component.getLayout ||
+    function (page: any) {
+      return <Layout>{page}</Layout>;
+    };
+
   useEffect(() => {
     getAllAccountList()
   }, [])
@@ -32,9 +37,7 @@ function App({ Component, pageProps }: any) {
 
   return (
     <Provider store={store} >
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+       {renderWithLayout(<Component {...pageProps} />)}
       <ToastContainer />
     </Provider>
   )
