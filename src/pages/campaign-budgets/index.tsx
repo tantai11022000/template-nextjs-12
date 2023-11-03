@@ -12,13 +12,14 @@ import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const { Search } = Input;
 
@@ -84,6 +85,7 @@ const BULK_ACTION = [
 function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
+  const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -104,6 +106,7 @@ function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   useEffect(() => {
     mapFirstQuery()
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET]}))
   }, [])
   
   useEffect(() => {
@@ -360,10 +363,9 @@ function CampaignBudgets (props: ICampaignBudgetsProps) {
 
 
 CampaignBudgets.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url}]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

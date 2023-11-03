@@ -7,11 +7,12 @@ import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
 import FSelect from '@/components/form/FSelect';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getAccountList } from '@/store/account/accountSlice';
 import FUploadFile from '@/components/form/FUploadFile';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 export interface IUpdateCampaignStatusProps {
 }
@@ -81,6 +82,7 @@ const FILES = [
 
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
   const { Title } = Typography
+  const dispatch = useAppDispatch()
   const [form]:any = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false)
   const accountList = useAppSelector(getAccountList);
@@ -101,6 +103,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 
   useEffect(() => {
     init()
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Update Campaign Status' , url: ''}]}))
   }, [])
 
   const init = () => {
@@ -285,13 +288,9 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 }
 
 UpdateCampaignStatus.getLayout = (page: any) => {
-  const breadcrumb = [
-    {label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url},
-    {label: 'Update Campaign Status' , url: ''}
-  ]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

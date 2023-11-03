@@ -17,6 +17,7 @@ import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/ac
 import { getItem, storeItem } from '@/utils/StorageUtils';
 import { CURRENT_MENU } from '@/utils/StorageKeys';
 import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING, BREADCRUMB_WEIGHT_TEMPLATE } from '../breadcrumb-context/constant';
+import { getBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 const {  Content, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -47,30 +48,48 @@ const ActiveMenuLink = (props: any) => {
 };
 
 const items: MenuItem[] = [
-  getItems('Campaign Budgets', 'campaign_budgets', 'campaign_budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
-  getItems('Targeting Bidding', 'targeting_bidding', 'targeting_bidding', BREADCRUMB_TARGETING_BIDDING.url, <DesktopOutlined />),
+  getItems('Campaign Budgets', 'campaign-budgets', 'campaign-budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
+  getItems('Targeting Bidding', 'targeting-bidding', 'targeting-bidding', BREADCRUMB_TARGETING_BIDDING.url, <DesktopOutlined />),
   getItems('Accounts', 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
-  getItems('Weight Template', 'weight_template', 'weight_template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
+  getItems('Weight Template', 'weight-template', 'weight-template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
 ];
 
 const DashboardLayout = (props: any) => {
-  const { children, breadcrumb } = props
+  const { children } = props
   const router = useRouter()
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
   const currentAccount = useAppSelector(getCurrentAccount);
+  const breadcrumb = useAppSelector(getBreadcrumb);
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [collapsed, setCollapsed] = useState(false);
-  const [menu, setMenu] = useState<string>("campaign_budgets")
+  const [menu, setMenu] = useState<string>("campaign-budgets")
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
     partnerAccount: false
   })
+
+  const handleMenuName = (pathName: string) : string => {
+    if (pathName.includes("campaign-budgets")) {
+      return "campaign-budgets"
+    }
+    if (pathName.includes("accounts")) {
+      return "accounts"
+    }
+    if (pathName.includes("targeting-bidding")) {
+      return "targeting-bidding"
+    }
+    if (pathName.includes("weight-template")) {
+      return "weight-template"
+    }
+    return ""
+  }
   useEffect(() => {
     if (router.pathname.includes("campaign-budgets")) {
       setShowGlobalButton({...showGlobalButton, partnerAccount: true})
     } else {
       setShowGlobalButton("")
     }
+    setMenu(handleMenuName(router.pathname))
   }, [router.pathname])
 
   useEffect(() => {
@@ -81,10 +100,10 @@ const DashboardLayout = (props: any) => {
     setOptionAccount(option)
   }, [accountList])
 
-  useEffect(() => {
-    const currentMenu: any = getItem(CURRENT_MENU)
-    if (currentMenu) setMenu(currentMenu);
-  }, []);
+  // useEffect(() => {
+  //   const currentMenu: any = getItem(CURRENT_MENU)
+  //   if (currentMenu) setMenu(currentMenu);
+  // }, []);
   
   const {
     token: { colorBgContainer },
