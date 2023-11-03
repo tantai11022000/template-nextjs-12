@@ -7,7 +7,7 @@ const nextConfig = {
     return [
       {
         source: `${process.env.NEXT_PUBLIC_SUB_URL}/_next/:path*`,
-        destination: '_next/:path*'
+        destination: '/_next/:path*'
       }
     ]
   }
