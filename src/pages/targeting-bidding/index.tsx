@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '../../components/layout';
+import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 
 import { Input, Space, Switch, Tag } from 'antd';
 import { Select } from 'antd';
@@ -12,6 +12,8 @@ import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import { useAppDispatch } from '@/store/hook';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const { Search } = Input;
 
@@ -57,7 +59,7 @@ const BULK_ACTION = [
     id: 2,
     value: "schedule_status",
     label: "Schedule Status",
-    url: '/amazon/targeting-bidding/update-schedule'
+    url: `${BREADCRUMB_TARGETING_BIDDING.url}/update-schedule`
   },
   {
     id: 3,
@@ -119,7 +121,7 @@ const DATA = [
 
 export default function TargetingBidding (props: ITargetingBiddingProps) {
   const router = useRouter()
-
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -141,6 +143,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   useEffect(() => {
     mapFirstQuery()
     init();
+    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
   }, [])
 
   const init = () => {
@@ -178,9 +181,9 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     if (value == "update_status") {
       setOpenModalUpdateStatus(!openModalUpdateStatus)
     } else if (value == "schedule_status") {
-      router.push(`/amazon/campaign-budgets/update-status`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == "schedule_budget_once") {
-      router.push(`/amazon/campaign-budgets/update-budget`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
     }
   };
   
@@ -228,7 +231,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 
           return (
             <>
-              <Link href={`/amazon/campaign-budgets/${id}`}>{campaign}</Link>
+              <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`}>{campaign}</Link>
             </>
           )
         },
@@ -276,7 +279,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
           return (
             <Space size="middle" className='flex justify-center'>
               <a>Edit</a>
-              <Link href={`/amazon/targeting-bidding/${id}`}>Log</Link>
+              <Link href={`${BREADCRUMB_TARGETING_BIDDING.url}/${id}`}>Log</Link>
             </Space>
           )
         },
@@ -365,10 +368,9 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 }
 
 TargetingBidding.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Targeting Bidding' , url: '/amazon/targeting-bidding'}]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

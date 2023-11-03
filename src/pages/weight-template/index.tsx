@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import qs from 'query-string';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '../../components/layout';
+import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 import { Space, Input, Layout, Button } from 'antd';
 import TableGeneral from '@/components/table';
@@ -12,6 +12,9 @@ import {
 import moment from 'moment';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
+import { useAppDispatch } from '@/store/hook';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const fakeData = [
   {
@@ -41,6 +44,7 @@ const fakeData = [
 ]
 function WeightTemplate() {
   const router = useRouter();
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     pageSize: 2,
@@ -118,7 +122,7 @@ function WeightTemplate() {
           return (
             <Space size="middle">
               <DeleteOutlined className='text-lg cursor-pointer'/>
-              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`/amazon/weight-template/edit/${record.id}`)}/>
+              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
             </Space>
           )
         },
@@ -140,6 +144,7 @@ function WeightTemplate() {
   useEffect(() => {
     mapFirstQuery()
     fetchWeightTemplate();
+    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
   },[])
   return (
     <>
@@ -149,7 +154,7 @@ function WeightTemplate() {
           onChange={(e:any) => setKeyword(e.target.value)} onSearch={handleOnSearch} className='w-96'/>
         </Space>
         <Space>
-          <Link href={'/amazon/weight-template/add'}>
+          <Link href={`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`}>
             <Button className='bg-primary text-white w-28 cursor-pointer'>Add</Button>
           </Link>
         </Space>
@@ -160,10 +165,9 @@ function WeightTemplate() {
 }
 
 WeightTemplate.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Weight Template' , url: '/amazon/weight-template'}]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

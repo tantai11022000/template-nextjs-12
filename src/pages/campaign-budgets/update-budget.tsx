@@ -1,18 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Button, Form, Modal, Select, Space, Tag, Typography } from 'antd';
+import { Button, Select, Space, Tag, Typography } from 'antd';
 import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
-import FSelect from '@/components/form/FSelect';
-import { useAppSelector } from '@/store/hook';
-import { getAccountList } from '@/store/account/accountSlice';
-import FUploadFile from '@/components/form/FUploadFile';
-import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { useAppDispatch } from '@/store/hook';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
-export interface IUpdateCampaignStatusProps {
+export interface IUpdateCampaignBudgetProps {
 }
 
 const PARTNER_ACCOUNT = [
@@ -78,47 +76,34 @@ const FILES = [
   },
 ]
 
-export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
+export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps) {
   const { Title } = Typography
-  const [form]:any = Form.useForm();
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
-  const accountList = useAppSelector(getAccountList);
-  const [reGenerateDataAccountList, setReGenerateDataAccountList] = useState<any[]>([])
-
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
-  const [previewFile, setPreviewFile] = useState<any[]>([])
-  const [openModalConfirmSetupBudgetSchedule, setOpenModalConfirmSetupBudgetSchedule] = useState<boolean>(false)
+  const [previewFile, setPreviewFile] = useState<any[]>(FILES)
 
   useEffect(() => {
-    const newData = accountList.map((account:any) => ({
-      value: account.id,
-      label: account.name
-    }))
-    setReGenerateDataAccountList(newData)
-  }, [accountList])
-
-  useEffect(() => {
-    init()
+   init()
+   dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Update Budgets Schedule' , url: ''}]}))
   }, [])
 
   const init = () => {
-    getFilePreview()
+    uploadFile()
   }
-  
 
-  const getFilePreview = async () => {
+  const uploadFile = async () => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setPreviewFile(FILES)
-        setLoading(false)
-      }, 1000);
-    } catch (error) {
+      setPreviewFile(FILES)
       setLoading(false)
-      console.log(">>> Get File Preview Error", error)
+    } catch (error) {
+      console.log(">>> Upload File Error", error)
+      setLoading(false)
     }
   }
+  
 
   const onChange = (value: string) => {
     console.log(`selected ${value}`);
@@ -130,27 +115,6 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 
   const filterOption = (input: string, option: any) =>
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
-  const onSave = async (value: any) => {
-    console.log(">>> value", value)
-    setStep(2)
-  }
-
-  const onSaveFail = (value: any) => {
-    console.log('>>> value', value);
-  }
-
-  const handleFinish = () => {
-    setOpenModalConfirmSetupBudgetSchedule(!openModalConfirmSetupBudgetSchedule)
-  }
-
-  const handleOk = () => {
-    setOpenModalConfirmSetupBudgetSchedule(false);
-  };
-
-  const handleCancel = () => {
-    setOpenModalConfirmSetupBudgetSchedule(false);
-  };
 
   const columnsBudgetLog: any = useMemo(
     () => [
@@ -214,7 +178,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`/amazon/campaign-budgets/${id}/history`}>Edit</Link>
+                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
                 </Space>
             )
         },
@@ -225,72 +189,41 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
   return (
     <div className='text-black'>
       {step == 1 ? (
-        // <>
-        //   <Title level={4}>Update Campaign Status Schedule</Title>
-        //   <div className='flex items-center'>
-        //     <p className='mr-2'>Status</p>
-        //     <Select
-        //       showSearch
-        //       placeholder="Select Partner Account"
-        //       optionFilterProp="children"
-        //       onChange={onChange}
-        //       onSearch={onSearch}
-        //       filterOption={filterOption}
-        //       options={partnerAccount}
-        //     />
-        //   </div>
-        //   <div className='flex items-center'>
-        //     <p className='mr-2'>Schedule File</p>
-        //     <UploadFile/>
-        //   </div>
-        //   <Button onClick={() => setStep(2)}>Next</Button>
-        // </>
         <>
-          <Title level={4}>Update Campaign Status Schedule</Title>
-          <Form
-            form= {form}
-            onFinish={onSave}
-            onFinishFailed={onSaveFail}
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 14 }}
-            layout="horizontal"
-          >
-            <FSelect name={'partnerAccount'} label={'Partner Account'} placeholder={'Select Partner Account'} options={reGenerateDataAccountList}/>
-            <FUploadFile name={'file'} label={'Schedule File'}/>
-
-            <Space size="middle" className='flex justify-center'>
-              <Button className='bg-primary text-white' htmlType="submit" >Next</Button>
-            </Space>
-          </Form>
+          <Title level={4}>Update Campaign Budgets Schedule</Title>
+          <div className='flex items-center'>
+            <p className='mr-2'>Status</p>
+            <Select
+              showSearch
+              placeholder="Select Partner Account"
+              optionFilterProp="children"
+              onChange={onChange}
+              onSearch={onSearch}
+              filterOption={filterOption}
+              options={partnerAccount}
+            />
+          </div>
+          <div className='flex items-center'>
+            <p className='mr-2'>Schedule File</p>
+            <UploadFile/>
+          </div>
+          <Button onClick={() => setStep(2)}>Next</Button>
         </>
       ) : step == 2 ? (
         <>
           <Title level={4}>Update Campaign Budgets Schedule - Validate and live Edit</Title>
+          <Button onClick={() => setStep(1)}>Back</Button>
           <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile}/>
-          <div className='w-full flex items-center justify-between'>
-            <Button onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={handleFinish}>Finish</Button>
-          </div>
         </>
       ) : null}
-
-      {openModalConfirmSetupBudgetSchedule && (
-        <Modal title="Existing Budget Schedule Warning" open={openModalConfirmSetupBudgetSchedule} onOk={handleOk} onCancel={handleCancel}>
-          <ConfirmSetupBudgetSchedule/>
-        </Modal>
-      )}
     </div>
   );
 }
 
-UpdateCampaignStatus.getLayout = (page: any) => {
-  const breadcrumb = [
-    {label: 'Campaign Budgets' , url: '/amazon/campaign-budgets'},
-    {label: 'Update Campaign Status' , url: ''}
-  ]
+UpdateCampaignBudget.getLayout = (page: any) => {
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

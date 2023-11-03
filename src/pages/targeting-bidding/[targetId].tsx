@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import RootLayout from '../../../components/layout';
-import DashboardLayout from '../../../components/nested-layout/DashboardLayout';
+import RootLayout from '../../components/layout';
+import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
 import { Space, Switch, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
@@ -8,6 +8,8 @@ import Link from 'next/link';
 import moment from "moment";
 // import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
+import { useAppDispatch } from '@/store/hook';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 export interface ITargetDetailProps {
 }
@@ -57,10 +59,16 @@ export default function TargetDetail (props: ITargetDetailProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const id = router && router.query && router.query.targetId ? router.query.targetId : ""
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     init()
   }, [])
+
+  useEffect(() => {
+    if (!id) return
+    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING, {label: id, url: ''}]}))
+  }, [id])
 
   const init = () => {
     getBudgetLog()
@@ -143,7 +151,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`/amazon/campaign-budgets/${id}/history`}>Edit</Link>
+                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
                     <a>Delete</a>
                 </Space>
             )

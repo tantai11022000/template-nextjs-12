@@ -12,13 +12,12 @@ import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function App({ Component, pageProps }: any) {
+function App({ Component, pageProps }: any) {
   const renderWithLayout =
     Component.getLayout ||
     function (page: any) {
       return <Layout>{page}</Layout>;
     };
-  
 
   useEffect(() => {
     getAllAccountList()
@@ -41,9 +40,10 @@ export default function App({ Component, pageProps }: any) {
 
   return (
     <Provider store={store} >
-      {renderWithLayout(<Component {...pageProps} />)}
+       {renderWithLayout(<Component {...pageProps} />)}
       <ToastContainer />
     </Provider>
   )
-  
 }
+
+export default App

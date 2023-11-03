@@ -4,30 +4,34 @@ import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { Button, Space, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
+import { GetServerSideProps } from 'next';
+import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { useAppDispatch } from '@/store/hook';
+import { useRouter } from 'next/router';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 export interface IBudgetHistoryProps {
 }
 
-import { GetServerSideProps } from 'next';
-import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
-  const historyId = context && context.query && context.query.historyId ? context.query.historyId : ""
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
+//   const historyId = context && context.query && context.query.historyId ? context.query.historyId : ""
 
-  const breadcrumb = [
-    { label: 'Campaign Budgets', url: '/amazon/campaign-budgets'},
-    { label: campaignId ? campaignId : "Detail", url: `/amazon/campaign-budgets/${campaignId}`},
-  ];
+//   const breadcrumb = [
+//     { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url},
+//     { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`},
+//   ];
 
-  if (historyId) breadcrumb.push({ label: 'History', url: ''}, { label: historyId, url: ''})
+//   if (historyId) breadcrumb.push({ label: 'History', url: ''}, { label: historyId, url: ''})
 
-  return {
-    props: {
-      breadcrumb,
-    },
-  };
-};
+//   return {
+//     props: {
+//       breadcrumb,
+//     },
+//   };
+// };
 
 const BUDGET_HISTORY = [
   {
@@ -94,12 +98,20 @@ const BUDGET_HISTORY = [
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
   const { Title } = Typography
+  const dispatch = useAppDispatch()
+  const router = useRouter()
+  const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetHistory, setBudgetHistory] = useState<any[]>([])
 
   useEffect(() => {
     init()
   }, [])
+
+  useEffect(() => {
+    if (!id) return
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: id, url: ``}]}))
+  }, [id])
 
   const init = () => {
     getBudgetHistory()
@@ -204,10 +216,9 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
 }
 
 BudgetHistory.getLayout = (page: any) => {
-  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   );
 };

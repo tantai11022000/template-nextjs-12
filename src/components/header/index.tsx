@@ -4,24 +4,23 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import styles from './index.module.scss'
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '../breadcrumb-context/constant';
 
 const { Header, Content, Footer } = Layout;
 
 const menuItems = [
-    { label: `Campaigns`, url: `http://localhost:8282/#/campaigns` },
-    { label: `Users`, url: `http://localhost:8282/#/users` },
-    { label: `Biz Management`, url: `http://localhost:8282/#/masterboard/clients` },
-    { label: `3rd Tracking Tools`, url: `http://localhost:8282/#/3rd-tracking-tools` },
-    { label: `Amazon`, url: `/amazon/campaign-budgets` },
+    { label: `Campaigns`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns` },
+    { label: `Users`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users` },
+    { label: `Biz Management`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/masterboard/clients` },
+    { label: `3rd Tracking Tools`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/3rd-tracking-tools` },
+    { label: `Amazon`, url: BREADCRUMB_CAMPAIGN_BUDGET.url },
 ];
 
 const ActiveMenuLink = ({ children, href }: any) => {
-    const active = href.includes('amazon');
-  
     return (
       <Link
         href={href}
-        className={`${active ? styles.active : ''}`}
+        className={`${children === "Amazon" ? styles.active : ''}`}
       >
         {children}
       </Link>
@@ -37,12 +36,11 @@ function HeaderApp() {
     <Layout>
       <header className="flex flex-col gap-5 bg-[#444]">
       <div className="flex items-center h-12">
-        <Link href="/" className='w-64'>
-          <Image
-            width={36}
-            height={36}
-            src="/favicon.ico"
-            className="w-8 md:w-9"
+        <Link href="/" className='w-64 flex justify-center'>
+          <img
+            width={130}
+            height={40}
+            src="https://adtran-oricom-demo.s3.amazonaws.com/company_logo/logo-w.png"
             alt="logo"
           />
         </Link>

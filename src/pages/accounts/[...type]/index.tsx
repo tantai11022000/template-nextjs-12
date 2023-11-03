@@ -10,26 +10,10 @@ import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccount
 import { useAppDispatch } from '@/store/hook';
 import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
+import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/components/breadcrumb-context/constant';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 export interface IAddAccountProps {
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
-  const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
-
-  let breadcrumb = [
-    { label: 'Accounts', url: '/amazon/accounts' },
-  ];
-
-  if (type == "add") breadcrumb.push({ label: "Add", url: `/amazon/accounts/add`})
-  else if (type == "edit") breadcrumb.push({ label: id, url: '' })
-
-  return {
-    props: {
-      breadcrumb,
-    },
-  };
-};
 
 const PARTNER_ACCOUNT = [
   {
@@ -71,6 +55,19 @@ export default function AddAccount (props: IAddAccountProps) {
   },[router])
 
   useEffect(() => {
+    let breadcrumb = [
+      BREADCRUMB_ACCOUNT,
+    ];
+  
+    if (valueEdit) {
+      breadcrumb.push({ label: id, url: '' })
+    } else {
+      breadcrumb.push(BREADCRUMB_ADD)
+    }
+    dispatch(setBreadcrumb({data: breadcrumb}))
+  },[valueEdit,id])
+
+  useEffect(() => {
     const isFormDirty = form.isFieldsTouched(true);
     setIsFormChanged(isFormDirty);
   }, [form]);
@@ -110,7 +107,7 @@ export default function AddAccount (props: IAddAccountProps) {
         dispatch(addAccount({data: result && result.data ? result.data : ""}))
       }
       setLoading(false)
-      router.push(`/amazon/accounts`)
+      router.push(BREADCRUMB_ACCOUNT.url)
     } catch (error: any) {
       console.log(">>>> Create Account Error", error)
       setLoading(false)
@@ -170,10 +167,9 @@ export default function AddAccount (props: IAddAccountProps) {
 }
 
 AddAccount.getLayout = (page: any) => {
-  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

@@ -1,7 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
 import { Dropdown, Input, Space, Switch, Tag } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
@@ -14,9 +12,14 @@ import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import RootLayout from '@/components/layout';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
+
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const { Search } = Input;
 
@@ -57,13 +60,13 @@ const BULK_ACTION = [
     id: 2,
     value: "schedule_status",
     label: "Schedule Status",
-    url: '/amazon/campaign-budgets/update-status'
+    url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`
   },
   {
     id: 3,
     value: "schedule_budget_once",
     label: "Schedule Budget Once",
-    url: '/amazon/campaign-budgets/update-budget'
+    url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`
   }, 
   {
     id: 4,
@@ -82,6 +85,7 @@ const BULK_ACTION = [
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
+  const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
@@ -103,6 +107,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   useEffect(() => {
     mapFirstQuery()
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET]}))
   }, [])
 
   useEffect(() => {
@@ -149,12 +154,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     if (value == "update_status") {
       setOpenModalUpdateStatus(!openModalUpdateStatus)
     } else if (value == "schedule_status") {
-      router.push(`/amazon/campaign-budgets/update-status`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == "schedule_budget_once") {
-      router.push(`/amazon/campaign-budgets/schedule-budget`)
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`)
     } else if (value == "schedule_budget_with_weight") {
       router.push({
-        pathname: `/amazon/campaign-budgets/schedule-budget`,
+        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
         query: {isWeight: true}
       })
     }
@@ -196,7 +201,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         render: (_: any, record: any) => {
           const {campaignId, name} = record
           return (
-            <Link href={`/amazon/campaign-budgets/${campaignId}`}>{name}</Link>
+            <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}>{name}</Link>
           )
         },
 
@@ -365,10 +370,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
 
 CampaignBudgets.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Campaign Budgets' , url: '/amazon/campaign-budgets'}]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };

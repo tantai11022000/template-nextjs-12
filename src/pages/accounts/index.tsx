@@ -1,6 +1,4 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import RootLayout from '@/components/layout';
-import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import Link from 'next/link';
 
 import { Input, Space, Tag } from 'antd';
@@ -9,6 +7,11 @@ import { Button } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { getAllPartnerAccounts } from '@/services/accounts-service';
+import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
+import DashboardLayout from '@/components/nested-layout/DashboardLayout';
+import RootLayout from '@/components/layout';
+import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { useAppDispatch } from '@/store/hook';
 
 export interface IAccountsProps {
 }
@@ -62,6 +65,7 @@ const BULK_ACTION = [
 export default function Accounts (props: IAccountsProps) {
   const { Search } = Input;
   const router = useRouter()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
@@ -74,8 +78,16 @@ export default function Accounts (props: IAccountsProps) {
   })
 
   useEffect(() => {
-    getAllAccounts()
+    dispatch(setBreadcrumb({data: [BREADCRUMB_ACCOUNT]}))
+  }, [])
+
+  useEffect(() => {
+    init()
   }, [pagination.pageSize, pagination.current])
+
+  const init = () => {
+    getAllAccounts()
+  }
   
   const getAllAccounts = async () => {
     setLoading(true)
@@ -154,7 +166,7 @@ export default function Accounts (props: IAccountsProps) {
         render: (_: any, record: any) => {
           return (
             <Space size="middle" className='flex justify-center'>
-              <a onClick={() => router.push(`/amazon/accounts/edit/${record.id}`)}>Edit</a>
+              <a onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}>Edit</a>
               <a>Delete</a>
             </Space>
           )
@@ -174,7 +186,7 @@ export default function Accounts (props: IAccountsProps) {
       <Space direction="vertical" className='flex flex-row justify-between'>
         <Search className='w-96' value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         <Button type="primary" className='bg-primary'>
-          <Link href={`/amazon/accounts/add`}>Add</Link>
+          <Link href={`${BREADCRUMB_ACCOUNT.url}/add`}>Add</Link>
         </Button>
       </Space>
       <div>
@@ -185,10 +197,9 @@ export default function Accounts (props: IAccountsProps) {
 }
 
 Accounts.getLayout = (page: any) => {
-  const breadcrumb = [{label: 'Accounts' , url: '/amazon/accounts'}]
   return (
     <RootLayout>
-      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+      <DashboardLayout>{page}</DashboardLayout>
     </RootLayout>
   )
 };
