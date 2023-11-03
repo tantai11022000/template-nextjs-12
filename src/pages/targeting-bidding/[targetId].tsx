@@ -8,8 +8,6 @@ import Link from 'next/link';
 import moment from "moment";
 // import { useBreadcrumb } from '@/components/breadcrumb-context';
 import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
-import { useAppDispatch } from '@/store/hook';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 export interface ITargetDetailProps {
 }
@@ -59,16 +57,10 @@ export default function TargetDetail (props: ITargetDetailProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const id = router && router.query && router.query.targetId ? router.query.targetId : ""
-  const dispatch = useAppDispatch()
 
   useEffect(() => {
     init()
   }, [])
-
-  useEffect(() => {
-    if (!id) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING, {label: id, url: ''}]}))
-  }, [id])
 
   const init = () => {
     getBudgetLog()

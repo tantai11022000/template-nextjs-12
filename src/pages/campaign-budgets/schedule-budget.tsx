@@ -3,7 +3,7 @@ import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
-import { useAppDispatch, useAppSelector } from '@/store/hook';
+import { useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography } from 'antd';
 import { useRouter } from 'next/router';
@@ -14,7 +14,6 @@ import { EditOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 
 export interface IScheduleBudgetProps {
@@ -84,7 +83,6 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [form]:any = Form.useForm();
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
-  const dispatch = useAppDispatch()
 
   const [selectMode, setSelectMode] = useState<string>("exact")
   const [loading, setLoading] = useState<boolean>(false);
@@ -108,10 +106,6 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       setShowMore(false);
     }
   }, [campaignBudgets]);
-
-  useEffect(() => {
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Schedule Budget for Campaigns' , url: ''}]}))
-  },[])
 
   const init = () => {
     getCampaignBudgetsList(currentAccount)
@@ -381,9 +375,13 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 }
 
 ScheduleBudget.getLayout = (page: any) => {
+  const breadcrumb = [
+    {label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url},
+    {label: 'Schedule Budget for Campaigns' , url: ''}
+  ]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

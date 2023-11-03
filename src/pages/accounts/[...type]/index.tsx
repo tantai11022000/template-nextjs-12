@@ -10,8 +10,7 @@ import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccount
 import { useAppDispatch } from '@/store/hook';
 import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
-import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/components/breadcrumb-context/constant';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
 export interface IAddAccountProps {
 }
 
@@ -71,19 +70,6 @@ function AddAccount (props: IAddAccountProps) {
       })
     }
   },[router])
-
-  useEffect(() => {
-    let breadcrumb = [
-      BREADCRUMB_ACCOUNT,
-    ];
-  
-    if (valueEdit) {
-      breadcrumb.push({ label: id, url: '' })
-    } else {
-      breadcrumb.push(BREADCRUMB_ADD)
-    }
-    dispatch(setBreadcrumb({data: breadcrumb}))
-  },[valueEdit,id])
 
   useEffect(() => {
     const isFormDirty = form.isFieldsTouched(true);
@@ -184,4 +170,11 @@ function AddAccount (props: IAddAccountProps) {
   );
 }
 
-export default AddAccount
+AddAccount.getLayout = (page: any) => {
+  const breadcrumb = page && page.props && page.props.breadcrumb ? page.props.breadcrumb : [];
+  return (
+    <RootLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
+    </RootLayout>
+  )
+};

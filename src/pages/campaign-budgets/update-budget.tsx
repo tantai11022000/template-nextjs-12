@@ -7,8 +7,6 @@ import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
-import { useAppDispatch } from '@/store/hook';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 export interface IUpdateCampaignBudgetProps {
 }
@@ -78,7 +76,6 @@ const FILES = [
 
 export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps) {
   const { Title } = Typography
-  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
@@ -86,7 +83,6 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 
   useEffect(() => {
    init()
-   dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Update Budgets Schedule' , url: ''}]}))
   }, [])
 
   const init = () => {
@@ -221,9 +217,13 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 }
 
 UpdateCampaignBudget.getLayout = (page: any) => {
+  const breadcrumb = [
+    {label: 'Campaign Budgets' , url: BREADCRUMB_CAMPAIGN_BUDGET.url},
+    {label: 'Update Budgets Schedule' , url: ''}
+  ]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };

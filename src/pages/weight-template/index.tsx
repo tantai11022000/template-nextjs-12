@@ -13,8 +13,6 @@ import moment from 'moment';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
 import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
-import { useAppDispatch } from '@/store/hook';
-import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 const fakeData = [
   {
@@ -44,7 +42,6 @@ const fakeData = [
 ]
 function WeightTemplate() {
   const router = useRouter();
-  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     pageSize: 2,
@@ -144,7 +141,6 @@ function WeightTemplate() {
   useEffect(() => {
     mapFirstQuery()
     fetchWeightTemplate();
-    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
   },[])
   return (
     <>
@@ -165,9 +161,10 @@ function WeightTemplate() {
 }
 
 WeightTemplate.getLayout = (page: any) => {
+  const breadcrumb = [{label: 'Weight Template' , url: BREADCRUMB_WEIGHT_TEMPLATE.url}]
   return (
     <RootLayout>
-      <DashboardLayout>{page}</DashboardLayout>
+      <DashboardLayout breadcrumb={breadcrumb}>{page}</DashboardLayout>
     </RootLayout>
   )
 };
