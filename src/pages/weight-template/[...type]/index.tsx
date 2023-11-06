@@ -177,11 +177,13 @@ function AddWeightTemplate() {
 
                 <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'max-h-80 w-[50%] m-auto overflow-y-auto'} />
 
-                <Form.Item className='flex justify-end mt-5'>
-                  <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
-                  <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
-                  <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>
-                </Form.Item>
+                <div className='mt-8'>
+                  <Form.Item className='flex justify-center'>
+                    <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
+                    <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
+                    <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>
+                  </Form.Item>
+                </div>
             </Form>
         </>
     );

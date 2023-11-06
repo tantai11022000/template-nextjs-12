@@ -9,6 +9,11 @@ import moment from 'moment';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import {
+  DeleteOutlined,
+  EditOutlined
+} from '@ant-design/icons';
+import { useRouter } from 'next/router';
 
 export interface IUpdateCampaignBudgetProps {
 }
@@ -79,6 +84,7 @@ const FILES = [
 export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps) {
   const { Title } = Typography
   const dispatch = useAppDispatch()
+  const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
   const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
   const [step, setStep] = useState<number>(1)
@@ -178,7 +184,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
             const {id} = record
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
+                    <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
                 </Space>
             )
         },

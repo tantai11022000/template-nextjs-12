@@ -362,7 +362,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
             onChange={handleChangeWeightTemplate}
             options={weights}
             />
-            <EditOutlined className='w-5 h-5' onClick={handleEditWeightTemplate}/>
+            <EditOutlined className='text-lg cursor-pointer' onClick={handleEditWeightTemplate}/>
         </Space>
       </Space>
       <div className='flex justify-center mt-6'>

@@ -10,6 +10,10 @@ import moment from "moment";
 import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import {
+  DeleteOutlined,
+  EditOutlined
+} from '@ant-design/icons';
 
 export interface ITargetDetailProps {
 }
@@ -150,10 +154,12 @@ export default function TargetDetail (props: ITargetDetailProps) {
         render: (_: any, record: any) => {
             const {id} = record
             return (
+              <div className='flex justify-center'>
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
-                    <a>Delete</a>
+                  <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
+                  <DeleteOutlined className='text-lg cursor-pointer'/>
                 </Space>
+              </div>
             )
         },
       },
@@ -216,10 +222,12 @@ export default function TargetDetail (props: ITargetDetailProps) {
         key: 'log',
         render: (_: any, record: any) => {
             return (
-                <Space size="middle" className='flex justify-center'>
-                    <a>Edit</a>
-                    <a>Delete</a>
+              <div className='flex justify-center'>
+                <Space size="middle">
+                  <EditOutlined className='text-lg cursor-pointer'/>
+                  <DeleteOutlined className='text-lg cursor-pointer'/>
                 </Space>
+              </div>
             )
         },
       },

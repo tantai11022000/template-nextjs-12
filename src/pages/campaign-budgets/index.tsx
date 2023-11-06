@@ -14,7 +14,7 @@ import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { SaveOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
@@ -95,7 +95,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
+  const [isEditingList, setIsEditingList] = useState(
+    campaignBudgets.map(() => false)
+  );
 
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
@@ -192,18 +194,24 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }
   }
 
+  const handleToggleEdit = (index: any) => {
+    const updatedIsEditingList = [...isEditingList];
+    updatedIsEditingList[index] = !updatedIsEditingList[index];
+    setIsEditingList(updatedIsEditingList);
+  };
+
+  const handleBudgetChange = (e: any, index: any) => {
+    console.log(">>> index", index)
+    console.log(">>> e.target.value", e.target.value)
+  };
+
   const columns: any = useMemo(
     () => [
       {
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render: (_: any, record: any) => {
-          const {campaignId, name} = record
-          return (
-            <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}>{name}</Link>
-          )
-        },
+        render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
@@ -239,19 +247,21 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: 'Current Budget',
         dataIndex: 'budget',
         key: 'budget',
-        render: (text: any) => {
-          const handleChangeBudget = () => {
-            if (isEditBudget) setIsEditBudget(false)
-            else setIsEditBudget(true)
-          }
+        render: (text: any, record: any, index: number) => {
+          const isEditing = isEditingList[index];
+
           return (
             <div className='flex items-center justify-between'>
-              {!isEditBudget 
-                ? <div className='flex items-center'>￥ <span>{text}</span></div>
-                : <Input type='number' min={0}/>}
-              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? <SaveOutlined className='w-5 h-5'/> : <EditOutlined className='w-5 h-5'/>}</a>
+              {!isEditing ? (
+                <div className='flex items-center'>￥ <span>{text}</span></div>
+              ) : (
+                <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+              )}
+              <div className='ml-2' onClick={() => handleToggleEdit(index)}>
+                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
+              </div>
             </div>
-          )
+          );
         }
       },
       {
@@ -290,15 +300,15 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>Action</div>,
         key: 'action',
         render: (_: any, record: any) => {
+          const {campaignId, name} = record
           return (
-            <Space size="middle" className='flex items-center justify-center'>
-              <EditOutlined className='w-5 h-5'/>
-              <DeleteOutlined className='w-5 h-5'/>
-            </Space>
+            <div className='flex justify-center'>
+              <FileTextOutlined className='text-lg cursor-pointer' onClick={() =>router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`)}/>
+            </div>
           )
         },
       },
-    ], [campaignBudgets, isEditBudget]
+    ], [campaignBudgets, handleToggleEdit, isEditingList]
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {

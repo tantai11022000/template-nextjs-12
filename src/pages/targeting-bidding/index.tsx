@@ -14,6 +14,8 @@ import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
+
 
 const { Search } = Input;
 
@@ -131,7 +133,9 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   const [targetBidding, setTargetBidding] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
 
-  const [isEditBudget, setIsEditBudget] = useState<boolean>(false);
+  const [isEditingList, setIsEditingList] = useState(
+    targetBidding.map(() => false)
+  );
 
   const [pagination, setPagination] = useState<any>({
     pageSize: 2,
@@ -214,6 +218,17 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     }
   }
 
+  const handleToggleEdit = (index: any) => {
+    const updatedIsEditingList = [...isEditingList];
+    updatedIsEditingList[index] = !updatedIsEditingList[index];
+    setIsEditingList(updatedIsEditingList);
+  };
+
+  const handleBudgetChange = (e: any, index: any) => {
+    console.log(">>> index", index)
+    console.log(">>> e.target.value", e.target.value)
+  };
+
   const columns: any = useMemo(
     () => [
       {
@@ -256,19 +271,21 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         title: 'Current Bidding',
         dataIndex: 'currentBidding',
         key: 'currentBidding',
-        render: (text: any) => {
-          const handleChangeBudget = () => {
-            if (isEditBudget) setIsEditBudget(false)
-            else setIsEditBudget(true)
-          }
+        render: (text: any, record: any, index: number) => {
+          const isEditing = isEditingList[index];
+
           return (
-            <div className='flex'>
-              {!isEditBudget 
-                ? <span>￥ {text}</span>
-                : <Input type='number' min={0}/>}
-              <a className='ml-2' onClick={handleChangeBudget}>{isEditBudget ? 'Save' : 'Edit'}</a>
+            <div className='flex items-center justify-between'>
+              {!isEditing ? (
+                <div className='flex items-center'>￥ <span>{text}</span></div>
+              ) : (
+                <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+              )}
+              <div className='ml-2' onClick={() => handleToggleEdit(index)}>
+                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
+              </div>
             </div>
-          )
+          );
         }
       },
       {
@@ -277,14 +294,16 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         render: (_: any, record: any) => {
           const {id} = record
           return (
-            <Space size="middle" className='flex justify-center'>
-              <a>Edit</a>
-              <Link href={`${BREADCRUMB_TARGETING_BIDDING.url}/${id}`}>Log</Link>
-            </Space>
+            <div className='flex justify-center'>
+              <Space size="middle">
+                <EditOutlined className='text-lg cursor-pointer'/>
+                <FileTextOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_TARGETING_BIDDING.url}/${id}`)}/>
+              </Space>
+            </div>
           )
         },
       },
-    ], [targetBidding, isEditBudget]
+    ], [targetBidding, handleToggleEdit, isEditingList]
   )
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {

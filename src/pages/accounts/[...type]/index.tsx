@@ -158,10 +158,12 @@ export default function AddAccount (props: IAddAccountProps) {
         <Button className={`${displayCreateButton ? 'bg-blue' : 'bg-primary'} text-white`} onClick={onTestValid} disabled={loading}>{displayCreateButton ? "Valid" : "Check"}</Button>
       </Space> */}
 
-      <Space size="middle" className='flex justify-center'>
-        <Button onClick={() => router.back()}>Cancel</Button>
-        <Button className='bg-primary text-white' htmlType="submit" disabled={loading}>{loading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
-      </Space>
+      <div className='flex justify-center'>
+        <Space size="middle" className='flex justify-center'>
+          <Button type="primary" className='bg-primary' onClick={() => router.back()}>Cancel</Button>
+          <Button type="primary" className='bg-primary' htmlType="submit" disabled={loading}>{loading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
+        </Space>
+      </div>
     </Form>
   );
 }

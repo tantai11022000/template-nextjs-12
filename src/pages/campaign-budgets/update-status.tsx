@@ -13,6 +13,11 @@ import FUploadFile from '@/components/form/FUploadFile';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import {
+  DeleteOutlined,
+  EditOutlined
+} from '@ant-design/icons';
+import { useRouter } from 'next/router';
 
 export interface IUpdateCampaignStatusProps {
 }
@@ -83,6 +88,7 @@ const FILES = [
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
   const { Title } = Typography
   const dispatch = useAppDispatch()
+  const router = useRouter()
   const [form]:any = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false)
   const accountList = useAppSelector(getAccountList);
@@ -217,8 +223,8 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         render: (_: any, record: any) => {
             const {id} = record
             return (
-                <Space size="middle" className='flex justify-center'>
-                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`}>Edit</Link>
+                <Space size="middle" className='w-full flex justify-center'>
+                    <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
                 </Space>
             )
         },
@@ -262,8 +268,8 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
             <FSelect name={'partnerAccount'} label={'Partner Account'} placeholder={'Select Partner Account'} options={reGenerateDataAccountList}/>
             <FUploadFile name={'file'} label={'Schedule File'}/>
 
-            <Space size="middle" className='flex justify-center'>
-              <Button className='bg-primary text-white' htmlType="submit" >Next</Button>
+            <Space size="middle" className='w-full flex justify-end'>
+              <Button type='primary' className='bg-primary text-white' htmlType="submit" >Next</Button>
             </Space>
           </Form>
         </>
@@ -273,7 +279,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
           <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile}/>
           <div className='w-full flex items-center justify-between'>
             <Button onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={handleFinish}>Finish</Button>
+            <Button type='primary' onClick={handleFinish}>Finish</Button>
           </div>
         </>
       ) : null}
