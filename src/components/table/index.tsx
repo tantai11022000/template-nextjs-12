@@ -1,7 +1,6 @@
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useState } from 'react';
-import styles from './index.module.scss'
 
 interface DataType {
   title: string;
@@ -30,7 +29,7 @@ const TableGeneral = (props: TableProps) => {
         loading={loading}
         bordered
         rowKey={(record) => record.id || record.campaignId}
-        className={`mt-6 ${customCss}`}
+        className={`custom-table ${customCss ? customCss : ""}`}
         dataSource={data}
         columns={columns ? columns.map((column: any) => ({
           ...column,

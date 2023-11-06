@@ -11,6 +11,10 @@ import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import {
+  DeleteOutlined,
+  EditOutlined
+} from '@ant-design/icons';
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 //   const { campaignId } = context.query;
@@ -178,10 +182,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (_: any, record: any) => {
             const {id} = record
             return (
+              <div className='flex justify-center'>
                 <Space size="middle" className='flex justify-center'>
-                    <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${router.query.campaignId}/history/${id}`}>Edit</Link>
-                    <a>Delete</a>
+                  <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${router.query.campaignId}/history/${id}`)}/>
+                  <DeleteOutlined className='text-lg cursor-pointer'/>
                 </Space>
+              </div>
             )
         },
       },
@@ -245,8 +251,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (_: any, record: any) => {
             return (
                 <Space size="middle" className='flex justify-center'>
-                    <a>Edit</a>
-                    <a>Delete</a>
+                    <EditOutlined className='text-lg cursor-pointer'/>
+                    <DeleteOutlined className='text-lg cursor-pointer'/>
                 </Space>
             )
         },

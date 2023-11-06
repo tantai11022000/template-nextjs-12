@@ -4,13 +4,13 @@ import {
   DesktopOutlined,
   PieChartOutlined,
   TeamOutlined,
-  GoldOutlined
+  GoldOutlined,
+  HomeFilled
 } from '@ant-design/icons';
 import { MenuProps, Select } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import styles from './index.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { useRouter } from 'next/router';
 import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/account/accountSlice';
@@ -18,7 +18,8 @@ import { getItem, storeItem } from '@/utils/StorageUtils';
 import { CURRENT_MENU } from '@/utils/StorageKeys';
 import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING, BREADCRUMB_WEIGHT_TEMPLATE } from '../breadcrumb-context/constant';
 import { getBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-const {  Content, Sider } = Layout;
+import { getCollapseMenu } from '@/store/globals/globalsSlice';
+const {  Content, Sider, Footer } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -43,7 +44,7 @@ function getItems(
 const ActiveMenuLink = (props: any) => {
   const { children, href } = props
   return (
-    <Link href={href}>{children}</Link>
+    <Link href={href} className='text-lg'>{children}</Link>
   )
 };
 
@@ -60,6 +61,7 @@ const DashboardLayout = (props: any) => {
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
   const currentAccount = useAppSelector(getCurrentAccount);
+  const isCollapseMenu = useAppSelector(getCollapseMenu)
   const breadcrumb = useAppSelector(getBreadcrumb);
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [collapsed, setCollapsed] = useState(false);
@@ -119,8 +121,8 @@ const DashboardLayout = (props: any) => {
   }
 
   return (
-    <Layout>
-      <Sider width={250} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)} className='sidebar-container'>
+    <Layout className='layout-container'>
+      <Sider width={250} collapsed={isCollapseMenu ? collapsed : !collapsed} onCollapse={(value) => setCollapsed(value)} className='sidebar-container'>
         <div className="demo-logo-vertical" />
         <Menu theme="dark" selectedKeys={[menu]} mode="inline" style={{backgroundColor: "#444"}} className='title-xl'>
           {items && items.map((item: any) => (
@@ -134,18 +136,18 @@ const DashboardLayout = (props: any) => {
       </Sider>
       <Layout>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
-        <div className='min-h-screen bg' style={{background: colorBgContainer }}>
+        <div className='min-h-screen bg-[#eeeeee]'>
           <Content className=''>
-            <div className='flex justify-between p-4' style={{background: "#f5f5f5"}}>
+            <div className='flex items-center justify-between p-4 max-h-[36px]' style={{background: "#f5f5f5"}}>
               <Breadcrumb>
                 <Breadcrumb.Item>
-                  <Link href="/">Home</Link>
+                  <Link href="/"><HomeFilled className='text-xs'/></Link>
                 </Breadcrumb.Item>
                   {breadcrumb ? breadcrumb.map((item:any, index: number) => (
                       <Breadcrumb.Item key={index}>
                         {item.url 
-                          ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span></Link> 
-                          :  <span className={breadcrumb.length - 1 === index ? styles.active : ""}>{item.label}</span>
+                          ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? "active" : ""}>{item.label}</span></Link> 
+                          :  <span className={breadcrumb.length - 1 === index ? "active" : ""}>{item.label}</span>
                         }
                       </Breadcrumb.Item>
                   )) : null}
@@ -166,12 +168,16 @@ const DashboardLayout = (props: any) => {
               </div>
             </div>
           </Content>
-          <div className='p-6'>
-            {React.Children.map(children, (child) => {
-              return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
-            })}
+          
+          <div className='m-6 bg-white'>
+            <div className='p-4'>
+              {React.Children.map(children, (child) => {
+                return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
+              })}
+            </div>
           </div>
         </div>
+        <Footer style={{ textAlign: 'left' }}>© 2023 ADTRAN</Footer>
       </Layout>
     </Layout>
   );

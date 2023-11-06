@@ -12,6 +12,10 @@ import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import RootLayout from '@/components/layout';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { useAppDispatch } from '@/store/hook';
+import {
+  DeleteOutlined,
+  EditOutlined
+} from '@ant-design/icons';
 
 export interface IAccountsProps {
 }
@@ -72,14 +76,18 @@ export default function Accounts (props: IAccountsProps) {
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
     current: 1,
+    total: 0,
     showSizeChanger: true,
     showQuickJumper: true,
   })
 
   useEffect(() => {
-    init()
     dispatch(setBreadcrumb({data: [BREADCRUMB_ACCOUNT]}))
   }, [])
+
+  useEffect(() => {
+    init()
+  }, [pagination.pageSize, pagination.current])
 
   const init = () => {
     getAllAccounts()
@@ -88,8 +96,19 @@ export default function Accounts (props: IAccountsProps) {
   const getAllAccounts = async () => {
     setLoading(true)
     try {
-      const result = await getAllPartnerAccounts()
-      setAccounts(result && result.data ? result.data : [])
+
+      const {pageSize, current, total} = pagination
+      var params = {
+        page: current,
+        pageSize,
+        total
+      }
+
+      const result = await getAllPartnerAccounts(params)
+      if (result && result.data) {
+        setAccounts(result.data)
+        setPagination({...pagination, total: result.pagination.total})
+      }
       setLoading(false)
     } catch (error) {
       console.log(">>> Get All Accounts Error", error)
@@ -150,10 +169,12 @@ export default function Accounts (props: IAccountsProps) {
         key: 'action',
         render: (_: any, record: any) => {
           return (
-            <Space size="middle" className='flex justify-center'>
-              <a onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}>Edit</a>
-              <a>Delete</a>
-            </Space>
+            <div className='flex justify-center'>
+              <Space size="middle">
+                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
+                <DeleteOutlined className='text-lg cursor-pointer'/>
+              </Space>
+            </div>
           )
         },
       },
@@ -168,7 +189,7 @@ export default function Accounts (props: IAccountsProps) {
 
   return (
     <div className='text-black'>
-      <Space direction="vertical" className='flex flex-row justify-between'>
+      <Space className='w-full flex flex-row justify-between'>
         <Search className='w-96' value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
         <Button type="primary" className='bg-primary'>
           <Link href={`${BREADCRUMB_ACCOUNT.url}/add`}>Add</Link>

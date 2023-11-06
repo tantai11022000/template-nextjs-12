@@ -15,8 +15,8 @@ export const editPartnerAccount = (id: any, body: any) => {
     return userClient.put(`${accountUrl}/${id}`, body);
 }
 
-export const getAllPartnerAccounts = () => {
-    return userClient.get(`${accountUrl}/all-accounts`);
+export const getAllPartnerAccounts = (params: any) => {
+    return userClient.get(`${accountUrl}/all-accounts`, { params });
 }
 
 export const getAccountInfo = (id: any) => {

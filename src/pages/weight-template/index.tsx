@@ -120,10 +120,12 @@ function WeightTemplate() {
         width: 100,
         render: (_: any, record: any) => {
           return (
-            <Space size="middle">
-              <DeleteOutlined className='text-lg cursor-pointer'/>
-              <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
-            </Space>
+            <div className='flex justify-center'>
+              <Space size="middle">
+                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
+                <DeleteOutlined className='text-lg cursor-pointer'/>
+              </Space>
+            </div>
           )
         },
       },

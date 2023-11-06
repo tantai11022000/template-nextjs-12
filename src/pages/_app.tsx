@@ -2,6 +2,8 @@ import Layout from '@/components/layout'
 import '@/styles/globals.scss'
 import '@/styles/custom-antd.scss'
 import '@/styles/common.scss'
+import '../components/table/index.scss'
+import '../components/nested-layout/index.scss'
 import type { AppProps } from 'next/app'
 import { BreadcrumbProvider } from '@/components/breadcrumb-context';
 import { Provider } from 'react-redux';
@@ -11,6 +13,8 @@ import { getAllPartnerAccounts } from '@/services/accounts-service'
 import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { StyleProvider } from '@ant-design/cssinjs';
+
 
 function App({ Component, pageProps }: any) {
   const renderWithLayout =
@@ -25,7 +29,10 @@ function App({ Component, pageProps }: any) {
   
   const getAllAccountList = async () => {
     try {
-      const result = await getAllPartnerAccounts()
+      var params = {
+        pageSize: 99999,
+      }
+      const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         store.dispatch(setAccountList({data: result.data}))
         store.dispatch(setCurrentAccount({data: result.data[3].id}))
@@ -37,7 +44,9 @@ function App({ Component, pageProps }: any) {
 
   return (
     <Provider store={store} >
-       {renderWithLayout(<Component {...pageProps} />)}
+      <StyleProvider hashPriority="high">
+        {renderWithLayout(<Component {...pageProps} />)}
+       </StyleProvider>
       <ToastContainer />
     </Provider>
   )

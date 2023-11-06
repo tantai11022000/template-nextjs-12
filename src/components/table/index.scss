@@ -1,0 +1,99 @@
+.custom-table {
+    margin-top: 24px;
+    
+    .ant-spin-nested-loading {
+        
+        .ant-spin-container {
+
+            .ant-table {
+
+                .ant-table-container {
+                    border-radius: unset;
+
+                    .ant-table-content {
+
+                        table {
+
+                            .ant-table-thead {
+
+                                .ant-table-cell {
+                                    border-radius: unset;
+                                }
+                            }
+
+                            .ant-table-tbody > tr:nth-child(odd) {
+                                background-color: white;
+                              }
+                              
+                              /* Làm cho các hàng chẵn có màu xám nhạt */
+                              .ant-table-tbody > tr:nth-child(even) {
+                                background-color: #fafafa;
+                              }
+                        }
+                    }
+                }
+            }
+        }    
+    }
+
+    .ant-table-thead >tr>th {
+        background: white !important;
+    }
+}
+// .custom-table {
+//     margin-top: 24px;
+
+//     .ant-table-wrapper-custom {
+//         background-color: red;
+
+//         .css-dev-only-do-not-override-i0102m.ant-spin-nested-loading {
+//             border-radius: 12px;
+
+//             .ant-spin-container {
+        
+//                 .ant-table-wrapper .ant-table {
+//                     background-color: red;
+//                     border-radius: unset !important;
+
+//                     .ant-table-wrapper .ant-table-container {
+//                         border-start-start-radius: unset !important;
+//                         border-start-end-radius: unset !important;
+//                     }
+//                 }
+//             }
+    
+//         }
+
+//     }
+// }
+
+// .customtable{
+    
+// }
+
+// .ant-spin-nested-loading {
+//     background-color: red;
+// }
+// .ant-spin-nested-loading-custom {
+//     background-color: red;
+// }
+
+// :where(.css-dev-only-do-not-override-i0102m) .ant-spin-nested-loading {
+//     background-color: blue;
+//   }
+
+//   .my-custom-table {
+//     // Tùy chỉnh cho bảng
+//     .ant-table-wrapper {
+//       background-color: green;
+//       // Tùy chỉnh cho .ant-table-wrapper
+//     }
+  
+//     .ant-spin-nested-loading {
+//       // Tùy chỉnh cho .ant-spin-nested-loading
+//     }
+//   }
+
+//   :where(.my-custom-table) .ant-spin-nested-loading {
+//   background-color: red;
+// }

@@ -21,7 +21,7 @@ function Layout(props: Props) {
     <>
       <Header />
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
