@@ -1,6 +1,5 @@
-import { Space, Table, Tag } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { useState } from 'react';
+import { Table} from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 interface DataType {
   title: string;
@@ -23,18 +22,40 @@ interface TableProps {
 
 const TableGeneral = (props: TableProps) => {
   const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss, loading} = props
+  // console.log(">>> pagination", pagination)
+
+  const itemRender = (_: any, type: any, originalElement: any) => {
+    if (type === "prev") {
+      return <a><LeftOutlined /> Back</a>;
+    }
+    if (type === "next") {
+      return <a>Next <RightOutlined/></a>;
+    }
+    
+    return originalElement;
+  };
+
   return (
-    <div>
+    <div className='custom-table'>
       <Table
         loading={loading}
         bordered
         rowKey={(record) => record.id || record.campaignId}
-        className={`custom-table ${customCss ? customCss : ""}`}
+        className={`${customCss ? customCss : ""}`}
         dataSource={data}
         columns={columns ? columns.map((column: any) => ({
           ...column,
         })) : []}
-        pagination={pagination}
+        pagination={{
+          // showSizeChanger: true,
+          // showQuickJumper: true,
+          // pageSizeOptions: ['10', '20', '50', '100'],
+          total: pagination.total ? pagination.total : "",
+          current: pagination.current ? pagination.current : "",
+          pageSize: pagination.pageSize ? pagination.pageSize : "",
+          itemRender: itemRender,
+        }}
+        // pagination={pagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
         scroll={{x: true}}

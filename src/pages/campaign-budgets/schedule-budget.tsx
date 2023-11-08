@@ -13,7 +13,7 @@ import TableGeneral from '@/components/table';
 import { EditOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 
 

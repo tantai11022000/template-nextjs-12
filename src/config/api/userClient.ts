@@ -44,6 +44,11 @@ userClient.interceptors.response.use(
           return userClient(originalConfig);
         }
 
+        if (error.response.status === 401 && !originalConfig._retry) {
+          window.location.href = `${process.env.NEXT_PUBLIC_MAIN_URL}/#/user/login`
+          return userClient(originalConfig);
+        }
+
         return Promise.reject(error.response && error.response.data ? error.response.data : error);
     }
 );

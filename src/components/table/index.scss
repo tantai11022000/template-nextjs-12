@@ -1,5 +1,7 @@
+@import '../../styles/variables.scss';
+
 .custom-table {
-    margin-top: 24px;
+    margin-top: 20px;
     
     .ant-spin-nested-loading {
         
@@ -18,19 +20,140 @@
 
                                 .ant-table-cell {
                                     border-radius: unset;
-
-                                    .ant-table-wrapper .ant-table-tbody > tr > td {
-                                        padding: 8px 16px !important;
-                                    }
                                 }
                             }
 
                             .ant-table-tbody > tr:nth-child(odd) {
                                 background-color: white;
-                              
+                            }
+
                             .ant-table-tbody > tr:nth-child(even) {
                                 background-color: #fafafa;
                             }                
+                        }
+                    }
+                }
+
+            }
+
+            .ant-pagination {
+
+                .ant-pagination-item {
+                    // border: 1px solid $color-border;
+                }
+    
+                .ant-pagination-item-link {
+
+                    .ant-pagination-item-container {
+
+                        .ant-pagination-item-link-icon {
+                            color: $color-link;
+                        }
+
+                        .ant-pagination-item-ellipsis {
+                            color: $color-link;
+                        }
+                    }
+                }
+
+                .ant-pagination-item-active {
+                    border: 1px solid $color-border;
+                    border-color: $color-link;
+                    background-color: $color-link;
+                    
+                    a {
+                        color: $color-white;
+                    }
+                }
+                
+                .anticon {
+                    font-size: 8px;
+                    height: 100%;
+                    margin: 0px 6px;
+                }
+                
+                .ant-pagination-prev {
+                    border-left: 1px solid $color-border;
+                    border-bottom-left-radius: 2px;
+                    border-top-left-radius: 2px;
+                    line-height: unset;
+                    
+                    display: flex;
+                    align-items: center;
+                    padding: 8px;
+
+                    a {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    a[disabled] {
+                        color: $color-disable;
+                    }
+
+                }
+
+                .ant-pagination-next {
+                    border-right: 1px solid $color-border;
+                    border-bottom-right-radius: 2px;
+                    border-top-right-radius: 2px;
+                    line-height: unset;
+
+                    display: flex;
+                    align-items: center;
+                    padding: 8px;
+
+                    a {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    a[disabled] {
+                        color: $color-disable;
+                    }
+                }
+
+                li {
+                    border-top: 1px solid $color-border;
+                    border-bottom: 1px solid $color-border;
+                    border-right: 1px solid $color-border;
+                    margin-inline-end: unset;
+                    border-radius: unset;
+
+                    a {
+                        color: $color-link;
+                    }
+                }
+
+                .ant-pagination-options {
+                    border-top: unset;
+                    border-bottom: unset;
+                    border-right: unset;
+                    margin-inline-end: unset;
+                    
+                    .ant-select-single {
+
+                        .ant-select-selector {
+                            border-radius: 2px;
+
+                            .ant-select-selection-item {
+                                color: $color-link;
+                            }
+                        }
+
+                        .ant-select-arrow {
+                            .anticon-down {
+                                font-size: 12px;
+                                margin: 0px;
+                                color: $color-link;
+                            }
+                        }
+
+                        .ant-select-dropdown {
+
+                            .ant-select-item-option-selected {
+                                background-color: unset;
+                            }
                         }
                     }
                 }
@@ -42,66 +165,7 @@
         background: white !important;
     }
 
-    
     .ant-table-cell {
-        padding: 4px 16px !important;
+        padding: 5px 16px !important;
     }
 }
-}
-// .custom-table {
-//     margin-top: 24px;
-
-//     .ant-table-wrapper-custom {
-//         background-color: red;
-
-//         .css-dev-only-do-not-override-i0102m.ant-spin-nested-loading {
-//             border-radius: 12px;
-
-//             .ant-spin-container {
-        
-//                 .ant-table-wrapper .ant-table {
-//                     background-color: red;
-//                     border-radius: unset !important;
-
-//                     .ant-table-wrapper .ant-table-container {
-//                         border-start-start-radius: unset !important;
-//                         border-start-end-radius: unset !important;
-//                     }
-//                 }
-//             }
-    
-//         }
-
-//     }
-// }
-
-// .customtable{
-    
-// }
-
-// .ant-spin-nested-loading {
-//     background-color: red;
-// }
-// .ant-spin-nested-loading-custom {
-//     background-color: red;
-// }
-
-// :where(.css-dev-only-do-not-override-i0102m) .ant-spin-nested-loading {
-//     background-color: blue;
-//   }
-
-//   .my-custom-table {
-//     // Tùy chỉnh cho bảng
-//     .ant-table-wrapper {
-//       background-color: green;
-//       // Tùy chỉnh cho .ant-table-wrapper
-//     }
-  
-//     .ant-spin-nested-loading {
-//       // Tùy chỉnh cho .ant-spin-nested-loading
-//     }
-//   }
-
-//   :where(.my-custom-table) .ant-spin-nested-loading {
-//   background-color: red;
-// }

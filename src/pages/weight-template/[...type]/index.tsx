@@ -8,7 +8,7 @@ import FTextArea from '@/components/form/FTextArea';
 import FRadio from '@/components/form/FRadio';
 import TableGeneral from '@/components/table';
 import { GetServerSideProps } from 'next';
-import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { useAppDispatch } from '@/store/hook';
 

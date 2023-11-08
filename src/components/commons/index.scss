@@ -1,0 +1,83 @@
+@import '../../styles/variables.scss';
+
+// INPUTS
+.search-container {
+
+    .ant-input-group-wrapper {
+        // width: unset;
+
+        .ant-input-wrapper {
+
+            .ant-input-affix-wrapper {
+                background: $color-main-secondary;
+
+                .ant-input {
+                    // border-radius: unset;
+                    background: $color-main-secondary;
+                }
+            }
+
+            .ant-input-group-addon {
+                
+            }
+        }
+    }
+    .ant-input-search >.ant-input-group >.ant-input-group-addon:last-child .ant-input-search-button {
+        border-radius: unset;
+        border-start-end-radius: 2px;
+        border-end-end-radius: 2px;
+    }
+    .ant-input-search .css-dev-only-do-not-override-i0102m.ant-input-group .ant-input-affix-wrapper:not(:last-child) {
+        border-start-start-radius: 2px;
+        border-end-start-radius: 2px;
+    }
+}
+
+// FILTERS
+.select-filter-container {
+    
+    .ant-select {
+
+        .ant-select-selector {
+            border-radius: 2px;
+            border: 1px solid $color-border;
+            box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+
+            .ant-select-selection-placeholder {
+                color: $color-text-base;
+            }
+        }
+
+        .ant-select-arrow {
+            color: $color-text-base;
+        }
+    }
+
+    .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+        background-color: $color-main-secondary;
+    }
+}
+
+// ACTION BUTTON
+.button-container {
+    
+    .ant-btn-default {
+        background-color: $color-link;
+        color: $color-white;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+        border-color: unset;
+    }
+
+    .ant-btn {
+        border-radius: 2px;
+        border: unset;
+        font-size: 13px;
+        padding: 0 12px 0 8px;
+    }
+
+    .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
+        background-color: #004a00;
+        color: $color-white;
+        border-color: #004a00;
+    }
+}

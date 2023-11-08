@@ -6,7 +6,7 @@ import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
 import moment from 'moment';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import {

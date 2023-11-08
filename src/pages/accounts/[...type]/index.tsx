@@ -10,7 +10,7 @@ import { checkValidAccount, createPartnerAccount, editPartnerAccount, getAccount
 import { useAppDispatch } from '@/store/hook';
 import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
-import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 export interface IAddAccountProps {
 }

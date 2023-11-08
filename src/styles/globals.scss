@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -18,10 +19,26 @@
 
 body {
   // color: rgb(var(--foreground-rgb));
+  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+.css-dev-only-do-not-override-i0102m[class^="ant-layout"] {
+  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
+}
+
+.css-dev-only-do-not-override-i0102m.ant-menu {
+  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.54;
+  font-weight: 700;
+}
+
+.css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table {
+  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
 }

@@ -1,6 +1,48 @@
+@import './variables.scss';
+
+h2 {
+    color: $color-text-h2;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 20px;
+}
 
 .title-xl {
     font-size: 17px;
     font-weight: 700;
     color: #ffffff;
+}
+
+.is-link {
+    color: $color-link;
+}
+
+.tag-container {
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+
+    .tag {
+        background-color: $color-link;
+        color: $color-white;
+        border-radius: 1px;
+    }
+
+    .tag:hover {
+        color: $color-link
+    }
+
+}
+
+.current-budget {
+    
+    .ant-input {
+        width: 100px;
+        padding: 0 11px;
+    }
+}
+
+.panel-heading {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
 }

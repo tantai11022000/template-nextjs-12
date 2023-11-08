@@ -4,20 +4,19 @@ import RootLayout from '../../components/layout';
 import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 
 import { Input, Space, Switch, Tag } from 'antd';
-import { Select } from 'antd';
 import TableGeneral from '@/components/table';
-import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BIDDING } from '@/Constant/index';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import Link from 'next/link';
 import { Button, Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
-import { useAppDispatch } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
-
-
-const { Search } = Input;
+import { SaveOutlined, EditOutlined, ClockCircleFilled, FileTextOutlined } from '@ant-design/icons';
+import SearchInput from '@/components/commons/textInputs/SearchInput';
+import SelectFilter from '@/components/commons/filters/SelectFilter';
+import { getCurrentAccount } from '@/store/account/accountSlice';
 
 export interface ITargetingBiddingProps {
 }
@@ -71,21 +70,6 @@ const BULK_ACTION = [
   }, 
 ]
 
-const CAMPAIGNS = [
-  {
-    value: 'campaignA',
-    label: 'Campaign A',
-  },
-  {
-    value: 'campaignB',
-    label: 'Campaign B',
-  },
-  {
-    value: 'campaignC',
-    label: 'Campaign C',
-  },
-]
-
 const DATA = [
   {
     id: 10,
@@ -124,11 +108,13 @@ const DATA = [
 export default function TargetingBidding (props: ITargetingBiddingProps) {
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const currentAccount = useAppSelector(getCurrentAccount)
   const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
-  const [campaigns, setCampaigns] = useState<any[]>(CAMPAIGNS)
+  const [campaigns, setCampaigns] = useState<any[]>([])
+  const [mappingCampaigns, setMappingCampaigns] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [targetBidding, setTargetBidding] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
@@ -145,10 +131,22 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   })
 
   useEffect(() => {
+    if (currentAccount) getCampaignBudgetsList(currentAccount)
+  }, [currentAccount])
+
+  useEffect(() => {
     mapFirstQuery()
     init();
     dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
   }, [])
+
+  useEffect(() => {
+    const newData = campaigns.map((campaign:any) => ({
+      value: campaign.campaignId,
+      label: campaign.name
+    }))
+    setMappingCampaigns(newData)
+  }, [campaigns])
 
   const init = () => {
     getTargetBiddingList()
@@ -164,6 +162,24 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     } catch (error) {
       console.log(">>> Get Target Bidding List Error", error)
       setLoading(true)
+    }
+  }
+
+  const getCampaignBudgetsList = async (partnerAccountId: any) => {
+    setLoading(true)
+    try {
+      var params = {
+        pageSize: 999999,
+      }
+
+      const result = await getCampaignBudgets(partnerAccountId, params)
+      if (result && result.data) {
+        setCampaigns(result.data)
+      }
+      setLoading(false)
+    } catch (error) {
+      console.log(">>> error", error)
+      setLoading(false)
     }
   }
   
@@ -229,83 +245,6 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     console.log(">>> e.target.value", e.target.value)
   };
 
-  const columns: any = useMemo(
-    () => [
-      {
-        title: 'Target',
-        dataIndex: 'target',
-        key: 'target',
-        render: (text: any) => <p>{text}</p>,
-      },
-      {
-        title: 'Name',
-        dataIndex: 'campaign',
-        key: 'campaign',
-        render: (_: any, record: any) => {
-          const {id, campaign} = record
-
-          return (
-            <>
-              <Link href={`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`}>{campaign}</Link>
-            </>
-          )
-        },
-
-        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
-      },
-      {
-        title: <div className='text-center'>Status</div>,
-        dataIndex: 'status',
-        key: 'status',
-        render: (_: any, record: any) => {
-          return (
-            <div className='flex justify-center'>
-              <Tag>{record.status}</Tag>
-            </div>
-          );
-        },
-        sorter: (a: any, b: any) => a.status - b.status,
-      },
-      {
-        title: 'Current Bidding',
-        dataIndex: 'currentBidding',
-        key: 'currentBidding',
-        render: (text: any, record: any, index: number) => {
-          const isEditing = isEditingList[index];
-
-          return (
-            <div className='flex items-center justify-between'>
-              {!isEditing ? (
-                <div className='flex items-center'>￥ <span>{text}</span></div>
-              ) : (
-                <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
-              )}
-              <div className='ml-2' onClick={() => handleToggleEdit(index)}>
-                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
-              </div>
-            </div>
-          );
-        }
-      },
-      {
-        title: <div className='text-center'>Action</div>,
-        key: 'action',
-        render: (_: any, record: any) => {
-          const {id} = record
-          return (
-            <div className='flex justify-center'>
-              <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer'/>
-                <FileTextOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_TARGETING_BIDDING.url}/${id}`)}/>
-              </Space>
-            </div>
-          )
-        },
-      },
-    ], [targetBidding, handleToggleEdit, isEditingList]
-  )
-
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys);
@@ -325,13 +264,106 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     setOpenModalUpdateStatus(false);
   };
 
+  const columns: any = useMemo(
+    () => [
+      {
+        title: <div className='text-center'>Target</div>,
+        dataIndex: 'target',
+        key: 'target',
+        render: (text: any) => <p>{text}</p>,
+      },
+      {
+        title: <div className='text-center'>Name</div>,
+        dataIndex: 'campaign',
+        key: 'campaign',
+        render: (_: any, record: any) => {
+          const {id, campaign} = record
+
+          return <p className='is-link' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`)}>{campaign}</p>
+        },
+
+        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
+      },
+      {
+        title: <div className='text-center'>Status</div>,
+        dataIndex: 'status',
+        key: 'status',
+        render: (text: any) => {
+          const renderStatus = () => {
+            let status = ''
+            let type = ''
+            if (text == "active") {
+              status = 'ACTIVE'
+              type = 'success'
+            } else if (text == 'inactive') {
+              status = 'INACTIVE'
+              type = 'error'
+            } else if (text == 'upcoming') {
+              status = 'UPCOMING'
+              type = 'processing'
+            }
+            return <Tag color={type}>{status}</Tag>
+          }
+        return (
+            <div className='flex justify-center uppercase'>
+              {renderStatus()}
+            </div>
+        );
+        },
+        sorter: (a: any, b: any) => a.status - b.status,
+      },
+      {
+        title: <div className='text-center'>Current Bidding</div>,
+        dataIndex: 'currentBidding',
+        key: 'currentBidding',
+        render: (text: any, record: any, index: number) => {
+          const isEditing = isEditingList[index];
+
+          return (
+            <div className='flex items-center justify-between'>
+              {!isEditing ? (
+                <div className='flex items-center'>￥ <span>{text}</span></div>
+              ) : (
+                <div className='current-budget'>
+                  <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+                </div>
+              )}
+              <div className='flex ml-2' onClick={() => handleToggleEdit(index)}>
+                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
+              </div>
+            </div>
+          );
+        }
+      },
+      {
+        title: <div className='text-center'>Action</div>,
+        key: 'action',
+        render: (_: any, record: any) => {
+          const {id} = record
+          return (
+            <div className='flex justify-center'>
+              <Space size="middle">
+                <ClockCircleFilled className='text-lg cursor-pointer'/>
+                <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_TARGETING_BIDDING.url}/${id}`)}/>
+              </Space>
+            </div>
+          )
+        },
+      },
+    ], [targetBidding, handleToggleEdit, isEditingList]
+  )
+
   return (
-    <div className='text-black'>
-      <div className='grid grid-cols-3 items-center'>
-        <Space direction="vertical">
-          <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
-        </Space>
-        <div className='col-span-2 flex justify-around items-center gap-4'>
+    <div>
+      <div className='flex items-center justify-between'>
+        <SearchInput keyword={keyword} name={"keyword"} placeholder={"Search by Target"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+        <div className='flex items-center gap-6'>
+          <SelectFilter placeholder={"Select Status"} onChange={onChange} options={statuses}/>
+          <SelectFilter showSearch placeholder={"Select Campaign"} onChange={onChange} options={mappingCampaigns}/>
+          <SelectFilter placeholder={"Select Action"} onChange={onChange} options={bulkAction}/>
+        </div>
+        {/* <div className='col-span-2 flex justify-around items-center gap-4'>
           <div className='flex items-center'>
             <p className='mr-2'>Status</p>
             <Select
@@ -372,7 +404,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
               options={bulkAction}
             />
           </div>
-        </div>
+        </div> */}
       </div>
       <div>
         <TableGeneral loading={loading} columns={columns} data={targetBidding} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

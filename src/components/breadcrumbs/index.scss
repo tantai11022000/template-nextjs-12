@@ -1,0 +1,18 @@
+.breadcrumb-container {
+    .ant-breadcrumb {
+        font-size: 11px;
+        color: #006400;
+    }
+
+    .ant-breadcrumb-link {
+        a {
+            height: unset;
+            margin-inline: unset;
+        }
+
+        a:hover {
+            color: unset;
+            background-color: unset;
+        }
+    }
+}

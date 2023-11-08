@@ -4,13 +4,16 @@
 }
 
 .layout-container {
-    .ant-breadcrumb {
-        font-size: 11px;
-        color: #006400;
-    }
+
+   
 
     .ant-breadcrumb .anticon {
         font-size: 11px;
         color: #006400;
+    }
+
+    .pannel {
+        padding: 1rem;
+        border: 1px solid #e0e0e0;
     }
 }
