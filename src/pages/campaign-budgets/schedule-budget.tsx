@@ -15,6 +15,7 @@ import AddWeightTemplate from '../weight-template/[...type]';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { changeNextPageUrl } from '@/utils/CommonUtils';
 
 
 export interface IScheduleBudgetProps {
@@ -96,6 +97,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [weights, setWeights] = useState<any[]>(WEIGHT_LIST)
   const [openModalEditWeightTemplate, setOpenModalEditWeightTemplate] = useState<boolean>(false);
   const [selectedWeight, setSelectedWeight] = useState<any>("");
+  const [pagination, setPagination] = useState<any>({
+    pageSize: 10,
+    current: 1,
+    total: 0,
+  })
 
   useEffect(() => {
     if (currentAccount) init();
@@ -260,6 +266,12 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setOpenModalEditWeightTemplate(false);
   };
 
+  const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+    const { current } = pagination
+    changeNextPageUrl(router, current)
+    setPagination(pagination)
+  }
+
   return (
     <div>
       <div>
@@ -370,7 +382,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={data}/>
+        <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalEditWeightTemplate && (
         <Modal width={1000} title="Set Weight for Daily Budget" open={openModalEditWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
