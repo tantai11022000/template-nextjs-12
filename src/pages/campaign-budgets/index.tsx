@@ -15,11 +15,13 @@ import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import SearchInput from '@/components/commons/textInputs/SearchInput';
+import SelectFilter from '@/components/commons/filters/SelectFilter';
 
 const { Search } = Input;
 
@@ -103,8 +105,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     pageSize: 10,
     current: 1,
     total: 0,
-    showSizeChanger: true,
-    showQuickJumper: true,
   })
 
   useEffect(() => {
@@ -208,7 +208,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const columns: any = useMemo(
     () => [
       {
-        title: 'Name',
+        title: <div className='text-center'>Campaign Name</div>,
         dataIndex: 'name',
         key: 'name',
         render: (text: any) => <p>{text}</p>,
@@ -217,10 +217,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
-        title: 'Portfolio',
+        title: <div className='text-center'>Portfolio</div>,
         dataIndex: 'deliveryProfile',
         key: 'deliveryProfile',
-        render: (text: any) => <p>{text}</p>,
+        render: (text: any) => <p className='text-center'>{text}</p>,
       },
       {
         title: <div className='text-center'>Status</div>,
@@ -232,19 +232,17 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             { key: '2', label: 'Action 2' },
           ];
           return (
-            <div className='flex justify-center uppercase'>
-              <Tag>
-                <Dropdown menu={{ items }}>
-                  <a>{record.state} <DownOutlined/></a>
-                </Dropdown>
-              </Tag>
+            <div className='tag-container'>
+              <Dropdown menu={{ items }}>
+                <a className='tag px-2 font-semibold'>{record.state} <DownOutlined/></a>
+              </Dropdown>
             </div>
           );
         },
         sorter: (a: any, b: any) => a.state - b.state,
       },
       {
-        title: 'Current Budget',
+        title: <div className='text-center'>Current Budget</div>,
         dataIndex: 'budget',
         key: 'budget',
         render: (text: any, record: any, index: number) => {
@@ -252,12 +250,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
           return (
             <div className='flex items-center justify-between'>
-              {!isEditing ? (
-                <div className='flex items-center'>￥ <span>{text}</span></div>
-              ) : (
-                <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+              {!isEditing 
+                ? <div className='flex items-center'>￥ <span>{text}</span></div>
+                : (
+                  <div className='current-budget'>
+                    <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+                  </div>
               )}
-              <div className='ml-2' onClick={() => handleToggleEdit(index)}>
+              <div className='flex ml-2' onClick={() => handleToggleEdit(index)}>
                 {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
               </div>
             </div>
@@ -265,34 +265,34 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         }
       },
       {
-        title: 'IMP',
+        title: <div className='text-center'>IMP</div>,
         dataIndex: 'imp',
         key: 'imp',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
 
         sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: 'Click',
+        title: <div className='text-center'>Click</div>,
         dataIndex: 'click',
         key: 'click',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
 
         sorter: (a: any, b: any) => a.click - b.click
       },
       {
-        title: 'Sale',
+        title: <div className='text-center'>Sale</div>,
         dataIndex: 'sale',
         key: 'sale',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
 
         sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
-        title: 'ROAS',
+        title: <div className='text-center'>ROAS</div>,
         dataIndex: 'roas',
         key: 'roas',
-        render: (text: any) => <p className='text-end'>{text}</p>,
+        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
         
         sorter: (a: any, b: any) => a.roas - b.roas
       },
@@ -303,7 +303,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const {campaignId, name} = record
           return (
             <div className='flex justify-center'>
-              <FileTextOutlined className='text-lg cursor-pointer' onClick={() =>router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`)}/>
+              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() =>router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`)}/>
             </div>
           )
         },
@@ -331,39 +331,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   };
 
   return (
-    <div className='text-black'>
-      <div className='grid grid-cols-3 items-center'>
-        <Space direction="vertical">
-          <Search value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
-        </Space>
-        <div className='col-span-2 flex justify-around items-center gap-4'>
-          <div className='flex items-center'>
-            <p className='mr-2'>Status</p>
-            <Select
-              style={{ width: 200 }}
-              defaultValue="all"
-              showSearch
-              placeholder="Select status"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={statuses}
-            />
-          </div>
-          <div className='flex items-center'>
-            <p className='mr-2'>Bulk Action</p>
-            <Select
-              style={{ width: 200 }}
-              showSearch
-              placeholder="Select action"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={bulkAction}
-            />
-          </div>
+    <div>
+      <div className='flex items-center justify-between'>
+          <SearchInput keyword={keyword} name={"keyword"} placeholder={"Search by Campaign"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+        <div className='flex items-center gap-6'>
+          <SelectFilter label={"Status"} placeholder={"Select Status"} onChange={onChange} options={statuses}/>
+          <SelectFilter label={"Bulk Action"} placeholder={"Select Action"} onChange={onChange} options={bulkAction}/>
         </div>
       </div>
       <div>

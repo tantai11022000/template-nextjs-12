@@ -1,13 +1,10 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import Link from 'next/link';
-
 import { Input, Space, Tag } from 'antd';
 import TableGeneral from '@/components/table';
-import { Button } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { getAllPartnerAccounts } from '@/services/accounts-service';
-import { BREADCRUMB_ACCOUNT } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_ACCOUNT } from '@/Constant/index';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import RootLayout from '@/components/layout';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
@@ -16,6 +13,10 @@ import {
   DeleteOutlined,
   EditOutlined
 } from '@ant-design/icons';
+import SearchInput from '@/components/commons/textInputs/SearchInput';
+import ActionButton from '@/components/commons/buttons/ActionButton';
+import { PlusOutlined } from '@ant-design/icons';
+
 
 export interface IAccountsProps {
 }
@@ -77,8 +78,6 @@ export default function Accounts (props: IAccountsProps) {
     pageSize: 10,
     current: 1,
     total: 0,
-    showSizeChanger: true,
-    showQuickJumper: true,
   })
 
   useEffect(() => {
@@ -190,10 +189,8 @@ export default function Accounts (props: IAccountsProps) {
   return (
     <div className='text-black'>
       <Space className='w-full flex flex-row justify-between'>
-        <Search className='w-96' value={keyword} name="keyword" placeholder="Search by name" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch} />
-        <Button type="primary" className='bg-primary'>
-          <Link href={`${BREADCRUMB_ACCOUNT.url}/add`}>Add</Link>
-        </Button>
+        <SearchInput keyword={keyword} name="keyword" placeholder="Search by Account" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+        <ActionButton icon={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={accounts} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

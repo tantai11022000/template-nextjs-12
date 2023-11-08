@@ -12,7 +12,7 @@ import {
 import moment from 'moment';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
-import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 

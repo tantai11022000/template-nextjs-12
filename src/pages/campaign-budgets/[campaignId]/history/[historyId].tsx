@@ -1,37 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Button, Space, Tag, Typography } from 'antd';
+import { Space, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
-import { GetServerSideProps } from 'next';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
-import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/components/breadcrumb-context/constant';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
 import { useRouter } from 'next/router';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import SelectFilter from '@/components/commons/filters/SelectFilter';
+import { changeNextPageUrl } from '@/utils/CommonUtils';
 
 export interface IBudgetHistoryProps {
 }
-
-
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const campaignId = context && context.query && context.query.campaignId ? context.query.campaignId : ""
-//   const historyId = context && context.query && context.query.historyId ? context.query.historyId : ""
-
-//   const breadcrumb = [
-//     { label: 'Campaign Budgets', url: BREADCRUMB_CAMPAIGN_BUDGET.url},
-//     { label: campaignId ? campaignId : "Detail", url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`},
-//   ];
-
-//   if (historyId) breadcrumb.push({ label: 'History', url: ''}, { label: historyId, url: ''})
-
-//   return {
-//     props: {
-//       breadcrumb,
-//     },
-//   };
-// };
 
 const BUDGET_HISTORY = [
   {
@@ -96,22 +78,40 @@ const BUDGET_HISTORY = [
   },
 ]
 
+const EXPORT_TYPE = [
+  {
+    value: 'csv',
+    label: 'CSV'
+  },
+  {
+    value: 'excel',
+    label: 'Excel'
+  },
+]
+
 export default function BudgetHistory (props: IBudgetHistoryProps) {
   const { Title } = Typography
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
+  const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
+  const historyId = router && router.query && router.query.historyId ? router.query.historyId : ""
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetHistory, setBudgetHistory] = useState<any[]>([])
+  const [exportType, setExportType] = useState<any[]>(EXPORT_TYPE)
+  const [pagination, setPagination] = useState<any>({
+    pageSize: 10,
+    current: 1,
+    total: 0,
+  })
 
   useEffect(() => {
     init()
   }, [])
 
   useEffect(() => {
-    if (!id) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: id, url: ``}]}))
-  }, [id])
+    if (!historyId || !campaignId) return
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: campaignId, url: `${BREADCRUMB_CAMPAIGN_BUDGET}/${campaignId}`}, { label: 'History', url: ''}, { label: historyId, url: ``}]}))
+  }, [historyId, campaignId])
 
   const init = () => {
     getBudgetHistory()
@@ -129,30 +129,55 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
       console.log(">>> Get Budget History Error", error)
     }
   }
+
+  const handleChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
+
+  const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
+    const { current } = pagination
+    changeNextPageUrl(router, current)
+    setPagination(pagination)
+  }
   
   const columnsBudgetLog: any = useMemo(
     () => [
       {
-        title: 'Time',
+        title: <div className='text-center'>Time</div>,
         dataIndex: 'updateTime',
         key: 'updateTime',
-        render: (text: any) => <p className='text-end'>{text ? moment(text).format("hh:mm:ss") : ""}</p>,
+        render: (text: any) => <p className='text-center'>{text ? moment(text).format("hh:mm:ss") : ""}</p>,
       },
       {
         title: <div className='text-center'>Status</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
+          const renderStatus = () => {
+            let status = ''
+            let type = ''
+            if (text == "active") {
+              status = 'ACTIVE'
+              type = 'success'
+            } else if (text == 'inactive') {
+              status = 'INACTIVE'
+              type = 'error'
+            } else if (text == 'upcoming') {
+              status = 'UPCOMING'
+              type = 'processing'
+            }
+            return <Tag color={type}>{status}</Tag>
+          }
         return (
-            <div className='flex justify-center'>
-            <Tag>{text}</Tag>
+            <div className='flex justify-center uppercase'>
+              {renderStatus()}
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status.localeCompare(b.status),
+        sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: 'IMP',
+        title: <div className='text-center'>IMP</div>,
         dataIndex: 'imp',
         key: 'imp',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -160,7 +185,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: 'Click',
+        title: <div className='text-center'>Click</div>,
         dataIndex: 'click',
         key: 'click',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -168,7 +193,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.click - b.click
       },
       {
-        title: 'CPM',
+        title: <div className='text-center'>CPM</div>,
         dataIndex: 'cpm',
         key: 'cpm',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -176,7 +201,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.cpm - b.cpm
       },
       {
-        title: 'Sale',
+        title: <div className='text-center'>Sale</div>,
         dataIndex: 'sale',
         key: 'sale',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -184,7 +209,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
-        title: 'CV',
+        title: <div className='text-center'>CV</div>,
         dataIndex: 'cv',
         key: 'cv',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -192,7 +217,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.cv - b.cv
       },
       {
-        title: 'Cost',
+        title: <div className='text-center'>Cost</div>,
         dataIndex: 'cost',
         key: 'cost',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -201,16 +226,17 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
       },
     ], [budgetHistory]
   )
+
   return (
     <div className='text-black'>
-      <div className='flex items-center justify-between'>
-        <Title level={4}>Budget Update on 17 23rd-Aug-2023</Title>
+      <div className='panel-heading flex items-center justify-between'>
+        <h2>Budget Update on 17 23rd-Aug-2023</h2>
         <Space>
           <RangeDatePicker/>
-          <Button>Export CSV</Button>
+          <SelectFilter placeholder={"Export"} onChange={handleChange} options={exportType}/>
         </Space>
       </div>
-        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetHistory}/>
+        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetHistory} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
     </div>
   );
 }
