@@ -155,7 +155,7 @@ function WeightTemplate() {
     <div>
       <Space className='w-full flex flex-row justify-between'>
         <SearchInput keyword={keyword} name="keyword" placeholder="Search by Template" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleOnSearch}/>
-        <ActionButton icon={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
+        <ActionButton icon={<PlusOutlined />} label={'Add Weight Template'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
