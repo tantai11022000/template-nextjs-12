@@ -187,7 +187,7 @@ export default function Accounts (props: IAccountsProps) {
   }
 
   return (
-    <div className='text-black'>
+    <div>
       <Space className='w-full flex flex-row justify-between'>
         <SearchInput keyword={keyword} name="keyword" placeholder="Search by Account" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <ActionButton icon={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>

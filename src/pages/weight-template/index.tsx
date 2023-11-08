@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import qs from 'query-string';
 import RootLayout from '../../components/layout';
 import DashboardLayout from '../../components/nested-layout/DashboardLayout';
-import Link from 'next/link';
-import { Space, Input, Layout, Button } from 'antd';
+import { Space } from 'antd';
 import TableGeneral from '@/components/table';
 import {
   DeleteOutlined,
@@ -15,6 +14,10 @@ import { useRouter } from 'next/router';
 import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import SearchInput from '@/components/commons/textInputs/SearchInput';
+import ActionButton from '@/components/commons/buttons/ActionButton';
+import { PlusOutlined } from '@ant-design/icons';
+
 
 const fakeData = [
   {
@@ -149,20 +152,15 @@ function WeightTemplate() {
     dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
   },[])
   return (
-    <>
-      <div className='flex justify-between'>
-        <Space>
-          <Input.Search value={keyword} name="keyword" placeholder="Search by name" 
-          onChange={(e:any) => setKeyword(e.target.value)} onSearch={handleOnSearch} className='w-96'/>
-        </Space>
-        <Space>
-          <Link href={`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`}>
-            <Button className='bg-primary text-white w-28 cursor-pointer'>Add</Button>
-          </Link>
-        </Space>
+    <div>
+      <Space className='w-full flex flex-row justify-between'>
+        <SearchInput keyword={keyword} name="keyword" placeholder="Search by Template" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleOnSearch}/>
+        <ActionButton icon={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
+      </Space>
+      <div>
+        <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
-      <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>        
-    </>
+    </div>
   );
 }
 
