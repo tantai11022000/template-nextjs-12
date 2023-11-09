@@ -12,6 +12,7 @@ import { addAccount, editAccount } from '@/store/account/accountSlice';
 import { toast } from 'react-toastify';
 import { BREADCRUMB_ACCOUNT, BREADCRUMB_ADD } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import ActionButton from '@/components/commons/buttons/ActionButton';
 export interface IAddAccountProps {
 }
 
@@ -89,7 +90,6 @@ export default function AddAccount (props: IAddAccountProps) {
     } catch (error) {
      console.log(">>> Get Account Info Error", error) 
     }
-    
   }
 
   const onChangeCheck = (value: any) => {
@@ -102,9 +102,11 @@ export default function AddAccount (props: IAddAccountProps) {
       if (valueEdit) {
         await editPartnerAccount(id, value)
         dispatch(editAccount({id, value}))
+        toast.success("UPDATE ACCOUNT SUCCESS")
       } else {
         const result = await createPartnerAccount(value)
         dispatch(addAccount({data: result && result.data ? result.data : ""}))
+        toast.success("CREATED ACCOUNT SUCCESS")
       }
       setLoading(false)
       router.push(BREADCRUMB_ACCOUNT.url)
@@ -141,12 +143,9 @@ export default function AddAccount (props: IAddAccountProps) {
       form= {form}
       onFinish={onSave}
       onFinishFailed={onSaveFail}
-      labelCol={{ span: 4 }}
-      wrapperCol={{ span: 14 }}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 12 }}
       layout="horizontal"
-      // initialValues={{ size: componentSize }}
-      // onValuesChange={onFormLayoutChange}
-      // size={componentSize as SizeType}
     >
       <FText name={'name'} label='Name'/>
       <FText name={['masterAccountConfig', 'client_id']} label='Client ID' onChange={handleChangeField}/>
@@ -160,8 +159,8 @@ export default function AddAccount (props: IAddAccountProps) {
 
       <div className='flex justify-center'>
         <Space size="middle" className='flex justify-center'>
-          <Button type="primary" className='bg-primary' onClick={() => router.back()}>Cancel</Button>
-          <Button type="primary" className='bg-primary' htmlType="submit" disabled={loading}>{loading ? <Spin/> : valueEdit ? "Save" : "Create"}</Button>
+          <ActionButton className={'cancel-button'} label={'Cancel'} onClick={() => router.back()}/>
+          <ActionButton htmlType="submit" disabled={loading} className={'finish-button'} label={loading ? <Spin/> : valueEdit ? "Save" : "Create"}/>
         </Space>
       </div>
     </Form>

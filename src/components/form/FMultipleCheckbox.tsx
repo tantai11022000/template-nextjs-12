@@ -7,7 +7,7 @@ export interface IFMultipleCheckboxProps {
   label: string,
   required?: boolean,
   errorMessage?: string,
-  onChange: any
+  onChange?: any
 }
 
 export interface IFMultipleCheckboxProps {

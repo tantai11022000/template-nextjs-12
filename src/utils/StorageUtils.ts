@@ -6,10 +6,13 @@ import {
     PERMISSION_DATA_KEY
   } from "./StorageKeys";
   
-  export const LANGUAGE_CODE = "language";
+  export const LANGUAGE_KEY = 'Accept-Language';
+  export const LANGUAGE_CODE = 'language';
   
   export const storeItem = (key: string, data: any) => {
-    localStorage.setItem(key, data);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(key, data);
+    }
   }
   
   export const removeItem = (key: string) => {
@@ -17,7 +20,10 @@ import {
   }
   
   export const getItem = (key: string) => {
-    return localStorage.getItem(key);
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(key);
+    }
+    return null;
   }
   
   export const getLocalRefreshToken = () => {

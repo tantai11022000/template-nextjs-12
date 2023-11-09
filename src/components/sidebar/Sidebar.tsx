@@ -55,14 +55,14 @@ export default function SideBar (props: ISideBarProps) {
 
   const ActiveMenuLink = (props: any) => {
     const { children, href } = props
-    return <Link href={href} className='text-lg'>{children}</Link>
+    return <Link href={href}>{children}</Link>
   };
 
   return (
     <div className='sidebar-container'>
       <Sider width={250} collapsed={isCollapseMenu ? collapsed : !collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" selectedKeys={[menu]} mode="inline" className='title-xl'>
+        <Menu theme="dark" selectedKeys={[menu]} mode="inline">
           {items && items.map((item: any) => (
             <Menu.Item key={item.key} icon={item.icon} onClick={() => handleClickMenu(item.value)}>
               <ActiveMenuLink href={item.url}>

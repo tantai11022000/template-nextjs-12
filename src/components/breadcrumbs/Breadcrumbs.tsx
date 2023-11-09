@@ -20,8 +20,8 @@ export default function Breadcrumbs (props: IBreadcrumbsProps) {
           {breadcrumb ? breadcrumb.map((item:any, index: number) => (
               <Breadcrumb.Item key={index}>
                 {item.url 
-                  ?  <Link href={item.url}><span className={breadcrumb.length - 1 === index ? "active" : ""}>{item.label}</span></Link> 
-                  :  <span className={breadcrumb.length - 1 === index ? "active" : ""}>{item.label}</span>
+                  ?  <Link href={item.url}><span className="active">{item.label}</span></Link> 
+                  :  <span className="active">{item.label}</span>
                 }
               </Breadcrumb.Item>
           )) : null}

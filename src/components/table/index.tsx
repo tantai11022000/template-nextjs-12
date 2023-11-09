@@ -17,11 +17,12 @@ interface TableProps {
   rowSelection?: any,
   handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
   customCss?: string,
-  loading?: boolean
+  loading?: boolean,
+  scrollY?: boolean
 }
 
 const TableGeneral = (props: TableProps) => {
-  const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss, loading} = props
+  const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss, loading, scrollY} = props
   // console.log(">>> pagination", pagination)
 
   const itemRender = (_: any, type: any, originalElement: any) => {
@@ -47,9 +48,9 @@ const TableGeneral = (props: TableProps) => {
           ...column,
         })) : []}
         pagination={{
-          // showSizeChanger: true,
+          showSizeChanger: true,
           // showQuickJumper: true,
-          // pageSizeOptions: ['10', '20', '50', '100'],
+          pageSizeOptions: ['10', '20', '50', '100'],
           total: pagination.total ? pagination.total : "",
           current: pagination.current ? pagination.current : "",
           pageSize: pagination.pageSize ? pagination.pageSize : "",
@@ -58,7 +59,7 @@ const TableGeneral = (props: TableProps) => {
         // pagination={pagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
-        scroll={{x: true}}
+        scroll={{x: true, y: scrollY ? 500 : undefined}}
       />
     </div>
   )

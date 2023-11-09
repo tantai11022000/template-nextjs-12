@@ -86,7 +86,7 @@ const DashboardLayout = (props: any) => {
           </Layout>
           
           <div className='m-6 bg-white'>
-            <div className='p-4 pannel'>
+            <div className='p-4 panel-container'>
               {React.Children.map(children, (child) => {
                 return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
               })}

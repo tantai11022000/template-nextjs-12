@@ -18,6 +18,9 @@ import {
   EditOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
+import { changeNextPageUrl } from '@/utils/CommonUtils';
+import ActionButton from '@/components/commons/buttons/ActionButton';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 export interface IUpdateCampaignStatusProps {
 }
@@ -86,18 +89,21 @@ const FILES = [
 ]
 
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
-  const { Title } = Typography
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [form]:any = Form.useForm();
-  const [loading, setLoading] = useState<boolean>(false)
   const accountList = useAppSelector(getAccountList);
-  const [reGenerateDataAccountList, setReGenerateDataAccountList] = useState<any[]>([])
 
-  const [partnerAccount, setPartnerAccount] = useState<any[]>(PARTNER_ACCOUNT)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [reGenerateDataAccountList, setReGenerateDataAccountList] = useState<any[]>([])
   const [step, setStep] = useState<number>(1)
   const [previewFile, setPreviewFile] = useState<any[]>([])
   const [openModalConfirmSetupBudgetSchedule, setOpenModalConfirmSetupBudgetSchedule] = useState<boolean>(false)
+  const [pagination, setPagination] = useState<any>({
+    pageSize: 10,
+    current: 1,
+    total: 0,
+  })
 
   useEffect(() => {
     const newData = accountList.map((account:any) => ({
@@ -116,7 +122,6 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
     getFilePreview()
   }
   
-
   const getFilePreview = async () => {
     setLoading(true)
     try {
@@ -162,6 +167,12 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
     setOpenModalConfirmSetupBudgetSchedule(false);
   };
 
+  const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
+    const { current } = pagination
+    changeNextPageUrl(router, current)
+    setPagination(pagination)
+  }
+
   const columnsBudgetLog: any = useMemo(
     () => [
       {
@@ -169,16 +180,28 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
+          const renderStatus = () => {
+            let status = ''
+            let type = ''
+            if (text == "valid") {
+              status = 'VALID'
+              type = 'success'
+            } else if (text == 'invalid') {
+              status = 'invalid'
+              type = 'error'
+            }
+            return <Tag color={type}>{status}</Tag>
+          }
         return (
-            <div className='flex justify-center'>
-              <Tag>{text}</Tag>
+            <div className='flex justify-center uppercase'>
+              {renderStatus()}
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
+        sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: 'Campaign Name',
+        title: <div className='text-center'>Campaign Name</div>,
         dataIndex: 'campaign',
         key: 'campaign',
         render: (text: any) => <p>{text}</p>,
@@ -187,7 +210,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         sorter: (a: any, b: any) => a.campaign - b.campaign,
       },
       {
-        title: 'Campaign ID',
+        title: <div className='text-center'>Campaign ID</div>,
         dataIndex: 'campaignId',
         key: 'campaignId',
         render: (text: any) => <p>{text}</p>,
@@ -196,7 +219,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         sorter: (a: any, b: any) => a.campaignId - b.campaignId,
       },
       {
-        title: 'Budget',
+        title: <div className='text-center'>Budget</div>,
         dataIndex: 'budget',
         key: 'budget',
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
@@ -208,80 +231,66 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         title: <div className='text-center'>From Time</div>,
         dataIndex: 'fromTime',
         key: 'fromTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("DD/MM/YYYY - hh:mm:ss") : ""} GMT+9</p>,
+        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
       },
       {
         title: <div className='text-center'>To Time</div>,
         dataIndex: 'toTime',
         key: 'toTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("DD/MM/YYYY - hh:mm:ss") : ""} GMT+9</p>,
+        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
       },
       {
         title: <div className='text-center'>Action</div>,
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
-            const {id} = record
-            return (
-                <Space size="middle" className='w-full flex justify-center'>
-                    <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
-                </Space>
-            )
+          const {id} = record
+          return (
+              <Space size="middle" className='w-full flex justify-center'>
+                  <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
+              </Space>
+          )
         },
       },
     ], [previewFile]
   )
 
   return (
-    <div className='text-black'>
+    <>
       {step == 1 ? (
-        // <>
-        //   <Title level={4}>Update Campaign Status Schedule</Title>
-        //   <div className='flex items-center'>
-        //     <p className='mr-2'>Status</p>
-        //     <Select
-        //       showSearch
-        //       placeholder="Select Partner Account"
-        //       optionFilterProp="children"
-        //       onChange={onChange}
-        //       onSearch={onSearch}
-        //       filterOption={filterOption}
-        //       options={partnerAccount}
-        //     />
-        //   </div>
-        //   <div className='flex items-center'>
-        //     <p className='mr-2'>Schedule File</p>
-        //     <UploadFile/>
-        //   </div>
-        //   <Button onClick={() => setStep(2)}>Next</Button>
-        // </>
-        <>
-          <Title level={4}>Update Campaign Status Schedule</Title>
-          <Form
-            form= {form}
-            onFinish={onSave}
-            onFinishFailed={onSaveFail}
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 14 }}
-            layout="horizontal"
-          >
-            <FSelect name={'partnerAccount'} label={'Partner Account'} placeholder={'Select Partner Account'} options={reGenerateDataAccountList}/>
-            <FUploadFile name={'file'} label={'Schedule File'}/>
-
-            <Space size="middle" className='w-full flex justify-end'>
-              <Button type='primary' className='bg-primary text-white' htmlType="submit" >Next</Button>
-            </Space>
-          </Form>
-        </>
-      ) : step == 2 ? (
-        <>
-          <Title level={4}>Update Campaign Budgets Schedule - Validate and live Edit</Title>
-          <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile}/>
-          <div className='w-full flex items-center justify-between'>
-            <Button onClick={() => setStep(1)}>Back</Button>
-            <Button type='primary' onClick={handleFinish}>Finish</Button>
+        <div>
+          <div className='panel-heading flex items-center justify-between'>
+            <h2>Update Campaign Status Schedule</h2>
           </div>
-        </>
+          <div className='form-container'>
+            <Form
+              form= {form}
+              onFinish={onSave}
+              onFinishFailed={onSaveFail}
+              labelCol={{ span: 4 }}
+              wrapperCol={{ span: 14 }}
+              layout="horizontal"
+            >
+              <FSelect name={'partnerAccount'} label={'Partner Account'} placeholder={'Select Partner Account'} options={reGenerateDataAccountList}/>
+              <FUploadFile name={'file'} label={'Schedule File'}/>
+
+              <Space size="middle" className='w-full flex justify-end'>
+                <ActionButton htmlType={"submit"} className={'next-button'} iconOnRight={<RightOutlined />} label={'Next'}/>
+              </Space>
+            </Form>
+          </div>
+        </div>
+      ) : step == 2 ? (
+        <div>
+          <div className='panel-heading flex items-center justify-between'>
+            <h2>Update Campaign Budgets Schedule - Validate and live Edit</h2>
+          </div>
+          <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile ? previewFile : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+          <div className='w-full flex items-center justify-between'>
+            <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={'Back'} onClick={() => setStep(1)}/>
+            <ActionButton className={'finish-button'} label={'Finish'} onClick={handleFinish}/>
+          </div>
+        </div>
       ) : null}
 
       {openModalConfirmSetupBudgetSchedule && (
@@ -289,7 +298,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
           <ConfirmSetupBudgetSchedule/>
         </Modal>
       )}
-    </div>
+    </>
   );
 }
 

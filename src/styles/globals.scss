@@ -28,17 +28,63 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-.css-dev-only-do-not-override-i0102m[class^="ant-layout"] {
+.css-dev-only-do-not-override-i0102m[class^="ant-layout"],
+.css-dev-only-do-not-override-i0102m.ant-menu,
+.css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table,
+.css-dev-only-do-not-override-i0102m.ant-pagination,
+.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-prev,
+.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-next,
+.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-item,
+.css-dev-only-do-not-override-i0102m.ant-breadcrumb,
+.css-dev-only-do-not-override-i0102m[class^="ant-typography"], .css-dev-only-do-not-override-i0102m[class*=" ant-typography"],
+.css-dev-only-do-not-override-i0102m.ant-select-single .ant-select-selector,
+.css-dev-only-do-not-override-i0102m.ant-input,
+.css-dev-only-do-not-override-i0102m[class^="ant-col"], .css-dev-only-do-not-override-i0102m[class*=" ant-col"],
+.css-dev-only-do-not-override-i0102m.ant-upload-wrapper,
+.css-dev-only-do-not-override-i0102m[class^="ant-upload"], .css-dev-only-do-not-override-i0102m[class*=" ant-upload"],
+.css-dev-only-do-not-override-i0102m[class^="ant-btn"], .css-dev-only-do-not-override-i0102m[class*=" ant-btn"],
+.css-dev-only-do-not-override-i0102m.ant-radio-group,
+.css-dev-only-do-not-override-i0102m.ant-radio-wrapper,
+.css-dev-only-do-not-override-i0102m[class^="ant-table"], .css-dev-only-do-not-override-i0102m[class*=" ant-table"],
+.css-dev-only-do-not-override-i0102m[class^="ant-checkbox"], .css-dev-only-do-not-override-i0102m[class*=" ant-checkbox"],
+.css-dev-only-do-not-override-i0102m[class^="ant-row"], .css-dev-only-do-not-override-i0102m[class*=" ant-row"],
+.css-dev-only-do-not-override-i0102m.ant-checkbox-wrapper,
+.css-dev-only-do-not-override-i0102m.ant-checkbox-group
+ {
   font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
 }
 
 .css-dev-only-do-not-override-i0102m.ant-menu {
-  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
   font-size: 17px;
   line-height: 1.54;
   font-weight: 700;
 }
 
-.css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table {
-  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
+.css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table,
+.css-dev-only-do-not-override-i0102m[class^="ant-typography"], .css-dev-only-do-not-override-i0102m[class*=" ant-typography"],
+.css-dev-only-do-not-override-i0102m.ant-select-single .ant-select-selector,
+.css-dev-only-do-not-override-i0102m.ant-input-affix-wrapper >input.ant-input,
+.css-dev-only-do-not-override-i0102m.ant-form-item .ant-form-item-label >label,
+.css-dev-only-do-not-override-i0102m[class^="ant-table"], .css-dev-only-do-not-override-i0102m[class*=" ant-table"],
+.css-dev-only-do-not-override-i0102m.ant-checkbox-wrapper
+{
+  font-size: 13px;
+}
+
+// Spin loading
+.css-dev-only-do-not-override-i0102m.ant-spin .ant-spin-dot-item {
+  background-color: #006400;
+}
+
+// Checkbox
+.css-dev-only-do-not-override-i0102m.ant-checkbox-checked .ant-checkbox-inner,
+.css-dev-only-do-not-override-i0102m.ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+  background-color: #006400 !important;
+  accent-color: #006400 !important;
+  border-color: #006400 !important;
+}
+.ant-checkbox-wrapper:not(.ant-checkbox-wrapper-disabled):hover .ant-checkbox-inner, .css-dev-only-do-not-override-i0102m.ant-checkbox:not(.ant-checkbox-disabled):hover .ant-checkbox-inner,
+.ant-radio-wrapper:not(.ant-radio-wrapper-disabled):hover .ant-radio-inner, .css-dev-only-do-not-override-i0102m.ant-radio:not(.ant-radio-disabled):hover .ant-radio-inner
+ {
+  border-color: #006400 !important
 }

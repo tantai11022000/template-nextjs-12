@@ -1,21 +1,23 @@
+@import '../../styles/variables.scss';
+
 .sidebar-container {
-    background: #444;
+    background: $color-main-primary;
 
     .ant-layout-sider-collapsed {
         width: 50px !important;
         flex: 0 0 50px !important;
         max-width: 50px !important;
         min-width: 50px !important;
-        background: #444;
+        background: $color-main-primary;
     }
 
     .ant-layout-sider {
-        background: #444 !important;
+        background: $color-main-primary !important;
 
         .ant-layout-sider-children {
 
             .ant-menu-dark {
-                background: #444;      
+                background: $color-main-primary;      
             }
 
             .ant-menu {
@@ -33,11 +35,20 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        color: $color-white;
+                    }
+
+                    .ant-menu-title-content {
+
+                        a {
+                            color: $color-white;
+                        }
                     }
                 }
 
                 .ant-menu-item-selected {
                     background-color: #079A92;
+                    font-weight: 700;
                 }
             }
         }

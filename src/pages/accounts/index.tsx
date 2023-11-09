@@ -135,13 +135,13 @@ export default function Accounts (props: IAccountsProps) {
   const columns: any = useMemo(
     () => [
       {
-        title: 'No.',
+        title: <div className='text-center'>No.</div>,
         dataIndex: 'id',
         key: 'id',
         render: (text: any) => <p>{text}</p>,
       },
       {
-        title: 'Name',
+        title: <div className='text-center'>Name</div>,
         dataIndex: 'name',
         key: 'name',
         render: (text: any) => <p>{text}</p>,
@@ -154,12 +154,24 @@ export default function Accounts (props: IAccountsProps) {
         dataIndex: 'status',
         key: 'status',
         render: (_: any, record: any) => {
-          const status = record.isActive
-          return (
-            <div className='flex justify-center'>
-              <Tag>{status == true ? "Active" : "isActive"}</Tag>
+          const statusData = record.isActive
+          const renderStatus = () => {
+            let status = ''
+            let type = ''
+            if (statusData == true) {
+              status = 'ACTIVE'
+              type = 'success'
+            } else if (statusData == false) {
+              status = 'INACTIVE'
+              type = 'error'
+            }
+            return <Tag color={type}>{status}</Tag>
+          }
+        return (
+            <div className='flex justify-center uppercase'>
+              {renderStatus()}
             </div>
-          );
+        );
         },
         sorter: (a: any, b: any) => a.status - b.status,
       },
@@ -170,7 +182,7 @@ export default function Accounts (props: IAccountsProps) {
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
+                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
                 <DeleteOutlined className='text-lg cursor-pointer'/>
               </Space>
             </div>
@@ -190,10 +202,10 @@ export default function Accounts (props: IAccountsProps) {
     <div>
       <Space className='w-full flex flex-row justify-between'>
         <SearchInput keyword={keyword} name="keyword" placeholder="Search by Account" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <ActionButton icon={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
+        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
       </Space>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={accounts} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={accounts ? accounts : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
     </div>
   );
