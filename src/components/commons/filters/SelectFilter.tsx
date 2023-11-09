@@ -5,13 +5,14 @@ export interface ISelectFilterProps {
   defaultValue?: string,
   showSearch?: boolean,
   label?: string,
+  value?: any,
   placeholder: string
   onChange: any
   options: any
 }
 
 export default function SelectFilter (props: ISelectFilterProps) {
-  const { label, defaultValue, showSearch, placeholder, onChange, options} = props
+  const { label, defaultValue, showSearch, placeholder, onChange, options, value} = props
   const { Text } = Typography
   return (
     <div className='select-filter-container'>
@@ -24,6 +25,7 @@ export default function SelectFilter (props: ISelectFilterProps) {
         placeholder={placeholder}
         onChange={onChange}
         options={options}
+        value={value}
       />
     </div>
   );

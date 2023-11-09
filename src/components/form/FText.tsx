@@ -14,7 +14,7 @@ export default function FText (props: IFTextProps) {
   const {name, label, required, errorMessage, onChange, customCss} = props
   return (
     <Form.Item
-      className={customCss ? customCss : ''}
+      className={`${customCss ? customCss : ''} text-input-container`}
       name={name}
       label={label}
       rules={[{

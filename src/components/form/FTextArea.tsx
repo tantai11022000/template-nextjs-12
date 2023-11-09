@@ -13,6 +13,7 @@ export default function FTextArea (props: IFTextAreaProps) {
   const {name, label, required, errorMessage, rows} = props
   return (
     <Form.Item
+      className='text-input-container'
       name={name}
       label={label}
       rules={[{

@@ -1,5 +1,13 @@
 @import '../../styles/variables.scss';
 
+// RADIO button
+.radio-container {
+
+    .ant-radio-wrapper {
+        
+    }
+}
+
 // INPUTS
 .search-container {
 
@@ -33,6 +41,17 @@
     }
 }
 
+.text-input-container {
+    
+    .ant-input {
+        border-radius: 2px;
+        padding: 4px 32px 4px 8px;
+        font-size: 13px;
+        background-color: $color-main-secondary;
+        color: $color-text-base;
+    }
+}
+
 // FILTERS
 .select-filter-container {
     
@@ -61,23 +80,134 @@
 // ACTION BUTTON
 .button-container {
     
-    .ant-btn-default {
-        background-color: $color-link;
-        color: $color-white;
-        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
-        border-color: unset;
-    }
+    // .ant-btn-default {
+    //     background-color: $color-link;
+    //     color: $color-white;
+    //     box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+    //     border-color: unset;
+    // }
 
     .ant-btn {
         border-radius: 2px;
         border: unset;
         font-size: 13px;
         padding: 0 12px 0 8px;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .ant-btn-default:not(:disabled):not(.ant-btn-disabled):hover {
-        background-color: #004a00;
+        background-color: unset;
+        color: unset;
+        border-color: unset;
+    }
+
+    .next-button, .action-button, .finish-button {
+        background-color: $color-link;
         color: $color-white;
-        border-color: #004a00;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+        border-color: unset;
+    }
+
+    .next-button:hover, .action-button:hover, .finish-button:hover {
+        background-color: #004a00 !important;;
+        color: $color-white !important;;
+        border-color: #004a00 !important;;
+    }
+    
+    .back-button, .cancel-button {
+        background-color: $color-main-secondary;
+        color: $color-text-base;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+        border-color: $color-border;
+        border: 1px solid $color-border;
+    }
+
+    .back-button:hover, .cancel-button:hover {
+        background-color: #ededed !important;
+        border-color: #cccccc !important;
+    }
+    
+    .process-button {
+    
+    }
+    
+}
+
+
+// FORM
+.form-container {
+    margin-top: 16px;
+
+    .ant-form-item-label {
+
     }
 }
+
+// UPLOAD FILE
+.upload-container {
+
+    .ant-upload-wrapper {
+
+        .ant-upload-drag {
+            background: rgba(0, 0, 0, 0.03);
+            border: 3px dashed #eeeeee;
+            
+            .ant-upload-drag-container {
+
+                p.ant-upload-drag-icon {
+                    margin-bottom: unset;
+                    margin-right: 8px;
+    
+                    .anticon {
+                        color: $color-disable;
+                        font-size: 24px;
+                    }
+                }
+    
+                p.ant-upload-text {
+                    margin: unset;
+                    font-size: 13px;
+                }
+
+                .ant-upload-hint {
+                    font-size: 13px;
+                    color: $color-disable;
+                }
+
+            }
+        }
+
+        .ant-upload-drag:not(.ant-upload-disabled):hover {
+            border-color: $color-disable
+        }
+
+    }
+}
+
+// CHECKBOX GROUP
+
+.checkbox-group-container {
+
+    .ant-checkbox-group {
+
+        .ant-checkbox-wrapper {
+        }
+
+        .upcoming {
+            color: red;
+        }
+        
+        .ant-checkbox {
+            align-self: unset;
+        }
+
+        .ant-checkbox+span {
+            padding: 4px 12px;
+        }
+    }
+}
+

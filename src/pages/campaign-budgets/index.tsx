@@ -22,8 +22,8 @@ import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
+import ActionButton from '@/components/commons/buttons/ActionButton';
 
-const { Search } = Input;
 
 export interface ICampaignBudgetsProps {
 }
@@ -90,6 +90,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<any>("Select Action");
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
@@ -152,9 +153,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }
 
   const onChange = (value: string) => {
+    
     console.log(`selected ${value}`);
     if (value == "update_status") {
-      setOpenModalUpdateStatus(!openModalUpdateStatus)
+      setOpenModalUpdateStatus(true)
     } else if (value == "schedule_status") {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == "schedule_budget_once") {
@@ -165,6 +167,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         query: {isWeight: true}
       })
     }
+    setSelectedStatus("Select Action")
   };
   
   const onSearchInFilter = (value: string) => {
@@ -324,10 +327,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const handleOk = () => {
     setOpenModalUpdateStatus(false);
+    setSelectedStatus("Select Action")
   };
 
   const handleCancel = () => {
     setOpenModalUpdateStatus(false);
+    setSelectedStatus("Select Action")
   };
 
   return (
@@ -335,16 +340,26 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       <div className='flex items-center justify-between'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={"Search by Campaign"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6'>
-          <SelectFilter label={"Status"} placeholder={"Select Status"} onChange={onChange} options={statuses}/>
-          <SelectFilter label={"Bulk Action"} placeholder={"Select Action"} onChange={onChange} options={bulkAction}/>
+          <SelectFilter label={"Status"} placeholder={"Select Status"} onChange={onChange} options={statuses} />
+          <SelectFilter label={"Bulk Action"} placeholder={"Select Action"} onChange={onChange} options={bulkAction} value={selectedStatus}/>
         </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={campaignBudgets} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={campaignBudgets ? campaignBudgets : []} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
-        <Modal title="Update Campaign Status" open={openModalUpdateStatus} onOk={handleOk} onCancel={handleCancel}>
+        <Modal
+          title="Update Campaign Status"
+          open={openModalUpdateStatus}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={null}
+        >
           <p>Update {selectedRowKeys && selectedRowKeys.length ? selectedRowKeys.length : 0} selected campaign(s) to status: <Switch defaultChecked /></p>
+          <Space size="middle" className='w-full flex items-center justify-end mt-8'>
+            <ActionButton className="cancel-button" label="Cancel" onClick={handleCancel} />
+            <ActionButton className="finish-button" label="Update" />
+          </Space>
         </Modal>
       )}
     </div>

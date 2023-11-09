@@ -4,10 +4,7 @@ import RootLayout from '../../components/layout';
 import DashboardLayout from '../../components/nested-layout/DashboardLayout';
 import { Space } from 'antd';
 import TableGeneral from '@/components/table';
-import {
-  DeleteOutlined,
-  EditOutlined
-} from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, CopyOutlined} from '@ant-design/icons';
 import moment from 'moment';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
@@ -16,7 +13,6 @@ import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import ActionButton from '@/components/commons/buttons/ActionButton';
-import { PlusOutlined } from '@ant-design/icons';
 
 
 const fakeData = [
@@ -50,7 +46,7 @@ function WeightTemplate() {
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 10,
     current: 1,
     showSizeChanger: true,
     showQuickJumper: true,
@@ -92,32 +88,32 @@ function WeightTemplate() {
   const columns: any = useMemo(
     () => [
       {
-        title: 'Id',
+        title: <div className='text-center'>ID</div>,
         dataIndex: 'id',
         key: 'id',
         render: (text: any) => <div>{text}</div>,
       },
       {
-        title: 'Template Name',
+        title: <div className='text-center'>Template Name</div>,
         dataIndex: 'name',
         key: 'name',
         render: (text: any) => <div>{text}</div>,
       },
       {
-        title: 'Description',
+        title: <div className='text-center'>Description</div>,
         dataIndex: 'description',
         key: 'description',
         render: (text: any) => <div>{text}</div>,
         width: 500,
       },
       {
-        title: 'Last Updated',
+        title: <div className='text-center'>Last Updated</div>,
         dataIndex: 'updatedAt',
         key: 'updatedAt',
         render: (text: any) => <div>{moment().format('DD-MM-YYYY')}</div>,
       },
       {
-        title: 'Action',
+        title: <div className='text-center'>Action</div>,
         key: 'action',
         align: 'center',
         width: 100,
@@ -125,7 +121,8 @@ function WeightTemplate() {
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
+                <CopyOutlined className='text-lg cursor-pointer' />
+                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
                 <DeleteOutlined className='text-lg cursor-pointer'/>
               </Space>
             </div>
@@ -155,7 +152,7 @@ function WeightTemplate() {
     <div>
       <Space className='w-full flex flex-row justify-between'>
         <SearchInput keyword={keyword} name="keyword" placeholder="Search by Template" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleOnSearch}/>
-        <ActionButton icon={<PlusOutlined />} label={'Add Weight Template'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
+        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={'Add Weight Template'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

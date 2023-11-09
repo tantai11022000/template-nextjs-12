@@ -5,7 +5,7 @@ import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography } from 'antd';
+import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography, Option, Switch, Slider } from 'antd';
 import { useRouter } from 'next/router';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import FText from '@/components/form/FText';
@@ -16,7 +16,12 @@ import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
+import ActionButton from '@/components/commons/buttons/ActionButton';
 
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import FSelect from '@/components/form/FSelect';
+import FRadio from '@/components/form/FRadio';
+import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 
 export interface IScheduleBudgetProps {
 }
@@ -81,6 +86,21 @@ const WEIGHT_LIST = [
 ]
 
 export default function ScheduleBudget (props: IScheduleBudgetProps) {
+  const { Option } = Select;
+
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 14 },
+};
+
+const normFile = (e: any) => {
+  console.log('Upload event:', e);
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+
   const { Text, Title } = Typography
   const [form]:any = Form.useForm();
   const router = useRouter()
@@ -189,40 +209,6 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     console.log('e :>> ', e);
   }
 
-  const columns: any = useMemo(
-    () => [
-      {
-        title: 'Mode',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text: any) => <p>{text}</p>,
-
-        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
-      },
-      {
-        title: 'Time',
-        dataIndex: 'createdDate',
-        key: 'createdDate',
-        render: (text: any) => <p>{text}</p>,
-      },
-      {
-        title: 'Budget Change',
-        dataIndex: 'budget',
-        key: 'budget',
-        render: (text: any) => <p className='text-end'>{text}</p>,
-
-        sorter: (a: any, b: any) => a.imp - b.imp
-      },
-      {
-        title: 'Weight',
-        dataIndex: 'weightName',
-        key: 'weightName',
-        render: (text: any) => <p>{text}</p>,
-      },
-    ], [data]
-  )
-
   const handleAddSchedule = () => {
     var newData: any
     if (router && router.query && router.query.isWeight) {
@@ -272,36 +258,126 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setPagination(pagination)
   }
 
+  const onFinish = (values: any) => {
+    console.log('Received values of form: ', values);
+  };
+
+  const columns: any = useMemo(
+    () => [
+      {
+        title: 'Mode',
+        dataIndex: 'name',
+        key: 'name',
+        render: (text: any) => <p>{text}</p>,
+
+        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+      },
+      {
+        title: 'Time',
+        dataIndex: 'createdDate',
+        key: 'createdDate',
+        render: (text: any) => <p>{text}</p>,
+      },
+      {
+        title: 'Budget Change',
+        dataIndex: 'budget',
+        key: 'budget',
+        render: (text: any) => <p className='text-end'>{text}</p>,
+
+        sorter: (a: any, b: any) => a.imp - b.imp
+      },
+      {
+        title: 'Weight',
+        dataIndex: 'weightName',
+        key: 'weightName',
+        render: (text: any) => <p>{text}</p>,
+      },
+    ], [data]
+  )
+
   return (
     <div>
       <div>
-      <Title level={1}>Schedule Budget for Campaigns</Title>
-      <Space className='flex items-center justify-between my-6'>
-        <Title level={5}>There are {campaignBudgets && campaignBudgets.length ? campaignBudgets.filter((campaign: any) => campaign.state == 'paused').length : ""} have existing upcoming schedule</Title>
-        <Space className='flex items-center mb-2'>
-          <div className='bg-red p-2 mr-3'></div>
-          <span className='text-red'>Existing Upcoming Schedule</span>
+        <div className='panel-heading flex items-center justify-between'>
+          <h2>Schedule Budget for Campaigns</h2>
+        </div>
+        <Space className='w-full flex items-center justify-between my-6'>
+          <h3>There are {campaignBudgets && campaignBudgets.length ? campaignBudgets.filter((campaign: any) => campaign.state != 'paused').length : ""} have existing upcoming schedule</h3>
+          <Space className='flex items-center'>
+            <div className='bg-red p-2 mr-1'></div>
+            <span className='text-red'>Existing Upcoming Schedule</span>
+          </Space>
         </Space>
-      </Space>
-      {/* <Form
-        form= {form}
-        onValuesChange={handleOnChangeForm}
-        onFinish={handleFinish}
-        onFinishFailed={handleFinishFailed}
-        // labelCol={{ span: 2 }}
-        // layout='vertical'
-      >
-        <FMultipleCheckbox name={'campaigns'} label='' data={displayedCampaigns} onChange={onChangeCheck}/>
+        <div className='checkbox-group-container'> 
+          <Checkbox.Group onChange={onChangeCheck}>
+            <Row>
+              {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
+                <Col key={campaign.campaignId} span={8}>
+                  <Checkbox value={campaign.campaignId} className={`${campaign.state != 'paused' ? 'upcoming' : ''}`}>{campaign.name}</Checkbox>
+                </Col>
+              )) : <Spin/>}
+            </Row>
+          </Checkbox.Group>
+        </div>
         <div className='w-full flex justify-end'>
           {showMore && (
             <button onClick={() => handleShowMore()}>View more...</button>
           )}
         </div>
-        <Space className='flex items-center justify-between my-6'>
-          <FRadio name={"Mode"} label={'Mode'} options={modes} />
-          <FRadio name={"withWeight"} label={''} options={[{ value: 'weight', label: 'Daily with Weight'}]} />
+        <Form
+          name="validate_other"
+          {...formItemLayout}
+          onFinish={onFinish}
+          initialValues={{
+            // 'input-number': 3,
+            // 'checkbox-group': ['A', 'B'],
+            // rate: 3.5,
+            // 'color-picker': null,
+          }}
+          labelCol={{ span: 9 }}
+          wrapperCol={{ span: 9 }}
+          layout="horizontal"
+        >
+          <FRadio name={'mode'} label={'Mode'} options={modes} onChange={handleChangeMode} value={selectMode}/>
+          {router && router.query && router.query.isWeight && (
+            <>
+              <FMultipleCheckbox name={'isWeight'} label='Daily with Weight' data={[{value: 'weight', name: ' '}]} />
+              <FSelect name={'weightTemplate'} label={'Weight'} placeholder={'Select Weight Template'} options={weights}/>
+            </>
+          )}       
+          <Form.Item name="time" label="Time">
+            <RangeDatePicker/>
+          </Form.Item>
+          <Form.Item name="budget" label="Budget Change">
+            <InputNumber
+              min={1}
+              defaultValue={100}
+              prefix={selectMode == "percent" ? "" : "￥"}
+              formatter={budgetFormatter}
+              parser={budgetParser}
+              onChange={handleBudgetChange}
+            />    
+          </Form.Item> 
+
+          <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
+            <div className='flex justify-center mt-6'>
+              <ActionButton htmlType={"submit"} className={'finish-button'} label={'Add'} onClick={handleAddSchedule}/>
+            </div>
+          </Form.Item>
+        </Form>
+        {/* <Space className='flex items-center justify-between my-6'>
+          <Space>
+            <Text>Mode</Text>
+            <Radio.Group onChange={handleChangeMode} value={selectMode}>
+              {modes ? modes.map((mode: any) => (
+                <Radio key={mode.id} value={mode.value}>{mode.label}</Radio>
+              )) : null}
+            </Radio.Group>
+          </Space>
+          {router && router.query && router.query.isWeight && <Radio checked>Daily with Weight</Radio>}
         </Space>
-        <Space className='flex items-center'>
+        <Space className='flex justify-center'>
           <Space>
             <Text>Time</Text>
             <DateTimePicker/>
@@ -316,70 +392,22 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               onChange={handleBudgetChange}
             />    
           </Space>
+          <Space>
+            <Select
+              labelInValue
+              style={{ width: 200 }}
+              showSearch
+              placeholder="Select Weight Template"
+              optionFilterProp="children"
+              onChange={handleChangeWeightTemplate}
+              options={weights}
+              />
+              <EditOutlined className='text-lg cursor-pointer' onClick={handleEditWeightTemplate}/>
+          </Space>
         </Space>
-
-        <Form.Item className='flex justify-end mt-5'>
-          <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
-          <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
-          <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>
-        </Form.Item>
-      </Form> */}
-      <Checkbox.Group style={{ width: '100%' }} onChange={onChangeCheck}>
-        <Row>
-          {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
-            <Col key={campaign.campaignId} span={8}>
-              <Checkbox value={campaign.campaignId} className={`${campaign.state == 'paused' ? 'text-red' : ''}`}>{campaign.name}</Checkbox>
-            </Col>
-          )) : <Spin/>}
-        </Row>
-      </Checkbox.Group>
-      <div className='w-full flex justify-end'>
-        {showMore && (
-          <button onClick={() => handleShowMore()}>View more...</button>
-        )}
-      </div>
-      <Space className='flex items-center justify-between my-6'>
-        <Space>
-          <Text>Mode</Text>
-          <Radio.Group onChange={handleChangeMode} value={selectMode}>
-            {modes ? modes.map((mode: any) => (
-              <Radio key={mode.id} value={mode.value}>{mode.label}</Radio>
-            )) : null}
-          </Radio.Group>
-        </Space>
-        {router && router.query && router.query.isWeight && <Radio checked>Daily with Weight</Radio>}
-      </Space>
-      <Space className='flex justify-center'>
-        <Space>
-          <Text>Time</Text>
-          <DateTimePicker/>
-        </Space>
-        <Space>
-          <Text>Budget Change</Text>
-          <InputNumber
-            defaultValue={100}
-            prefix={selectMode == "percent" ? "" : "￥"}
-            formatter={budgetFormatter}
-            parser={budgetParser}
-            onChange={handleBudgetChange}
-          />    
-        </Space>
-        <Space>
-          <Select
-            labelInValue
-            style={{ width: 200 }}
-            showSearch
-            placeholder="Select Weight Template"
-            optionFilterProp="children"
-            onChange={handleChangeWeightTemplate}
-            options={weights}
-            />
-            <EditOutlined className='text-lg cursor-pointer' onClick={handleEditWeightTemplate}/>
-        </Space>
-      </Space>
-      <div className='flex justify-center mt-6'>
-        <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer' onClick={handleAddSchedule}>Add</Button>
-      </div>
+        <div className='flex justify-center mt-6'>
+          <ActionButton htmlType={"submit"} className={'finish-button'} label={'Add'} onClick={handleAddSchedule}/>
+        </div> */}
       </div>
       <div>
         <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

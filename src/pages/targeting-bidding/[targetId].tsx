@@ -309,7 +309,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
   )
 
   return (
-    <div className='text-black'>      
+    <div>      
       <div>
         <div className='panel-heading flex items-center justify-between'>
           <h2>Schedule Adtran log: Target A - Campaign A</h2>

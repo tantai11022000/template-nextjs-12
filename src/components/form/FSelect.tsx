@@ -21,6 +21,7 @@ export default function FSelect (props: IFSelectProps) {
     <Form.Item
       name={name}
       label={label}
+      className='select-filter-container'
     >
       <Select placeholder={placeholder}>
         {options && options.map((option: any) => <Select.Option key={option.value} value={option.value}>{option.label}</Select.Option>)}

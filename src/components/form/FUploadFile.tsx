@@ -1,5 +1,5 @@
 import { Form, Input, Radio, Select, Upload } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined } from '@ant-design/icons';
 import React from 'react';
 
 interface IOption {
@@ -26,15 +26,14 @@ export default function FUploadFile (props: IFUploadFileProps) {
   };
 
   return (
-    <Form.Item label={label}>
+    <Form.Item label={label} className='upload-container'>
       <Form.Item name={name} valuePropName="fileList" getValueFromEvent={normFile} noStyle>
         <Upload.Dragger name="files" action="/upload.do">
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p className="ant-upload-text">Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint">Support for a single or bulk upload.</p>
-          <p className="ant-upload-text">Note: CSV only - max file size: 2MB.</p>
+          <div className='flex items-end justify-center'>
+            <p className="ant-upload-drag-icon"><CloudUploadOutlined /></p>
+            <p className="ant-upload-text">Drop file here or click to browse</p>
+          </div>
+          <p className="ant-upload-hint">(Allowed file types: *.CSV,*.xls,*.xlsx)</p>
         </Upload.Dragger>
       </Form.Item>
     </Form.Item>

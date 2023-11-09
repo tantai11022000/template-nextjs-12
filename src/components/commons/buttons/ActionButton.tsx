@@ -4,16 +4,20 @@ import { SearchOutlined } from '@ant-design/icons';
 
 
 export interface IActionButtonProps {
-  icon: any,
-  label: string,
-  onClick: any
+  iconOnLeft?: any,
+  iconOnRight?: any,
+  className?: string,
+  htmlType?: any,
+  onClick?: any
+  disabled?: any,
+  label: any,
 }
 
 export default function ActionButton (props: IActionButtonProps) {
-  const { icon, label, onClick } = props
+  const { iconOnLeft, iconOnRight, className, label, onClick, htmlType, disabled } = props
   return (
     <div className='button-container'>
-      <Button icon={icon} onClick={onClick}>{label}</Button>
+      <Button htmlType={htmlType} className={`${className ? className : ""}`} onClick={onClick} disabled={disabled}>{iconOnLeft}{label}{iconOnRight}</Button>
     </div>
   );
 }

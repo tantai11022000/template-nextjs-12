@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router'
-import { Button, Form, Input, Radio } from 'antd';
+import { Button, Form, Input, Radio, Space } from 'antd';
 import FText from '@/components/form/FText';
 import FTextArea from '@/components/form/FTextArea';
 import FRadio from '@/components/form/FRadio';
@@ -11,6 +11,9 @@ import { GetServerSideProps } from 'next';
 import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { useAppDispatch } from '@/store/hook';
+import ActionButton from '@/components/commons/buttons/ActionButton';
+import { RightOutlined } from '@ant-design/icons';
+import TextInput from '@/components/commons/textInputs/TextInput';
 
 const fakeDataForm = {
   name: "fake data",
@@ -162,30 +165,32 @@ function AddWeightTemplate() {
     }
 
     return (
-        <>
-            <Form
+      <div>
+        <div className='panel-heading flex items-center justify-between'>
+          <h2>{isEdit ? "Edit" : "Add"} Weight Template</h2>
+        </div>
+        <div className='form-container'>
+          <Form
             form= {form}
-            onValuesChange={handleOnChangeForm}
-            onFinish={handleFinish}
+            onFinish={handleOnChangeForm}
             onFinishFailed={handleFinishFailed}
-            labelCol={{ span: 2 }}
-            layout='vertical'
-            >
-                <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
-                <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
-                <FRadio name={"timeSlot"} label={'Time slot'} options={options} />
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 14 }}
+            layout="horizontal"
+          >
+            <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
+            <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
+            <FRadio name={"timeSlot"} label={'Time slot'} options={options} />
 
-                <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'max-h-80 w-[50%] m-auto overflow-y-auto'} />
+            <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'w-[80%] m-auto'} scrollY={true} />
 
-                <div className='mt-8'>
-                  <Form.Item className='flex justify-center'>
-                    <Button type="primary" className='bg-secondary text-white w-28 cursor-pointer mr-5' onClick={() => router.back()}>Cancel</Button>
-                    <Button type="primary" className='bg-blue text-white w-28 cursor-pointer mr-5'>Clone</Button>
-                    <Button type="primary" htmlType="submit" className='bg-primary text-white w-28 cursor-pointer'>Submit</Button>
-                  </Form.Item>
-                </div>
-            </Form>
-        </>
+            <Space size="middle" className='w-full flex justify-center mt-8'>
+              <ActionButton className={'cancel-button'} label={'Cancel'} onClick={() => router.back()}/>
+              <ActionButton htmlType={"submit"} className={'finish-button'} label={'Submit'}/>
+            </Space>
+          </Form>
+        </div>
+      </div>
     );
 }
 
