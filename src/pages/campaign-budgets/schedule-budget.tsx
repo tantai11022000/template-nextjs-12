@@ -5,7 +5,7 @@ import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography, Option, Switch, Slider } from 'antd';
+import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography, Slider } from 'antd';
 import { useRouter } from 'next/router';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import FText from '@/components/form/FText';
