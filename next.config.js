@@ -3,12 +3,10 @@
 const { i18n } = require('./next-i18next.config');
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   assetPrefix: '/amazon',
   basePath: '/amazon',
   i18n,
 }
-
-console.log('basePath:', nextConfig.basePath);
 
 module.exports = nextConfig
