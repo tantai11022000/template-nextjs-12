@@ -23,7 +23,19 @@ import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import ActionButton from '@/components/commons/buttons/ActionButton';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
+  }
+}
 
 export interface ICampaignBudgetsProps {
 }
@@ -85,7 +97,9 @@ const BULK_ACTION = [
 ]
 
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
+  const { t } = useTranslation('common')
   const router = useRouter()
+  console.log(">>> router", router)
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
 
@@ -203,9 +217,31 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setIsEditingList(updatedIsEditingList);
   };
 
-  const handleBudgetChange = (e: any, index: any) => {
-    console.log(">>> index", index)
-    console.log(">>> e.target.value", e.target.value)
+  const changeLanguage = (newLanguage: any) => {
+    console.log('Changing language to:', newLanguage);
+    const { pathname, query } = router;
+    router.push({ pathname, query }, undefined, { locale: newLanguage });
+  };
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    getCheckboxProps: (record: any) => ({
+      id: record.campaignId,
+    }),
+    onChange: onSelectChange,
+  };
+
+  const handleOk = () => {
+    setOpenModalUpdateStatus(false);
+    setSelectedStatus("Select Action")
+  };
+
+  const handleCancel = () => {
+    setOpenModalUpdateStatus(false);
+    setSelectedStatus("Select Action")
   };
 
   const columns: any = useMemo(
@@ -250,6 +286,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         key: 'budget',
         render: (text: any, record: any, index: number) => {
           const isEditing = isEditingList[index];
+
+          const handleBudgetChange = (e: any, index: any) => {
+            const updatedBudgets = [...campaignBudgets];
+            updatedBudgets[index].budget = e.target.value;
+            setCampaignBudgets(updatedBudgets);
+          };
 
           return (
             <div className='flex items-center justify-between'>
@@ -314,31 +356,17 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     ], [campaignBudgets, handleToggleEdit, isEditingList]
   )
 
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-  const rowSelection = {
-    getCheckboxProps: (record: any) => ({
-      id: record.campaignId,
-    }),
-    onChange: onSelectChange,
-  };
-
-  const handleOk = () => {
-    setOpenModalUpdateStatus(false);
-    setSelectedStatus("Select Action")
-  };
-
-  const handleCancel = () => {
-    setOpenModalUpdateStatus(false);
-    setSelectedStatus("Select Action")
-  };
+ 
 
   return (
     <div>
+      <h1>{t("greeting")}</h1>
+      <div className='button-container'>
+      <button className='finish-button mr-4' onClick={() => changeLanguage('en')}>English</button>
+      <button className='finish-button' onClick={() => changeLanguage('jp')}>Japanese</button>
+      </div>
       <div className='flex items-center justify-between'>
-          <SearchInput keyword={keyword} name={"keyword"} placeholder={"Search by Campaign"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+          <SearchInput keyword={keyword} name={"keyword"} placeholder={t("greeting")} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6'>
           <SelectFilter label={"Status"} placeholder={"Select Status"} onChange={onChange} options={statuses} />
           <SelectFilter label={"Bulk Action"} placeholder={"Select Action"} onChange={onChange} options={bulkAction} value={selectedStatus}/>
