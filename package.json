@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "next dev -p 8000",
     "start": "next start",
-    "start:dev": "env-cmd -f .env.development next dev",
-    "start:staging": "env-cmd -f .env.staging next dev",
-    "start:prod": "env-cmd -f .env.production next dev",
+    "start:dev": "env-cmd -f .env.development next start",
+    "start:staging": "env-cmd -f .env.staging next start",
+    "start:prod": "env-cmd -f .env.production next start",
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
