@@ -17,8 +17,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { appWithTranslation } from 'next-i18next'
+import { useRouter } from 'next/router'
 
 function App({ Component, pageProps }: any) {
+  const { locale } = useRouter();
   const renderWithLayout =
     Component.getLayout ||
     function (page: any) {
@@ -47,7 +49,7 @@ function App({ Component, pageProps }: any) {
   return (
     <Provider store={store} >
       <StyleProvider hashPriority="high">
-        {renderWithLayout(<Component {...pageProps} />)}
+        {renderWithLayout(<Component {...pageProps} dir={locale === "en" ? "ltr" : "rtl"}/>)}
        </StyleProvider>
       <ToastContainer />
     </Provider>
