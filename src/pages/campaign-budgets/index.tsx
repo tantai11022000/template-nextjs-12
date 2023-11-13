@@ -96,8 +96,8 @@ const BULK_ACTION = [
   }, 
 ]
 
-export default function CampaignBudgets (props: ICampaignBudgetsProps) {
-  const { t } = useTranslation('common')
+export default async function CampaignBudgets (props: ICampaignBudgetsProps) {
+  const { t } = await useTranslation('common')
   const router = useRouter()
   console.log(">>> router", router)
   const currentAccount = useAppSelector(getCurrentAccount)
