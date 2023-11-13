@@ -4,7 +4,7 @@ const { i18n } = require('./next-i18next.config');
 
 const nextConfig = {
   reactStrictMode: true,
-  basePath: '/amazon',
+  assetPrefix: '/amazon/',
   i18n,
 }
 
