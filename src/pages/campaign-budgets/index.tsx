@@ -27,11 +27,15 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 
-export const getStaticProps = async ({ locale, defaultLocale }: any) => ({
-  props: {
-    ...(await serverSideTranslations(locale ?? defaultLocale, ['common']))
+export async function getStaticProps(context: any) {
+  const { locale } = context
+
+  return {
+    props: {
+      ...(await serverSideTranslations(locale)),
+    },
   }
-});
+}
 
 export interface ICampaignBudgetsProps {
 }
