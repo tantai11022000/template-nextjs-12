@@ -28,11 +28,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 
 export async function getStaticProps(context: any) {
-  const { locale } = context
-
+  const { locale, locales } = context
+  console.log(">>> locale", locale);
+  console.log(">>> locales", locales);
   return {
     props: {
-      ...(await serverSideTranslations(locale)),
+      ...(await serverSideTranslations(locale, ['common'])),
     },
   }
 }
