@@ -16,6 +16,7 @@ import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { StyleProvider } from '@ant-design/cssinjs';
+import { appWithTranslation } from 'next-i18next'
 
 function App({ Component, pageProps }: any) {
   const renderWithLayout =
@@ -53,4 +54,4 @@ function App({ Component, pageProps }: any) {
   )
 }
 
-export default App
+export default appWithTranslation(App)
