@@ -170,3 +170,12 @@
         padding: 5px 16px !important;
     }
 }
+
+.weight-table-css {
+    width: 80%;
+    margin: auto;
+
+    .ant-col-14 {
+        max-width: unset;
+    }
+}

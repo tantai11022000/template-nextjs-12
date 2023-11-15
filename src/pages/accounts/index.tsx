@@ -16,8 +16,17 @@ import {
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 import { PlusOutlined } from '@ant-design/icons';
-
-
+import { USER_STATUS } from '@/enums/status';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 export interface IAccountsProps {
 }
 
@@ -95,7 +104,6 @@ export default function Accounts (props: IAccountsProps) {
   const getAllAccounts = async () => {
     setLoading(true)
     try {
-
       const {pageSize, current, total} = pagination
       var params = {
         page: current,
@@ -154,14 +162,14 @@ export default function Accounts (props: IAccountsProps) {
         dataIndex: 'status',
         key: 'status',
         render: (_: any, record: any) => {
-          const statusData = record.isActive
+          const statusData = record.status
           const renderStatus = () => {
             let status = ''
             let type = ''
-            if (statusData == true) {
-              status = 'ACTIVE'
+            if (statusData == USER_STATUS.ACTIVE) {
+              status = "ACTIVE"
               type = 'success'
-            } else if (statusData == false) {
+            } else if (statusData == USER_STATUS.INACTIVE) {
               status = 'INACTIVE'
               type = 'error'
             }

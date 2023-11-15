@@ -6,53 +6,46 @@ import { Space } from 'antd';
 import TableGeneral from '@/components/table';
 import { DeleteOutlined, EditOutlined, PlusOutlined, CopyOutlined} from '@ant-design/icons';
 import moment from 'moment';
-import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
 import { useRouter } from 'next/router';
 import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import ActionButton from '@/components/commons/buttons/ActionButton';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { deleteWeightTemplate, getAllWeightTemplates } from '@/services/weight-template';
+import { useTranslation } from 'next-i18next';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 
-const fakeData = [
-  {
-    id: 1,
-    name: "Template 1",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus et veritatis voluptatum animi ipsum facilis at asperiores a. Nihil assumenda corporis ipsa debitis tenetur expedita, numquam magnam? Aliquid, modi obcaecati!",
-    updatedAt: "2023-01-01"
-  },
-  {
-    id: 2,
-    name: "Template 2",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus et veritatis voluptatum animi ipsum facilis at asperiores a. Nihil assumenda corporis ipsa debitis tenetur expedita, numquam magnam? Aliquid, modi obcaecati!",
-    updatedAt: "2023-01-02"
-  },
-  {
-    id: 3,
-    name: "Template 3",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus et veritatis voluptatum animi ipsum facilis at asperiores a. Nihil assumenda corporis ipsa debitis tenetur expedita, numquam magnam? Aliquid, modi obcaecati!",
-    updatedAt: "2023-01-03"
-  },
-  {
-    id: 4,
-    name: "Template 4",
-    description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus et veritatis voluptatum animi ipsum facilis at asperiores a. Nihil assumenda corporis ipsa debitis tenetur expedita, numquam magnam? Aliquid, modi obcaecati!",
-    updatedAt: "2023-01-04"
-  },
-]
 function WeightTemplate() {
+  const { t } = useTranslation()
   const router = useRouter();
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
     current: 1,
-    showSizeChanger: true,
-    showQuickJumper: true,
   })
-  const [data, setData] = useState<any>([]);
+  const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [keyword, setKeyword] = useState<string>("");
+
+  useEffect(() => {
+    mapFirstQuery()
+    fetchAllWeightTemplates();
+    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
+  },[])
+
   const handleOnSearch = async(value:string) => {
     setKeyword(value)
     const params = {
@@ -66,13 +59,20 @@ function WeightTemplate() {
     updateUrlQuery(router,params)
   }
 
-  const fetchWeightTemplate = async () => {
+  const fetchAllWeightTemplates = async () => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setData(fakeData)
-        setLoading(false)
-      }, 1000);
+      const {pageSize, current, total} = pagination
+      var params = {
+        page: current,
+        pageSize,
+        total
+      }
+      const result = await getAllWeightTemplates(params)
+      if (result && result.data) {
+        setWeightTemplates(result.data)
+      }
+      setLoading(false)
     } catch (error) {
       console.log(">>> Get Weight Template Error", error)
       setLoading(false)
@@ -85,51 +85,6 @@ function WeightTemplate() {
     setPagination(pagination)
   }
 
-  const columns: any = useMemo(
-    () => [
-      {
-        title: <div className='text-center'>ID</div>,
-        dataIndex: 'id',
-        key: 'id',
-        render: (text: any) => <div>{text}</div>,
-      },
-      {
-        title: <div className='text-center'>Template Name</div>,
-        dataIndex: 'name',
-        key: 'name',
-        render: (text: any) => <div>{text}</div>,
-      },
-      {
-        title: <div className='text-center'>Description</div>,
-        dataIndex: 'description',
-        key: 'description',
-        render: (text: any) => <div>{text}</div>,
-        width: 500,
-      },
-      {
-        title: <div className='text-center'>Last Updated</div>,
-        dataIndex: 'updatedAt',
-        key: 'updatedAt',
-        render: (text: any) => <div>{moment().format('DD-MM-YYYY')}</div>,
-      },
-      {
-        title: <div className='text-center'>Action</div>,
-        key: 'action',
-        align: 'center',
-        width: 100,
-        render: (_: any, record: any) => {
-          return (
-            <div className='flex justify-center'>
-              <Space size="middle">
-                <CopyOutlined className='text-lg cursor-pointer' />
-                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
-                <DeleteOutlined className='text-lg cursor-pointer'/>
-              </Space>
-            </div>
-          )
-        },
-      },
-    ], [data])
   const mapFirstQuery = () => {
     const query = qs.parse(window.location.search);
     const {page, keyword} = query
@@ -143,11 +98,65 @@ function WeightTemplate() {
       setKeyword(keyword.toString())
     }
   }
-  useEffect(() => {
-    mapFirstQuery()
-    fetchWeightTemplate();
-    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
-  },[])
+
+  const deleteTemplate = async (id: number, name: string) => {
+    try {
+      const result = await deleteWeightTemplate(id)
+      setWeightTemplates((prevTemplates: any) => prevTemplates.filter((template: any) => template.id !== id));
+      notificationSimple(`Delete Weight Template ${name} Success`, NOTIFICATION_SUCCESS)
+    } catch (error) {
+      console.log(">>> Delete Weight Template Error", error)
+      notificationSimple(`Delete Weight Template ${name} Fail`, NOTIFICATION_ERROR)
+    }    
+  }
+
+  const columns: any = useMemo(
+    () => [
+      {
+        title: <div className='text-center'>{t('weight_template_page.id')}</div>,
+        dataIndex: 'id',
+        key: 'id',
+        render: (text: any) => <div>{text}</div>,
+      },
+      {
+        title: <div className='text-center'>{t('weight_template_page.template_name')}</div>,
+        dataIndex: 'name',
+        key: 'name',
+        render: (text: any) => <div>{text}</div>,
+      },
+      {
+        title: <div className='text-center'>{t('weight_template_page.description')}</div>,
+        dataIndex: 'description',
+        key: 'description',
+        render: (text: any) => <div>{text}</div>,
+        width: 500,
+      },
+      {
+        title: <div className='text-center'>{t('weight_template_page.last_updated')}</div>,
+        dataIndex: 'updatedAt',
+        key: 'updatedAt',
+        render: (text: any) => <div>{moment().format('DD-MM-YYYY')}</div>,
+      },
+      {
+        title: <div className='text-center'>{t('weight_template_page.action')}</div>,
+        key: 'action',
+        align: 'center',
+        width: 100,
+        render: (_: any, record: any) => {
+          const { id, name } = record
+          return (
+            <div className='flex justify-center'>
+              <Space size="middle">
+                <CopyOutlined className='text-lg cursor-pointer' />
+                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
+                <DeleteOutlined className='text-lg cursor-pointer' onClick={() => deleteTemplate(id, name)}/>
+              </Space>
+            </div>
+          )
+        },
+      },
+    ], [weightTemplates, t])
+  
   return (
     <div>
       <Space className='w-full flex flex-row justify-between'>
@@ -155,7 +164,7 @@ function WeightTemplate() {
         <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={'Add Weight Template'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
       </Space>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={data} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={weightTemplates} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
     </div>
   );

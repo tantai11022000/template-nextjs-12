@@ -8,6 +8,8 @@ import { BREADCRUMB_ACCOUNT, BREADCRUMB_CAMPAIGN_BUDGET, BREADCRUMB_TARGETING_BI
 import { DesktopOutlined, PieChartOutlined, TeamOutlined, GoldOutlined } from '@ant-design/icons';
 import { storeItem } from '@/utils/StorageUtils';
 import { CURRENT_MENU } from '@/utils/StorageKeys';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export interface ISideBarProps {
   menu: string,
@@ -34,19 +36,20 @@ function getItems(
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
-  getItems('Campaign Budgets', 'campaign-budgets', 'campaign-budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
-  getItems('Targeting Bidding', 'targeting-bidding', 'targeting-bidding', BREADCRUMB_TARGETING_BIDDING.url, <DesktopOutlined />),
-  getItems('Accounts', 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
-  getItems('Weight Template', 'weight-template', 'weight-template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
-];
-
 export default function SideBar (props: ISideBarProps) {
-  const {  Content, Sider, Footer } = Layout;
+  const { t } = useTranslation()
+  const { Sider } = Layout;
   const { menu, setMenu } = props
   const isCollapseMenu = useAppSelector(getCollapseMenu)
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  const items: MenuItem[] = [
+    getItems(t("sidebar.campaign_budgets"), 'campaign-budgets', 'campaign-budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
+    getItems(t('sidebar.target_bidding'), 'targeting-bidding', 'targeting-bidding', BREADCRUMB_TARGETING_BIDDING.url, <DesktopOutlined />),
+    getItems(t('sidebar.accounts'), 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
+    getItems(t('sidebar.weight_template'), 'weight-template', 'weight-template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
+  ];
 
   const handleClickMenu = (value: string) => {
     setMenu(value)

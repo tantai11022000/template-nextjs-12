@@ -3,7 +3,7 @@ import guestClient from '../config/api/guestClient';
 
 const campaignAmazonUrl = '/campaign-amazon'
 
-
 export const getCampaignBudgets = (partnerAccountId: any, params: any) => {
-    return userClient.get(`${campaignAmazonUrl}/${partnerAccountId}`,  { params });
+    return userClient.get(`/campaigns/partner-account/${partnerAccountId}`, { params });
 }
+

@@ -1,31 +1,28 @@
 'use client'
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { Breadcrumb, Dropdown, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import styles from './index.module.scss'
+// import styles from './index.module.scss'
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '../../Constant/index';
 import { MenuOutlined } from '@ant-design/icons';
 import { useAppDispatch } from '@/store/hook';
 import { setCollapseMenu } from '../../store/globals/globalsSlice';
 import { useState } from 'react';
-
-
-const { Header, Content, Footer } = Layout;
-
-const menuItems = [
-    { label: `Campaigns`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns` },
-    { label: `Users`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users` },
-    { label: `Biz Management`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/masterboard/clients` },
-    { label: `3rd Tracking Tools`, url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/3rd-tracking-tools` },
-    { label: `Amazon`, url: BREADCRUMB_CAMPAIGN_BUDGET.url },
-];
+import {
+  PlusOutlined,
+  BellFilled,
+  UserOutlined,
+  GlobalOutlined
+} from '@ant-design/icons';
+import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 
 const ActiveMenuLink = ({ children, href }: any) => {
     return (
       <Link
         href={href}
-        className={`${children === "Amazon" ? styles.active : ''}`}
+        className={`${children === "Amazon" ? 'active' : ''}`}
       >
         {children}
       </Link>
@@ -33,12 +30,24 @@ const ActiveMenuLink = ({ children, href }: any) => {
   };
 
 function HeaderApp() {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
+  const router = useRouter()
   const [isCollapseMenu, setIsCollapseMenu] = useState<boolean>(true)
 
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
+  const LANGUAGE = [
+    { key: 'en', label: 'English' },
+    { key: 'jp', label: 'Japanese' },
+  ];
+  const [languages, setLanguages] = useState<any[]>(LANGUAGE)
+
+  const menuItems = [
+    { label: t('header_bar.campaigns'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns` },
+    { label: t('header_bar.users'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users` },
+    { label: t('header_bar.biz_management'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/masterboard/clients` },
+    { label: t('header_bar.3rd_tracking_tools'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/3rd-tracking-tools` },
+    { label: t('header_bar.amazon'), url: BREADCRUMB_CAMPAIGN_BUDGET.url },
+  ];
 
   const handleCollapse = () => {
     if (isCollapseMenu) {
@@ -50,11 +59,25 @@ function HeaderApp() {
     }
   }
 
+  const menu = (
+    <Menu onClick={({ key }) => changeLanguage(key)}>
+      {languages.map((language: any) => (
+        <Menu.Item key={language.key}>{language.label}</Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const changeLanguage = (newLanguage: any) => {
+    console.log('Changing language to:', newLanguage);
+    const { pathname, query } = router;
+    router.push({ pathname, query }, undefined, { locale: newLanguage });
+  };
+
   return (
     <Layout>
-      <header className={styles['header-container']}>
+      <header className='header-container'>
         <div className="flex items-center h-12">
-          <div className='flex items-center w-[250px]'>
+          <div className='flex items-center w-[250px] min-w-[250px]'>
             <MenuOutlined className='text-white font-semibold p-2 m-2 cursor-pointer bg-[#ffffff1a]' onClick={handleCollapse} />
             <Link href="/campaign-budgets" className='flex justify-center'>
               <img
@@ -65,15 +88,25 @@ function HeaderApp() {
               />
             </Link>
           </div>
-          <nav className={styles['header-nav']}>
-            <ul>
-              {menuItems.map(({ url, label }, index) => (
-                <li key={index}>
-                  <ActiveMenuLink href={url}>{label}</ActiveMenuLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className='nav-wrapper'>
+            <nav className='header-nav'>
+              <ul>
+                {menuItems.map(({ url, label }, index) => (
+                  <li key={index}>
+                    <ActiveMenuLink href={url}>{label}</ActiveMenuLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <div className='header-icon'>
+              <PlusOutlined />
+              <BellFilled />
+              <UserOutlined />
+              <Dropdown overlay={menu}>
+                <GlobalOutlined />
+              </Dropdown>
+            </div>
+          </div>
         </div>
       </header>
     </Layout>
