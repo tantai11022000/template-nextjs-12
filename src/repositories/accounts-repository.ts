@@ -22,3 +22,7 @@ export const getAllPartnerAccounts = (params: any) => {
 export const getAccountInfo = (id: any) => {
     return userClient.get(`${accountUrl}/${id}`);
 }
+
+export const updateAccountStatus = (id: any, body: any) => {
+    return userClient.put(`${accountUrl}/status/${id}`, body);
+}

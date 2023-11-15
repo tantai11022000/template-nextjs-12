@@ -50,3 +50,13 @@ export const getAccountInfo = async (id: any) => {
         return Promise.reject(error);
     }
 }
+
+export const updateAccountStatus = async (id: any, body: any) => {
+    try {
+        const response = await accountsRepository.updateAccountStatus(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
