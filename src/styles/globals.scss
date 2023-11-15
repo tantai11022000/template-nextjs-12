@@ -19,7 +19,7 @@
 
 body {
   // color: rgb(var(--foreground-rgb));
-  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
+  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif !important;
   background: linear-gradient(
       to bottom,
       transparent,
@@ -28,31 +28,31 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-.css-dev-only-do-not-override-i0102m[class^="ant-layout"],
-.css-dev-only-do-not-override-i0102m.ant-menu,
-.css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table,
-.css-dev-only-do-not-override-i0102m.ant-pagination,
-.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-prev,
-.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-next,
-.css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-item,
-.css-dev-only-do-not-override-i0102m.ant-breadcrumb,
-.css-dev-only-do-not-override-i0102m[class^="ant-typography"], .css-dev-only-do-not-override-i0102m[class*=" ant-typography"],
-.css-dev-only-do-not-override-i0102m.ant-select-single .ant-select-selector,
-.css-dev-only-do-not-override-i0102m.ant-input,
-.css-dev-only-do-not-override-i0102m[class^="ant-col"], .css-dev-only-do-not-override-i0102m[class*=" ant-col"],
-.css-dev-only-do-not-override-i0102m.ant-upload-wrapper,
-.css-dev-only-do-not-override-i0102m[class^="ant-upload"], .css-dev-only-do-not-override-i0102m[class*=" ant-upload"],
-.css-dev-only-do-not-override-i0102m[class^="ant-btn"], .css-dev-only-do-not-override-i0102m[class*=" ant-btn"],
-.css-dev-only-do-not-override-i0102m.ant-radio-group,
-.css-dev-only-do-not-override-i0102m.ant-radio-wrapper,
-.css-dev-only-do-not-override-i0102m[class^="ant-table"], .css-dev-only-do-not-override-i0102m[class*=" ant-table"],
-.css-dev-only-do-not-override-i0102m[class^="ant-checkbox"], .css-dev-only-do-not-override-i0102m[class*=" ant-checkbox"],
-.css-dev-only-do-not-override-i0102m[class^="ant-row"], .css-dev-only-do-not-override-i0102m[class*=" ant-row"],
-.css-dev-only-do-not-override-i0102m.ant-checkbox-wrapper,
-.css-dev-only-do-not-override-i0102m.ant-checkbox-group
- {
-  font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
-}
+// .css-dev-only-do-not-override-i0102m[class^="ant-layout"],
+// .css-dev-only-do-not-override-i0102m.ant-menu,
+// .css-dev-only-do-not-override-i0102m.ant-table-wrapper .ant-table,
+// .css-dev-only-do-not-override-i0102m.ant-pagination,
+// .css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-prev,
+// .css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-next,
+// .css-dev-only-do-not-override-i0102m.ant-pagination .ant-pagination-item,
+// .css-dev-only-do-not-override-i0102m.ant-breadcrumb,
+// .css-dev-only-do-not-override-i0102m[class^="ant-typography"], .css-dev-only-do-not-override-i0102m[class*=" ant-typography"],
+// .css-dev-only-do-not-override-i0102m.ant-select-single .ant-select-selector,
+// .css-dev-only-do-not-override-i0102m.ant-input,
+// .css-dev-only-do-not-override-i0102m[class^="ant-col"], .css-dev-only-do-not-override-i0102m[class*=" ant-col"],
+// .css-dev-only-do-not-override-i0102m.ant-upload-wrapper,
+// .css-dev-only-do-not-override-i0102m[class^="ant-upload"], .css-dev-only-do-not-override-i0102m[class*=" ant-upload"],
+// .css-dev-only-do-not-override-i0102m[class^="ant-btn"], .css-dev-only-do-not-override-i0102m[class*=" ant-btn"],
+// .css-dev-only-do-not-override-i0102m.ant-radio-group,
+// .css-dev-only-do-not-override-i0102m.ant-radio-wrapper,
+// .css-dev-only-do-not-override-i0102m[class^="ant-table"], .css-dev-only-do-not-override-i0102m[class*=" ant-table"],
+// .css-dev-only-do-not-override-i0102m[class^="ant-checkbox"], .css-dev-only-do-not-override-i0102m[class*=" ant-checkbox"],
+// .css-dev-only-do-not-override-i0102m[class^="ant-row"], .css-dev-only-do-not-override-i0102m[class*=" ant-row"],
+// .css-dev-only-do-not-override-i0102m.ant-checkbox-wrapper,
+// .css-dev-only-do-not-override-i0102m.ant-checkbox-group
+//  {
+//   font-family: 'M PLUS Rounded 1c', 'Droid Sans', Tahoma, Arial, sans-serif;
+// }
 
 .css-dev-only-do-not-override-i0102m.ant-menu {
   font-size: 17px;
