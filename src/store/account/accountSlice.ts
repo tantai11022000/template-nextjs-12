@@ -15,6 +15,7 @@ interface IAccount {
 interface IAccountList {
   accounts: IAccount[],
   currentAccount: string,
+  isSyncData: boolean,
   status: string,
   error: string
 }
@@ -22,6 +23,7 @@ interface IAccountList {
 const initialState: IAccountList = {
   accounts: [],
   currentAccount: "",
+  isSyncData: false, 
   status: "idle",
   error: ""
 }
@@ -66,13 +68,21 @@ const slice = createSlice({
 
       }
     },
+
+    setSyncData: (
+      state,
+      { payload: { data } }: PayloadAction<{ data: any }>
+    ) => {
+      state.isSyncData = data ? data : false;
+    },
   },
 });
 
-export const { setAccountList, setCurrentAccount, addAccount, editAccount } = slice.actions
+export const { setAccountList, setCurrentAccount, addAccount, editAccount, setSyncData } = slice.actions
 
 //Fetch User Report
 export const getAccountList = (state: any) => state.account ? state.account.accounts : null;
 export const getCurrentAccount = (state: any) => state.account ? state.account.currentAccount : null;
+export const getIsSyncData = (state: any) => state.account ? state.account.isSyncData : null;
 
 export default slice.reducer;

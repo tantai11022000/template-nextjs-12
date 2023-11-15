@@ -4,11 +4,16 @@ import { Layout } from 'antd';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { useRouter } from 'next/router';
-import { getAccountList, getCurrentAccount, setCurrentAccount } from '@/store/account/accountSlice';
+import { getAccountList, getCurrentAccount, setCurrentAccount, setSyncData } from '@/store/account/accountSlice';
 import SideBar from '../sidebar/Sidebar';
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs';
+import ActionButton from '../commons/buttons/ActionButton';
+import {CloudSyncOutlined} from '@ant-design/icons';
+import { useTranslation } from 'next-i18next';
+import { getSyncData } from '@/services/globals-service';
 
 const DashboardLayout = (props: any) => {
+  const { t } = useTranslation()
   const { Footer } = Layout;
   const { children } = props
   const router = useRouter()
@@ -58,6 +63,17 @@ const DashboardLayout = (props: any) => {
     dispatch(setCurrentAccount({data: account.value}))
   }
 
+  const handleSyncData = async (id: any) => {
+    try {
+      const result = await getSyncData(id)
+      if (result && result.message == "OK") {
+        dispatch(setSyncData({data: true}))
+      }
+    } catch (error) {
+      console.log(">>> Sync Data Error", error)
+    }
+  }
+
   return (
     <Layout className='layout-container'>
       <SideBar menu={menu} setMenu={setMenu}/>
@@ -66,23 +82,24 @@ const DashboardLayout = (props: any) => {
           <Layout>
             <div className='flex items-center justify-between px-6 py-4 max-h-[36px] bg-[#f5f5f5]'>
               <Breadcrumbs/>
-              <div className='flex'>
                 {showGlobalButton.partnerAccount &&
-                  <div className='select-filter-container'>
-                    <Select
-                      labelInValue
-                      style={{ width: 250 }}
-                      showSearch
-                      placeholder="Select Account"
-                      optionFilterProp="label"
-                      onChange={onChangeAccount}
-                      value={currentAccount}
-                      options={optionAccount}
-                      />
+                  <div className='flex items-center'>
+                      <div className='select-filter-container mr-3'>
+                        <Select
+                          labelInValue
+                          style={{ width: 250 }}
+                          showSearch
+                          placeholder="Select Account"
+                          optionFilterProp="label"
+                          onChange={onChangeAccount}
+                          value={currentAccount}
+                          options={optionAccount}
+                          />
+                      </div>
+                    <ActionButton className={'action-button'} iconOnLeft={<CloudSyncOutlined />} label={t('commons.synchronize')} onClick={() => handleSyncData(currentAccount)}/>
                   </div>
                 }
-              </div>
-            </div>
+                </div>
           </Layout>
           
           <div className='m-6 bg-white'>

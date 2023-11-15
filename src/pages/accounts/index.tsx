@@ -1,23 +1,22 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import { Input, Space, Tag } from 'antd';
+import { Dropdown, Input, Space, Tag } from 'antd';
 import TableGeneral from '@/components/table';
 import { useRouter } from 'next/router';
-import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
-import { getAllPartnerAccounts } from '@/services/accounts-service';
+import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
+import { getAllPartnerAccounts, updateAccountStatus } from '@/services/accounts-service';
 import { BREADCRUMB_ACCOUNT } from '@/Constant/index';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import RootLayout from '@/components/layout';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { useAppDispatch } from '@/store/hook';
-import {
-  DeleteOutlined,
-  EditOutlined
-} from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, DownOutlined } from '@ant-design/icons';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 import { PlusOutlined } from '@ant-design/icons';
 import { USER_STATUS } from '@/enums/status';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -30,54 +29,8 @@ export async function getStaticProps(context: any) {
 export interface IAccountsProps {
 }
 
-const STATUSES = [
-  {
-    id: 1,
-    value: "all",
-    label: "All"
-  },
-  {
-    id: 2,
-    value: "running",
-    label: "Running"
-  },
-  {
-    id: 3,
-    value: "upcomming",
-    label: "Upcomming"
-  },
-]
-
-const BULK_ACTION = [
-  {
-    id: 1,
-    value: "update_status",
-    label: "Update Status"
-  },
-  {
-    id: 2,
-    value: "schedule_status",
-    label: "Schedule Status"
-  },
-  {
-    id: 3,
-    value: "schedule_budget_once",
-    label: "Schedule Budget Once"
-  }, 
-  {
-    id: 4,
-    value: "schedule_budget_with_weight",
-    label: "Schedule Budget With Weight"
-  }, 
-  {
-    id: 5,
-    value: "export_schedule",
-    label: "Export Schedule"
-  }, 
-]
-
 export default function Accounts (props: IAccountsProps) {
-  const { Search } = Input;
+  const  { t } = useTranslation()
   const router = useRouter()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
@@ -140,6 +93,20 @@ export default function Accounts (props: IAccountsProps) {
     console.log('search:', value);
   };
 
+  const handleUpdateAccountStatus = async (id: string, status: any) => {
+    try {
+      const body = { status }
+      const result = await updateAccountStatus(id, body)
+      if (result && result.message == "OK") {
+        await getAllAccounts();
+        notificationSimple("Update Status Success", NOTIFICATION_SUCCESS)
+      }
+    } catch (error) {
+      console.log(">>> Update Account Status Error", error)
+      notificationSimple("Update Status Fail", NOTIFICATION_ERROR)
+    }
+  };
+
   const columns: any = useMemo(
     () => [
       {
@@ -158,11 +125,19 @@ export default function Accounts (props: IAccountsProps) {
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
-        title: <div className='text-center'>Status</div>,
-        dataIndex: 'status',
-        key: 'status',
+        title: <div className='text-center'>{t('commons.status')}</div>,
+        dataIndex: 'state',
+        key: 'state',
         render: (_: any, record: any) => {
           const statusData = record.status
+          const id = record.id
+          const dropdownMenuItems = [
+            {
+              key: '1',
+              label: statusData === USER_STATUS.ACTIVE ? 'INACTIVE' : 'ACTIVE',
+              onClick: () => handleUpdateAccountStatus(id, statusData === USER_STATUS.ACTIVE ? USER_STATUS.INACTIVE : USER_STATUS.ACTIVE),
+            },
+          ];
           const renderStatus = () => {
             let status = ''
             let type = ''
@@ -173,15 +148,17 @@ export default function Accounts (props: IAccountsProps) {
               status = 'INACTIVE'
               type = 'error'
             }
-            return <Tag color={type}>{status}</Tag>
+            return <Tag className='text-center uppercase' color={type}>{status} <DownOutlined/></Tag>
           }
-        return (
-            <div className='flex justify-center uppercase'>
-              {renderStatus()}
+          return (
+            <div className='flex justify-center'>
+              <Dropdown menu={{ items: dropdownMenuItems }}>
+                <a className='tag px-2 font-semibold'>{renderStatus()}</a>
+              </Dropdown>
             </div>
-        );
+          );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        sorter: (a: any, b: any) => a.state - b.state,
       },
       {
         title: <div className='text-center'>Action</div>,

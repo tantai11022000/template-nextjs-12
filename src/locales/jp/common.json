@@ -1,24 +1,68 @@
 {
-    "greeting": {
-        "hi": "Hello"
-    },
-    "description": "これは日本語のサンプル説明です。",
     "commons": {
+        "synchronize": "同期する",
+
+        "id": "ID",
+        "name": "名前",
         "status": "ステータス",
+        "description" : "説明",
+
         "bulk_action": "一括操作", 
         "search_by_text": "ドで探す {text}",
         "filter_text": "選択する {text}",
+
+        "action": "アクション",
         "no_data": "利用できないデータです",
-        "add": "追加 {text}",
-        "edit": "編集 {text}"
-    },
-    "campaigns": {
-        "campaign_budgets": "キャンペーンの予算"
+        "before": "前に",
+        "after": "後",
+        "update_time": "更新時間",
+        "setting_type": "設定種類",
+        "updated_by": "更新者",
+        "log": "ログ",
+
+        "filter_label": {
+            "status": "Status",
+            "bulk_action": "Bulk Action"
+        },
+
+        "status_enum": {
+            "paused": "一時停止した",
+            "enable": "有効にする",
+            "archived": "アーカイブ済み",
+            "other": "他の",
+
+            "active": "アクティブ",
+            "inactive": "非活性",
+            "upcoming": "今後の"
+        },
+
+        "action_type" : {
+            "add_text": "追加 {text}",
+            "edit_text": "編集 {text}",
+            "input": "入ってください {text}",
+            "cancel": "キャンセル",
+            "submit": "提出する",
+            "edit": "編集",
+            "save": "保存"
+        },
+
+        "weight_type": {
+            "one_time": "一度",
+            "daily_with_weight": "毎日の体重測定"
+        }
     },
 
-    "translate": {
-        "english": "英語",
-        "japanese": "日本語"
+    "metrics": {
+        "imp": "IMP",
+        "click": "クリック",
+        "sale": "セール",
+        "roas": "ROAS"
+    },
+
+    "pagination": {
+        "next": "次",
+        "back": "戻る",
+        "page": "ページ"
     },
 
     "header_bar": {
@@ -36,19 +80,23 @@
         "weight_template": "ウェイトテンプレート"
     },
 
+    "breadcrumb": {
+
+    },
+
     "campaign_budget_page": {
         "campaign_name": "キャンペーン名",
         "portfolio": "ポートフォリオ",
-        "status": "ステータス",
-        "current_budget": "現在の予算",
-        "imp": "IMP",
-        "click": "クリック",
-        "sale": "セール",
-        "roas": "ROAS",
-        "action": "アクション"
+        "current_budget": "現在の予算"
+    },
+
+    "update_log_page": {
+        "budget_update_log": "予算更新ログ",
+        "status_update": "ステータスアップデート"
     },
 
     "weight_template_page": {
+        "weight_template": "ウェイトテンプレート",
         "id": "ID",
         "template_name": "テンプレート名",
         "description" : "説明",
@@ -61,9 +109,12 @@
             "description": "説明",
             "time_slot": "タイムスロット",
             "time_mins": "時間（分",
-            "weight_%": "重さ（％）"
+            "weight_%": "重さ（％）",
+            "30_minute": "30分",
+            "1_hour": "1時間",
+            "minute": "分",
+            "hour": "時間",
+            "time": "時間"
         }
-    },
-
-    "campaignbudgets": "Campaign Budgets"
+    }
 }
