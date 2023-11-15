@@ -36,17 +36,6 @@ export async function getStaticProps(context: any) {
   }
 }
 
-const options = [
-  {
-    value: 0,
-    label: '30 mins'
-  },
-  {
-    value: 1,
-    label: '1 hour'
-  },
-]
-
 const templateRecord = {
   time: '',
   weight: 0
@@ -71,12 +60,22 @@ function AddWeightTemplate() {
     const [weightSetting, setWeightSetting] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false)
     const [weights, setWeights] = useState<any>([])
-
     const [pagination, setPagination] = useState<any>({
       pageSize: 10,
       current: 1,
       total: 0,
     })
+
+    const options = [
+      {
+        value: 0,
+        label: t('weight_template_page.form.30_minute')
+      },
+      {
+        value: 1,
+        label: t('weight_template_page.form.1_hour')
+      },
+    ]
 
     useEffect(() => {
       init()
@@ -225,10 +224,20 @@ function AddWeightTemplate() {
       setPagination(pagination)
     }
 
+    const renderTranslateTitleText = (text: any) => {
+      let translate = isEdit ? t("commons.action_type.edit_text") : t("commons.action_type.add_text");
+      return translate.replace("{text}", text);
+    }
+
+    const renderTranslateInputText = (text: any) => {
+      let translate = t("commons.action_type.input");
+      return translate.replace("{text}", text);
+    }
+
     const columns: any = useMemo(
       () => [
         {
-          title: <div className='text-center'>{`Time ${timeSlot === 1 ? '(Hours)' : '(Mins)'}`}</div>,
+          title: <div className='text-center'>{`${t('weight_template_page.form.time')} ${timeSlot === 1 ? t('weight_template_page.form.hour') : t('weight_template_page.form.minute')}`}</div>,
           dataIndex: 'time',
           key: 'time',
           align: 'center',
@@ -251,12 +260,12 @@ function AddWeightTemplate() {
             );
           },
         },
-      ], [weightSetting, timeSlot])
+      ], [weightSetting, timeSlot, t])
 
     return (
       <div>
         <div className='panel-heading flex items-center justify-between'>
-          <h2>{isEdit ? "Edit" : "Add"} Weight Template</h2>
+          <h2>{renderTranslateTitleText(t('weight_template_page.weight_template'))}</h2>
         </div>
         <div className='form-container'>
           <Form
@@ -267,9 +276,9 @@ function AddWeightTemplate() {
             wrapperCol={{ span: 14 }}
             layout="horizontal"
           >
-            <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
-            <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
-            <FRadio name={"type"} value={timeSlot} defaultValue={timeSlot} label={'Time slot'} options={options} onChange={(e: any) => handleChangeTimeSlot(e.target.value)} />
+            <FText name={"name"} label={t('commons.name')} errorMessage={renderTranslateInputText(t('commons.name'))} required/>
+            <FTextArea name={"description"} label={t('commons.description')} errorMessage={renderTranslateInputText(t('commons.description'))} />
+            <FRadio name={"type"} value={timeSlot} defaultValue={timeSlot} label={t('weight_template_page.form.time_slot')} options={options} onChange={(e: any) => handleChangeTimeSlot(e.target.value)} />
             <div className='weight-table-css w-[80%] m-auto'>
               <Form.Item name="weightSetting">
                 <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} scrollY={true} handleOnChangeTable={handleOnChangeTable}/>
@@ -277,8 +286,8 @@ function AddWeightTemplate() {
             </div>
 
             <Space size="middle" className='w-full flex justify-center mt-8'>
-              <ActionButton className={'cancel-button'} label={'Cancel'} onClick={() => router.back()}/>
-              <ActionButton htmlType={"submit"} className={'finish-button'} label={'Submit'}/>
+              <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={() => router.back()}/>
+              <ActionButton htmlType={"submit"} className={'finish-button'} label={isEdit ? t('commons.action_type.save') : t('commons.action_type.submit')}/>
             </Space>
           </Form>
         </div>

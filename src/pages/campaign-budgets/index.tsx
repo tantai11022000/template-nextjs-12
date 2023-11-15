@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
-import { getCurrentAccount } from '@/store/account/accountSlice';
+import { getCurrentAccount, getIsSyncData, setSyncData } from '@/store/account/accountSlice';
 import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import RootLayout from '@/components/layout';
@@ -101,10 +101,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const { t } = useTranslation()
   const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
+  const isSync = useAppSelector(getIsSyncData)
   const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
-  const [selectedAction, setSelectedAction] = useState<any>(t('campaign_budget_page.action'));
+  const [selectedAction, setSelectedAction] = useState<any>('');
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
@@ -132,7 +133,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }, [currentAccount, pagination.pageSize, pagination.current])
 
   useEffect(() => {
-    setSelectedAction(t('campaign_budget_page.action'))
+    if (isSync) { 
+      getCampaignBudgetsList(currentAccount)
+      dispatch(setSyncData({data: false}))
+    }
+  }, [isSync])
+
+  useEffect(() => {
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
   
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
@@ -240,12 +248,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const handleOk = () => {
     setOpenModalUpdateStatus(false);
-    setSelectedAction(t('campaign_budget_page.action'))
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
 
   const handleCancel = () => {
     setOpenModalUpdateStatus(false);
-    setSelectedAction(t('campaign_budget_page.action'))
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
 
   const columns: any = useMemo(
@@ -265,11 +273,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         key: 'portfolio',
         render: (_: any, record: any) => {
           const portfolio = record.portfolio;
-          return <p className='text-end'>{portfolio && portfolio.name ? portfolio.name : ""}</p>
+          return <p className='text-center'>{portfolio && portfolio.name ? portfolio.name : ""}</p>
         }
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.status')}</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'state',
         key: 'state',
         render: (_: any, record: any) => {
@@ -282,19 +290,19 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             let status = ''
             let type = ''
             if (statusData == CAMPAIGN_STATUS.ENABLE) {
-              status = "ENABLE"
+              status = t('commons.status_enum.enable')
               type = 'success'
             } else if (statusData == CAMPAIGN_STATUS.PAUSED) {
-              status = 'PAUSED'
+              status = t('commons.status_enum.paused')
               type = 'warning'
             } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
-              status = 'ARCHIVED'
+              status = t('commons.status_enum.archived')
               type = 'processing'
             } else if (statusData == CAMPAIGN_STATUS.OTHER) {
-              status = 'OTHER'
+              status = t('commons.status_enum.other')
               type = 'default'
             }
-            return <Tag className='text-center' color={type}>{status} <DownOutlined/></Tag>
+            return <Tag className='text-center uppercase' color={type}>{status} <DownOutlined/></Tag>
           }
           return (
             <div className='flex justify-center'>
@@ -337,7 +345,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         }
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.imp')}</div>,
+        title: <div className='text-center'>{t('metrics.imp')}</div>,
         dataIndex: 'imp',
         key: 'imp',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -345,7 +353,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.click')}</div>,
+        title: <div className='text-center'>{t('metrics.click')}</div>,
         dataIndex: 'click',
         key: 'click',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -353,7 +361,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.click - b.click
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.sale')}</div>,
+        title: <div className='text-center'>{t('metrics.sale')}</div>,
         dataIndex: 'sale',
         key: 'sale',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -361,7 +369,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.roas')}</div>,
+        title: <div className='text-center'>{t('metrics.roas')}</div>,
         dataIndex: 'roas',
         key: 'roas',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -369,7 +377,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.roas - b.roas
       },
       {
-        title: <div className='text-center'>{t('campaign_budget_page.action')}</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
           const {campaignId, name} = record
@@ -380,54 +388,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           )
         },
       },
-    ], [campaignBudgets, handleToggleEdit, isEditingList]
+    ], [campaignBudgets, handleToggleEdit, isEditingList, t]
   )
-
-  // const handleChangeWeight = (event: any) => {
-            //   const value = event.target.value;
-            //   setWeightSetting((prevWeightSetting) => {
-            //     const updatedWeightSetting = [...prevWeightSetting];
-            //     updatedWeightSetting[index] = {
-            //       ...updatedWeightSetting[index],
-            //       slot: index + 1,
-            //       time: time,
-            //       weight: value ? Number(value) : 0,
-            //     };
-            //     form.setFieldsValue({ weightSetting: updatedWeightSetting }); // Set form values
-            //     return updatedWeightSetting;
-            //   });
-            // };
-            // {
-            //   title: <div className='text-center'>{t('weight_template_page.form.weight_%')}</div>,
-            //   dataIndex: 'weight',
-            //   key: 'weight',
-            //   render: (text: any, record: any, index: number) => {
-            //     const weight = record && record.weight ? record.weight : 0;
-            //     const time = record && record.time ? record.time : '';
-          
-            //     const handleChangeWeight = (event: any) => {
-            //       const value = event.target.value;
-            //       setWeightSetting((prevWeightSetting) => {
-            //         const updatedWeightSetting = [...prevWeightSetting];
-            //         updatedWeightSetting[index] = {
-            //           ...updatedWeightSetting[index],
-            //           slot: index + 1,
-            //           time: updatedWeightSetting[index].time,  // Include the time field (replace with your actual time logic)
-            //           weight: value ? Number(value) : 0,
-            //         };
-            //         return updatedWeightSetting;
-            //       });
-            //     };
-          
-            //     return (
-            //       <Form.Item name={['weightSetting', index, 'weight']} initialValue={weight}>
-            //         <Input type='number' min={0} onChange={handleChangeWeight} />
-            //       </Form.Item>
-            //     );
-            //   },
-            // },
-
-
+  
   const renderTranslateSearchText = (text: any) => {
     let translate = t("commons.search_by_text");
     return translate.replace("{text}", text);
@@ -443,8 +406,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       <div className='flex items-center justify-between'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6'>
-          <SelectFilter label={t('commons.status')} placeholder={renderTranslateFilterText(t('campaign_budget_page.status'))} onChange={onChange} options={statuses} />
-          <SelectFilter label={t('commons.bulk_action')} placeholder={renderTranslateFilterText(t('campaign_budget_page.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
+          <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={onChange} options={statuses} />
+          <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
         </div>
       </div>
       <div>

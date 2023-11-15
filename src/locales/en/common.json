@@ -1,28 +1,68 @@
 {
-    "greeting": {
-        "hi": "Hi"
-    },
-    "description": "This is a sample description in English.",
     "commons": {
+        "synchronize": "Synchronize",
+
+        "id": "ID",
+        "name": "Name",
         "status": "Status",
+        "description" : "Description",
+
         "bulk_action": "Bulk Action",
         "search_by_text": "Search by {text}",
         "filter_text": "Select {text}",
+        
         "action": "Action",
         "no_data": "Data is not available",
-        "add": "Add {text}",
-        "edit": "Edit {text}"
-    },
-    "imp": "IMP",
-    "campaigns": {
-        "campaign_budgets": "Campaign Budgets"
-    },
-   
-    "campaignbudgets": "Campaign Budgets",
+        "before": "Before",
+        "after": "After",
+        "update_time": "Update Time",
+        "setting_type": "Setting Type",
+        "updated_by": "Updated By",
+        "log": "Log",
+        
+        "filter_label": {
+            "status": "Status",
+            "bulk_action": "Bulk Action"
+        },
 
-    "translate": {
-        "english": "English",
-        "japanese": "Japanese"
+        "status_enum": {
+            "paused": "Paused",
+            "enable": "Enable",
+            "archived": "Archived",
+            "other": "Other",
+            
+            "active": "Active",
+            "inactive": "Inactive",
+            "upcoming": "Upcoming"
+        },
+
+        "action_type" : {
+            "add_text": "Add {text}",
+            "edit_text": "Edit {text}",
+            "input": "Please input {text}",
+            "cancel": "Cancel",
+            "submit": "Submit",
+            "edit": "Edit",
+            "save": "Save"
+        },
+
+        "weight_type": {
+            "one_time": "One-time",
+            "daily_with_weight": "Daily with Weight"
+        }
+    },
+
+    "metrics": {
+        "imp": "IMP",
+        "click": "Click",
+        "sale": "Sale",
+        "roas": "ROAS"
+    },
+
+    "pagination": {
+        "next": "Next",
+        "back": "Back",
+        "page": "Page"
     },
 
     "header_bar": {
@@ -47,16 +87,16 @@
     "campaign_budget_page": {
         "campaign_name": "Campaign Name",
         "portfolio": "Portfolio",
-        "status": "Status",
-        "current_budget": "Current Budget",
-        "imp": "IMP",
-        "click": "Click",
-        "sale": "Sale",
-        "roas": "ROAS",
-        "action": "Action"
+        "current_budget": "Current Budget"
+    },
+
+    "update_log_page": {
+        "budget_update_log": "Budget Update Log",
+        "status_update": "Status Update"
     },
 
     "weight_template_page": {
+        "weight_template": "Weight Template",
         "id": "ID",
         "template_name": "Template Name",
         "description" : "Description",
@@ -69,7 +109,12 @@
             "description": "Description",
             "time_slot": "Time Slot",
             "time_mins": "Time (Mins)",
-            "weight_%": "Weight(%)"
+            "weight_%": "Weight(%)",
+            "30_minute": "30 mins",
+            "1_hour": "1 Hour",
+            "minute": "Mins",
+            "hour": "Hours",
+            "time": "Time"
         }
     }
 }

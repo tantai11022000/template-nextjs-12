@@ -28,10 +28,10 @@ const TableGeneral = (props: TableProps) => {
 
   const itemRender = (_: any, type: any, originalElement: any) => {
     if (type === "prev") {
-      return <a><LeftOutlined /> Back</a>;
+      return <a><LeftOutlined /> {t('pagination.back')}</a>;
     }
     if (type === "next") {
-      return <a>Next <RightOutlined/></a>;
+      return <a>{t('pagination.next')} <RightOutlined/></a>;
     }
     
     return originalElement;

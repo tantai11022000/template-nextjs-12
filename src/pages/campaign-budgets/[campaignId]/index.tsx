@@ -17,6 +17,26 @@ import {
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+
+export const getStaticPaths = async () => {
+  const campaignIds: any[] = [];
+  const paths = campaignIds.map((id: any) => ({
+    params: { type: [id.toString()] },
+  }));
+  return { paths, fallback: true };
+};
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 
 export interface ICampaignDetailProps {
 }
@@ -72,6 +92,7 @@ const UPDATE_BUDGET = [
 ]
 
 export default function CampaignDetail (props: ICampaignDetailProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const id = router && router.query && router.query.campaignId ? router.query.campaignId : ""
   const dispatch = useAppDispatch()
@@ -163,7 +184,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const columnsBudgetLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Before</div>,
+        title: <div className='text-center'>{t('commons.before')}</div>,
         dataIndex: 'before',
         key: 'before',
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
@@ -172,7 +193,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.before - b.before,
       },
       {
-        title: <div className='text-center'>After</div>,
+        title: <div className='text-center'>{t('commons.after')}</div>,
         dataIndex: 'after',
         key: 'after',
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
@@ -181,7 +202,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.after - b.after,
       },
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
@@ -189,16 +210,16 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             let status = ''
             let type = ''
             if (text == "active") {
-              status = 'ACTIVE'
+              status = t('commons.status_enum.active')
               type = 'success'
             } else if (text == 'inactive') {
-              status = 'INACTIVE'
+              status = t('commons.status_enum.inactive')
               type = 'error'
             } else if (text == 'upcoming') {
-              status = 'UPCOMING'
+              status = t('commons.status_enum.upcoming')
               type = 'processing'
             }
-            return <Tag color={type}>{status}</Tag>
+            return <Tag color={type} className='uppercase'>{status}</Tag>
           }
         return (
             <div className='flex justify-center uppercase'>
@@ -209,21 +230,21 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: <div className='text-center'>Update Time</div>,
+        title: <div className='text-center'>{t('commons.update_time')}</div>,
         dataIndex: 'updateTime',
         key: 'updateTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""}</p>,
       },
       {
-        title: <div className='text-center'>Setting Type</div>,
+        title: <div className='text-center'>{t('commons.setting_type')}</div>,
         dataIndex: 'settingType',
         key: 'settingType',
-        render: (text: any) => <p>{text}</p>,
+        render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
 
         sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
-        title: <div className='text-center'>Updated By</div>,
+        title: <div className='text-center'>{t('commons.updated_by')}</div>,
         dataIndex: 'userUpdate',
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
@@ -231,7 +252,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
@@ -254,7 +275,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const columnsStatusLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
@@ -277,7 +298,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         }
       },
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
@@ -285,16 +306,16 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             let status = ''
             let type = ''
             if (text == "active") {
-              status = 'ACTIVE'
+              status = t('commons.status_enum.active')
               type = 'success'
             } else if (text == 'inactive') {
-              status = 'INACTIVE'
+              status = t('commons.status_enum.inactive')
               type = 'error'
             } else if (text == 'upcoming') {
-              status = 'UPCOMING'
+              status = t('commons.status_enum.upcoming')
               type = 'processing'
             }
-            return <Tag color={type}>{status}</Tag>
+            return <Tag color={type} className='uppercase'>{status}</Tag>
           }
         return (
             <div className='flex justify-center uppercase'>
@@ -305,21 +326,21 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: <div className='text-center'>Update Time</div>,
+        title: <div className='text-center'>{t('commons.update_time')}</div>,
         dataIndex: 'updateTime',
         key: 'updateTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""}</p>,
       },
       {
-        title: <div className='text-center'>Setting Type</div>,
+        title: <div className='text-center'>{t('commons.setting_type')}</div>,
         dataIndex: 'settingType',
         key: 'settingType',
-        render: (text: any) => <p>{text}</p>,
+        render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
 
         sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
-        title: <div className='text-center'>Updated By</div>,
+        title: <div className='text-center'>{t('commons.updated_by')}</div>,
         dataIndex: 'userUpdate',
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
@@ -327,7 +348,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
-        title: <div className='text-center'>Log</div>,
+        title: <div className='text-center'>{t('commons.log')}</div>,
         dataIndex: 'log',
         key: 'log',
         render: (_: any, record: any) => {
@@ -352,7 +373,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     <div>
       <div>
         <div className='panel-heading flex items-center justify-between'>
-          <h2>Budget Update Log</h2>
+          <h2>{t('update_log_page.budget_update_log')}</h2>
           <Space>
             <RangeDatePicker/>
             <SelectFilter placeholder={"Update Budget"} onChange={handleChange} options={statusLog}/>
@@ -362,7 +383,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       </div>
       <div className='mt-6'>
         <div className='panel-heading flex items-center justify-between'>
-          <h2>Status Update</h2>
+          <h2>{t('update_log_page.status_update')}</h2>
           <RangeDatePicker/>
         </div>
         <TableGeneral loading={loading} columns={columnsStatusLog} data={statusLog} pagination={pagination.statusLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "STATUS")} />

@@ -110,10 +110,20 @@ function WeightTemplate() {
     }    
   }
 
+  const renderTranslateSearchText = (text: any) => {
+    let translate = t("commons.search_by_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateActionButton = (text: any) => {
+    let translate = t("commons.action_type.add_text");
+    return translate.replace("{text}", text);
+  }
+
   const columns: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>{t('weight_template_page.id')}</div>,
+        title: <div className='text-center'>{t('commons.id')}</div>,
         dataIndex: 'id',
         key: 'id',
         render: (text: any) => <div>{text}</div>,
@@ -138,7 +148,7 @@ function WeightTemplate() {
         render: (text: any) => <div>{moment().format('DD-MM-YYYY')}</div>,
       },
       {
-        title: <div className='text-center'>{t('weight_template_page.action')}</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         align: 'center',
         width: 100,
@@ -160,8 +170,8 @@ function WeightTemplate() {
   return (
     <div>
       <Space className='w-full flex flex-row justify-between'>
-        <SearchInput keyword={keyword} name="keyword" placeholder="Search by Template" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleOnSearch}/>
-        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={'Add Weight Template'} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
+        <SearchInput keyword={keyword} name="keyword" placeholder={renderTranslateSearchText(t('weight_template_page.template_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleOnSearch}/>
+        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={renderTranslateActionButton(t('weight_template_page.weight_template'))} onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`)}/>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={weightTemplates} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
