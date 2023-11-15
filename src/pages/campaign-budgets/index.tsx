@@ -19,6 +19,7 @@ import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 
+import { CAMPAIGN_STATUS } from '@/enums/status';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
@@ -26,10 +27,9 @@ import ActionButton from '@/components/commons/buttons/ActionButton';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-
 export async function getStaticProps(context: any) {
   const { locale } = context
-  console.log(">>>> locale", locale)
+
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
@@ -98,14 +98,13 @@ const BULK_ACTION = [
 ]
 
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation()
   const router = useRouter()
-  console.log(">>> router", router)
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
-  const [selectedStatus, setSelectedStatus] = useState<any>("Select Action");
+  const [selectedAction, setSelectedAction] = useState<any>(t('campaign_budget_page.action'));
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
@@ -132,6 +131,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     if (currentAccount) getCampaignBudgetsList(currentAccount)
   }, [currentAccount, pagination.pageSize, pagination.current])
 
+  useEffect(() => {
+    setSelectedAction(t('campaign_budget_page.action'))
+  }, [t])
+  
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
     try {
@@ -182,7 +185,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         query: {isWeight: true}
       })
     }
-    setSelectedStatus("Select Action")
+    setSelectedAction("Select Action")
   };
   
   const onSearchInFilter = (value: string) => {
@@ -237,18 +240,18 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const handleOk = () => {
     setOpenModalUpdateStatus(false);
-    setSelectedStatus("Select Action")
+    setSelectedAction(t('campaign_budget_page.action'))
   };
 
   const handleCancel = () => {
     setOpenModalUpdateStatus(false);
-    setSelectedStatus("Select Action")
+    setSelectedAction(t('campaign_budget_page.action'))
   };
 
   const columns: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Campaign Name</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.campaign_name')}</div>,
         dataIndex: 'name',
         key: 'name',
         render: (text: any) => <p>{text}</p>,
@@ -257,13 +260,16 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
-        title: <div className='text-center'>Portfolio</div>,
-        dataIndex: 'deliveryProfile',
-        key: 'deliveryProfile',
-        render: (text: any) => <p className='text-center'>{text}</p>,
+        title: <div className='text-center'>{t('campaign_budget_page.portfolio')}</div>,
+        dataIndex: 'portfolio',
+        key: 'portfolio',
+        render: (_: any, record: any) => {
+          const portfolio = record.portfolio;
+          return <p className='text-end'>{portfolio && portfolio.name ? portfolio.name : ""}</p>
+        }
       },
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.status')}</div>,
         dataIndex: 'state',
         key: 'state',
         render: (_: any, record: any) => {
@@ -271,10 +277,29 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             { key: '1', label: 'Action 1' },
             { key: '2', label: 'Action 2' },
           ];
+          const statusData = record.status
+          const renderStatus = () => {
+            let status = ''
+            let type = ''
+            if (statusData == CAMPAIGN_STATUS.ENABLE) {
+              status = "ENABLE"
+              type = 'success'
+            } else if (statusData == CAMPAIGN_STATUS.PAUSED) {
+              status = 'PAUSED'
+              type = 'warning'
+            } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
+              status = 'ARCHIVED'
+              type = 'processing'
+            } else if (statusData == CAMPAIGN_STATUS.OTHER) {
+              status = 'OTHER'
+              type = 'default'
+            }
+            return <Tag className='text-center' color={type}>{status} <DownOutlined/></Tag>
+          }
           return (
-            <div className='tag-container'>
+            <div className='flex justify-center'>
               <Dropdown menu={{ items }}>
-                <a className='tag px-2 font-semibold'>{record.state} <DownOutlined/></a>
+                <a className='tag px-2 font-semibold'>{renderStatus()}</a>
               </Dropdown>
             </div>
           );
@@ -282,25 +307,26 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.state - b.state,
       },
       {
-        title: <div className='text-center'>Current Budget</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.current_budget')}</div>,
         dataIndex: 'budget',
         key: 'budget',
         render: (text: any, record: any, index: number) => {
+          const budget = record.adtranAmazonCampaignBudget.dailyBudget
           const isEditing = isEditingList[index];
 
-          const handleBudgetChange = (e: any, index: any) => {
+          const handleBudgetChange = (event: any, index: any) => {
             const updatedBudgets = [...campaignBudgets];
-            updatedBudgets[index].budget = e.target.value;
+            updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = event.target.value;
             setCampaignBudgets(updatedBudgets);
           };
 
           return (
             <div className='flex items-center justify-between'>
               {!isEditing 
-                ? <div className='flex items-center'>￥ <span>{text}</span></div>
+                ? <div className='flex items-center'>￥ <span>{budget}</span></div>
                 : (
                   <div className='current-budget'>
-                    <Input type='number' min={0} value={text} onChange={(e) => handleBudgetChange(e, index)} />
+                    <Input type='number' min={0} value={budget} onChange={(e) => handleBudgetChange(e, index)} />
                   </div>
               )}
               <div className='flex ml-2' onClick={() => handleToggleEdit(index)}>
@@ -311,7 +337,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         }
       },
       {
-        title: <div className='text-center'>IMP</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.imp')}</div>,
         dataIndex: 'imp',
         key: 'imp',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -319,7 +345,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: <div className='text-center'>Click</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.click')}</div>,
         dataIndex: 'click',
         key: 'click',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -327,7 +353,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.click - b.click
       },
       {
-        title: <div className='text-center'>Sale</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.sale')}</div>,
         dataIndex: 'sale',
         key: 'sale',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -335,7 +361,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
-        title: <div className='text-center'>ROAS</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.roas')}</div>,
         dataIndex: 'roas',
         key: 'roas',
         render: (text: any) => <p className='text-end'>{text || '-'}</p>,
@@ -343,7 +369,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sorter: (a: any, b: any) => a.roas - b.roas
       },
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('campaign_budget_page.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
           const {campaignId, name} = record
@@ -357,20 +383,68 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     ], [campaignBudgets, handleToggleEdit, isEditingList]
   )
 
- 
+  // const handleChangeWeight = (event: any) => {
+            //   const value = event.target.value;
+            //   setWeightSetting((prevWeightSetting) => {
+            //     const updatedWeightSetting = [...prevWeightSetting];
+            //     updatedWeightSetting[index] = {
+            //       ...updatedWeightSetting[index],
+            //       slot: index + 1,
+            //       time: time,
+            //       weight: value ? Number(value) : 0,
+            //     };
+            //     form.setFieldsValue({ weightSetting: updatedWeightSetting }); // Set form values
+            //     return updatedWeightSetting;
+            //   });
+            // };
+            // {
+            //   title: <div className='text-center'>{t('weight_template_page.form.weight_%')}</div>,
+            //   dataIndex: 'weight',
+            //   key: 'weight',
+            //   render: (text: any, record: any, index: number) => {
+            //     const weight = record && record.weight ? record.weight : 0;
+            //     const time = record && record.time ? record.time : '';
+          
+            //     const handleChangeWeight = (event: any) => {
+            //       const value = event.target.value;
+            //       setWeightSetting((prevWeightSetting) => {
+            //         const updatedWeightSetting = [...prevWeightSetting];
+            //         updatedWeightSetting[index] = {
+            //           ...updatedWeightSetting[index],
+            //           slot: index + 1,
+            //           time: updatedWeightSetting[index].time,  // Include the time field (replace with your actual time logic)
+            //           weight: value ? Number(value) : 0,
+            //         };
+            //         return updatedWeightSetting;
+            //       });
+            //     };
+          
+            //     return (
+            //       <Form.Item name={['weightSetting', index, 'weight']} initialValue={weight}>
+            //         <Input type='number' min={0} onChange={handleChangeWeight} />
+            //       </Form.Item>
+            //     );
+            //   },
+            // },
+
+
+  const renderTranslateSearchText = (text: any) => {
+    let translate = t("commons.search_by_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateFilterText = (text: any) => {
+    let translate = t("commons.filter_text");
+    return translate.replace("{text}", text);
+  }
 
   return (
     <div>
-      <h1>{t("greeting")}</h1>
-      <div className='button-container'>
-      <button className='finish-button mr-4' onClick={() => changeLanguage('en')}>English</button>
-      <button className='finish-button' onClick={() => changeLanguage('jp')}>Japanese</button>
-      </div>
       <div className='flex items-center justify-between'>
-          <SearchInput keyword={keyword} name={"keyword"} placeholder={t("greeting")} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+          <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6'>
-          <SelectFilter label={"Status"} placeholder={"Select Status"} onChange={onChange} options={statuses} />
-          <SelectFilter label={"Bulk Action"} placeholder={"Select Action"} onChange={onChange} options={bulkAction} value={selectedStatus}/>
+          <SelectFilter label={t('commons.status')} placeholder={renderTranslateFilterText(t('campaign_budget_page.status'))} onChange={onChange} options={statuses} />
+          <SelectFilter label={t('commons.bulk_action')} placeholder={renderTranslateFilterText(t('campaign_budget_page.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
         </div>
       </div>
       <div>

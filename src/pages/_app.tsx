@@ -2,6 +2,7 @@ import Layout from '@/components/layout'
 import '@/styles/globals.scss'
 import '@/styles/custom-antd.scss'
 import '@/styles/common.scss'
+import '../components/header/index.scss'
 import '../components/table/index.scss'
 import '../components/nested-layout/index.scss'
 import '../components/sidebar/index.scss'
@@ -17,10 +18,19 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { appWithTranslation } from 'next-i18next'
-import { useRouter } from 'next/router'
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 
 function App({ Component, pageProps }: any) {
-  const { locale } = useRouter();
   const renderWithLayout =
     Component.getLayout ||
     function (page: any) {
@@ -39,7 +49,7 @@ function App({ Component, pageProps }: any) {
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         store.dispatch(setAccountList({data: result.data}))
-        store.dispatch(setCurrentAccount({data: result.data[3].id}))
+        store.dispatch(setCurrentAccount({data: result.data[0].id}))
       }
     } catch (error) {
       console.log(">>> Get All Partner Accounts Error", error)
@@ -49,7 +59,7 @@ function App({ Component, pageProps }: any) {
   return (
     <Provider store={store} >
       <StyleProvider hashPriority="high">
-        {renderWithLayout(<Component {...pageProps} dir={locale === "en" ? "ltr" : "rtl"}/>)}
+        {renderWithLayout(<Component {...pageProps}/>)}
        </StyleProvider>
       <ToastContainer />
     </Provider>

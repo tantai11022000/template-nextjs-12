@@ -3,7 +3,9 @@ import { createSlice, current, PayloadAction } from '@reduxjs/toolkit';
 interface IAccount {
   id: number | string,
   name: string,
-  masterAccountConfig: {
+  description: string,
+  supervisors: number[],
+  setting: {
     client_id: string;
     client_secret: string;
     refresh_token: string;
@@ -56,9 +58,12 @@ const slice = createSlice({
       const editedAccount = state.accounts.find((account: any) => account.id == id);
       if (editedAccount) {
         editedAccount.name = value.name;
-        editedAccount.masterAccountConfig.client_id = value.masterAccountConfig.client_id;
-        editedAccount.masterAccountConfig.client_secret = value.masterAccountConfig.client_secret;
-        editedAccount.masterAccountConfig.refresh_token = value.masterAccountConfig.refresh_token;
+        editedAccount.description = value.description;
+        editedAccount.supervisors = value.supervisors;
+        editedAccount.setting.client_id = value.setting.client_id;
+        editedAccount.setting.client_secret = value.setting.client_secret;
+        editedAccount.setting.refresh_token = value.setting.refresh_token;
+
       }
     },
   },

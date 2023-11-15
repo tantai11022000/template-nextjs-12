@@ -1,4 +1,75 @@
 {
-    "greeting": "Hello!",
-    "description": "This is a sample description in English."
+    "greeting": {
+        "hi": "Hi"
+    },
+    "description": "This is a sample description in English.",
+    "commons": {
+        "status": "Status",
+        "bulk_action": "Bulk Action",
+        "search_by_text": "Search by {text}",
+        "filter_text": "Select {text}",
+        "action": "Action",
+        "no_data": "Data is not available",
+        "add": "Add {text}",
+        "edit": "Edit {text}"
+    },
+    "imp": "IMP",
+    "campaigns": {
+        "campaign_budgets": "Campaign Budgets"
+    },
+   
+    "campaignbudgets": "Campaign Budgets",
+
+    "translate": {
+        "english": "English",
+        "japanese": "Japanese"
+    },
+
+    "header_bar": {
+        "campaigns": "Campaigns",
+        "users": "Users",
+        "biz_management": "Biz Management",
+        "3rd_tracking_tools": "3rd Tracking Tools",
+        "amazon": "Amazon"
+    },
+
+    "sidebar": {
+        "campaign_budgets": "Campaign Budgets",
+        "target_bidding": "Target Bidding",
+        "accounts": "Accounts",
+        "weight_template": "Weight Template"
+    },
+
+    "breadcrumb": {
+
+    },
+
+    "campaign_budget_page": {
+        "campaign_name": "Campaign Name",
+        "portfolio": "Portfolio",
+        "status": "Status",
+        "current_budget": "Current Budget",
+        "imp": "IMP",
+        "click": "Click",
+        "sale": "Sale",
+        "roas": "ROAS",
+        "action": "Action"
+    },
+
+    "weight_template_page": {
+        "id": "ID",
+        "template_name": "Template Name",
+        "description" : "Description",
+        "last_updated": "Last Updated",
+        "action": "Action",
+
+        "form": {
+            "title": "{action} Weight Template",
+            "name": "Name",
+            "description": "Description",
+            "time_slot": "Time Slot",
+            "time_mins": "Time (Mins)",
+            "weight_%": "Weight(%)"
+        }
+    }
 }

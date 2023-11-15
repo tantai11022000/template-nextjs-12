@@ -17,7 +17,17 @@ import { SaveOutlined, EditOutlined, ClockCircleFilled, FileTextOutlined } from 
 import SearchInput from '@/components/commons/textInputs/SearchInput';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { getCurrentAccount } from '@/store/account/accountSlice';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 export interface ITargetingBiddingProps {
 }
 

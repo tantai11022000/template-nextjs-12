@@ -1,4 +1,69 @@
 {
-    "greeting": "こんにちは！",
-    "description": "これは日本語のサンプル説明です。"
+    "greeting": {
+        "hi": "Hello"
+    },
+    "description": "これは日本語のサンプル説明です。",
+    "commons": {
+        "status": "ステータス",
+        "bulk_action": "一括操作", 
+        "search_by_text": "ドで探す {text}",
+        "filter_text": "選択する {text}",
+        "no_data": "利用できないデータです",
+        "add": "追加 {text}",
+        "edit": "編集 {text}"
+    },
+    "campaigns": {
+        "campaign_budgets": "キャンペーンの予算"
+    },
+
+    "translate": {
+        "english": "英語",
+        "japanese": "日本語"
+    },
+
+    "header_bar": {
+        "campaigns": "キャンペーン",
+        "users": "ユーザー",
+        "biz_management": "ビジネス管理",
+        "3rd_tracking_tools": "3rd Tracking Tools",
+        "amazon": "Amazon"
+    },
+
+    "sidebar": {
+        "campaign_budgets": "キャンペーンの予算",
+        "target_bidding": "ターゲット入札",
+        "accounts": "アカウント",
+        "weight_template": "ウェイトテンプレート"
+    },
+
+    "campaign_budget_page": {
+        "campaign_name": "キャンペーン名",
+        "portfolio": "ポートフォリオ",
+        "status": "ステータス",
+        "current_budget": "現在の予算",
+        "imp": "IMP",
+        "click": "クリック",
+        "sale": "セール",
+        "roas": "ROAS",
+        "action": "アクション"
+    },
+
+    "weight_template_page": {
+        "id": "ID",
+        "template_name": "テンプレート名",
+        "description" : "説明",
+        "last_updated": "最終更新",
+        "action": "アクション",
+
+        "form": {
+            "title": "{action} ウェイトテンプレート",
+            "name": "名前",
+            "description": "説明",
+            "time_slot": "タイムスロット",
+            "time_mins": "時間（分",
+            "weight_%": "重さ（％）"
+        }
+    },
+
+    "campaignbudgets": "Campaign Budgets"
 }

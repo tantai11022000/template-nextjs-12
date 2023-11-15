@@ -2,48 +2,48 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router'
-import { Button, Form, Input, Radio, Space } from 'antd';
+import { Form, Input, Space, Table } from 'antd';
 import FText from '@/components/form/FText';
 import FTextArea from '@/components/form/FTextArea';
 import FRadio from '@/components/form/FRadio';
-import TableGeneral from '@/components/table';
-import { GetServerSideProps } from 'next';
 import { BREADCRUMB_ADD, BREADCRUMB_EDIT, BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { useAppDispatch } from '@/store/hook';
 import ActionButton from '@/components/commons/buttons/ActionButton';
-import { RightOutlined } from '@ant-design/icons';
-import TextInput from '@/components/commons/textInputs/TextInput';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { useTranslation } from 'next-i18next';
+import { createWeightTemplate, editWeightTemplate, getWeightTemplateDetail } from '@/services/weight-template';
+import TableGeneral from '@/components/table';
+import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
-const fakeDataForm = {
-  name: "fake data",
-  description: "This is a fake data",
-  timeSlot: 2
+export const getStaticPaths = async () => {
+  const weightTemplateIds: any[] = [];
+  const paths = weightTemplateIds.map((id: any) => ({
+    params: { type: ['edit', id.toString()] },
+  }));
+  return { paths, fallback: true };
+};
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
 }
 
 const options = [
   {
-    value: 1,
-    label: '1 hour'
-  },
-  {
-    value: 2,
+    value: 0,
     label: '30 mins'
   },
-]
-
-const DATA = [
   {
-    id: 1,
-    value: 'A'
-  },
-  {
-    id: 2,
-    value: 'B'
-  },
-  {
-    id: 3,
-    value: 'C'
+    value: 1,
+    label: '1 hour'
   },
 ]
 
@@ -57,112 +57,201 @@ interface iRecordTable {
   weight: number,
 }
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//   const type = context && context.query && context.query.type && context.query.type.length ? context.query.type[0] : ""
-//   const id = context && context.query && context.query.type && context.query.type.length ? context.query.type[1] : ""
-
-//   let breadcrumb = [
-//     { label: 'Weight Template', url: BREADCRUMB_WEIGHT_TEMPLATE.url },
-//   ];
-
-//   if (type == "add") breadcrumb.push({ label: "Add", url: `${BREADCRUMB_WEIGHT_TEMPLATE.url}/add`})
-//   else if (type == "edit") breadcrumb.push({ label: id, url: '' })
-
-//   return {
-//     props: {
-//       breadcrumb,
-//     },
-//   };
-// };
-
 function AddWeightTemplate() {
+    const [form]:any = Form.useForm();
+    const { t } = useTranslation()
     const router = useRouter()
+    const id = router && router.query && router.query.type && router.query.type.length && router.query.type[1] ? router.query.type[1] : ""
+    const valueEdit = router && router.query && router.query.type && router.query.type.length && router.query.type[0] === 'edit' ? true : false
     const dispatch = useAppDispatch()
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [dataOneHour, setDataOneHour] = useState<iRecordTable[]>([])
     const [dataThirtyMins, setDataThirtyMins] = useState<iRecordTable[]>([])
     const [timeSlot, setTimeSlot] = useState<number>(1)
-    const [checkedList, setCheckedList] = useState<any[]>(DATA);
-    const [form]:any = Form.useForm();
+    const [weightSetting, setWeightSetting] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(false)
+    const [weights, setWeights] = useState<any>([])
+
+    const [pagination, setPagination] = useState<any>({
+      pageSize: 10,
+      current: 1,
+      total: 0,
+    })
+
+    useEffect(() => {
+      init()
+    }, [])
+
+    const init = () => {
+      form.setFieldsValue({
+        type: options[1].value
+      });
+    }
+
+    useEffect(() => {
+      initDataDefaultTable()
+      const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
+      setIsEdit(valueEdit)
+      if (valueEdit) {
+        handleMapEditData()
+        dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_EDIT, { label: id, url: '' }]}))
+      } else {
+        dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_ADD]}))
+      }
+    },[router])
+
+    const fetchWeightTemplateDetail = async () => {
+      setLoading(true)
+      try {
+        const result = await getWeightTemplateDetail(3)
+        if (result && result.data) {
+          setWeights(result.data)
+
+          if (result.data.weightSetting && result.data.weightSetting.length) {
+            setWeightSetting(result.data.weightSetting)
+          }
+        }
+        setLoading(false)
+      } catch (error) {
+        console.log(">>> Get Weight Template Detail Error", error)
+        setLoading(false)
+      }
+    }
+    
 
     const initDataDefaultTable = () => {
-      const defaultDataOneHour = Array.from({ length: 24 }, (_, index) => ({
+      const formatTime = (hours: any, minutes: any) => {
+        const formattedHours = hours < 10 ? `0${hours}` : hours;
+        const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+        return `${formattedHours}:${formattedMinutes}`;
+      };
+    
+      const defaultDataOneHour: any = Array.from({ length: 24 }, (_, index) => ({
         ...templateRecord,
-        time: index,
+        time: formatTime(index, 0),
+        weight: 0
       }));
-      const defaultDataThirtyMins = Array.from({ length: 48 }, (_, index) => ({
+    
+      const defaultDataThirtyMins: any = Array.from({ length: 48 }, (_, index) => ({
         ...templateRecord,
-        time: index * 30,
+        time: formatTime(Math.floor(index / 2), (index % 2) * 30),
+        weight: 0
       }));
+    
       setDataOneHour(defaultDataOneHour);
       setDataThirtyMins(defaultDataThirtyMins);
-    }
+    };
 
-    const handleOnChangeForm = (changedValues:any) => {
-      if (changedValues.hasOwnProperty('timeSlot')) {
-        setTimeSlot(+changedValues.timeSlot)
+    const handleChangeValueTable = (value: number, row: number) => {
+      const newData = timeSlot === 1 ? [...dataOneHour] : [...dataThirtyMins];
+      if (row >= 0 && row < newData.length) {
+        newData[row].weight = Number(value);        
+        timeSlot === 1 ? setDataOneHour(newData) : setDataThirtyMins(newData);
+      }
+    };
+
+    const handleMapEditData = async () => {
+      setLoading(true)
+      try {
+        const result = await getWeightTemplateDetail(id)
+        if (result && result.data) {
+          const { name, description, type, weightSetting } = result.data
+          form.setFieldsValue({
+            name: name,
+            description: description,
+            type: type,
+            weightSetting: weightSetting
+          })
+        }
+        setLoading(false)
+      } catch (error) {
+       console.log(">>> Get Account Info Error", error)
+       setLoading(false)
       }
     }
 
-    const handleChangeValueTable = (e:any,row: number) => {
-      const {name, value} = e.target;
-      if (timeSlot === 1) {
-        const newData = {...dataOneHour[row],[name]: +value}
-        dataOneHour[row] = newData;
-        setDataOneHour(dataOneHour);
-      } else {
-        const newData = {...dataThirtyMins[row],[name]: +value}
-        dataThirtyMins[row] = newData;
-        setDataThirtyMins(dataThirtyMins);
-      }
-    }
+    const handleFinish = async (values: any) => {
+      try {
+        if (values.description === undefined) values.description = ''
 
-    const handleMapEditData = () => {
-      form.setFieldsValue(fakeDataForm)
-      setTimeSlot(+fakeDataForm.timeSlot)
-    }
-    const handleFinish = (value:any) => {
-      console.log('value :>> ', value);
-    }
+        const { weightSetting } = values;
+        const updatedWeightSetting = weightSetting.map((item: any, index: number) => ({
+          slot: index + 1,
+          time: `${index}:00`,
+          ...item,
+        }));
+  
+        const updatedValues = {
+          ...values,
+          description: values.description || '',
+          weightSetting: updatedWeightSetting,
+        };
+        console.log(">>> updatedValues", updatedValues)
+        if (valueEdit) {
+          await editWeightTemplate(id, updatedValues)
+        } else {
+          await createWeightTemplate(updatedValues)
+          notificationSimple("Create Weight Template Success", NOTIFICATION_SUCCESS);
+        }
+        router.push(BREADCRUMB_WEIGHT_TEMPLATE.url)
+      } catch (error) {
+        console.log(">>> Create Weight Template Error", error)
+        notificationSimple("Create Weight Template Fail", NOTIFICATION_ERROR);
+      }
+    };
+    
     const handleFinishFailed = (e:any) => {
-      console.log('e :>> ', e);
+      console.log('>>> handle Finish Failed ', e);
     }
+
+    const itemRender = (_: any, type: any, originalElement: any) => {
+      if (type === "prev") {
+        return <a><LeftOutlined /> Back</a>;
+      }
+      if (type === "next") {
+        return <a>Next <RightOutlined/></a>;
+      }
+      
+      return originalElement;
+    };
+
+    const handleChangeTimeSlot = (value: any) => {
+      setTimeSlot(value)
+    }
+
+    const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
+      const { current } = pagination
+      // changeNextPageUrl(router, current)
+      setPagination(pagination)
+    }
+
     const columns: any = useMemo(
       () => [
         {
-          title: `Time ${timeSlot === 1 ? '(Hours)' : '(Mins)'}`,
+          title: <div className='text-center'>{`Time ${timeSlot === 1 ? '(Hours)' : '(Mins)'}`}</div>,
           dataIndex: 'time',
           key: 'time',
           align: 'center',
           render: (text: any) => <span>{text}</span>
         },
         {
-          title: 'Weight (%)',
+          title: <div className='text-center'>{t('weight_template_page.form.weight_%')}</div>,
           dataIndex: 'weight',
           key: 'weight',
-          align: 'center',
-          render: (text: any, index:number) => <Input name='weight' defaultValue={text} onChange={(e:any) => handleChangeValueTable(e,index)} className='flex justify-center' />,
+          render: (text: any, record: any, index: number) => {
+            const weight = record && record.weight ? record.weight : 0;
+            return (
+              <Form.Item
+                name={['weightSetting', index, 'weight']}
+                initialValue={weight}
+                getValueFromEvent={(e) => (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value))}
+              >
+                <Input type='number' onChange={(e) => handleChangeValueTable(+e.target.value, index)} />
+              </Form.Item>
+            );
+          },
         },
-      ], [dataOneHour, dataThirtyMins, timeSlot])
-    useEffect(() => {
-        initDataDefaultTable()
-        const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
-        setIsEdit(valueEdit)
-        if (valueEdit) {
-          handleMapEditData()
-          dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_EDIT]}))
-        } else {
-          dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_ADD]}))
-          form.setFieldsValue({
-            timeSlot: 1
-          })
-          setTimeSlot(1)
-        }
-      },[router])
-
-    const onChangeCheck = (value: any) => {
-      console.log(">>> value", value)
-    }
+      ], [weightSetting, timeSlot])
 
     return (
       <div>
@@ -172,7 +261,7 @@ function AddWeightTemplate() {
         <div className='form-container'>
           <Form
             form= {form}
-            onFinish={handleOnChangeForm}
+            onFinish={handleFinish}
             onFinishFailed={handleFinishFailed}
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 14 }}
@@ -180,9 +269,12 @@ function AddWeightTemplate() {
           >
             <FText name={"name"} label={'Name'} errorMessage={'Please input your Name'} required/>
             <FTextArea name={"description"} label={'Description'} errorMessage={'Please input your Description'} />
-            <FRadio name={"timeSlot"} label={'Time slot'} options={options} />
-
-            <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} customCss={'w-[80%] m-auto'} scrollY={true} />
+            <FRadio name={"type"} value={timeSlot} defaultValue={timeSlot} label={'Time slot'} options={options} onChange={(e: any) => handleChangeTimeSlot(e.target.value)} />
+            <div className='weight-table-css w-[80%] m-auto'>
+              <Form.Item name="weightSetting">
+                <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins} pagination={false} scrollY={true} handleOnChangeTable={handleOnChangeTable}/>
+              </Form.Item>
+            </div>
 
             <Space size="middle" className='w-full flex justify-center mt-8'>
               <ActionButton className={'cancel-button'} label={'Cancel'} onClick={() => router.back()}/>

@@ -1,5 +1,6 @@
 import { Table} from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { useTranslation } from 'next-i18next';
 
 interface DataType {
   title: string;
@@ -23,7 +24,7 @@ interface TableProps {
 
 const TableGeneral = (props: TableProps) => {
   const {data, columns, pagination, rowSelection, handleOnChangeTable , customCss, loading, scrollY} = props
-  // console.log(">>> pagination", pagination)
+  const { t } = useTranslation()
 
   const itemRender = (_: any, type: any, originalElement: any) => {
     if (type === "prev") {
@@ -60,6 +61,9 @@ const TableGeneral = (props: TableProps) => {
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
         scroll={{x: true, y: scrollY ? 500 : undefined}}
+        locale={{
+          emptyText: t('commons.no_data'), // Customize the "No data" message
+        }}
       />
     </div>
   )

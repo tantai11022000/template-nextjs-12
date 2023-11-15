@@ -1,0 +1,76 @@
+@import '../../styles/variables.scss';
+
+.header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background-color: #444;
+}
+
+.nav-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .header-nav {
+        height: 100%;
+    
+        ul {
+            height: 100%;
+            display: flex;
+            align-items: center;
+    
+            li {
+                height: 100%;
+    
+                a {
+                    height: 100%;
+                    display: flex !important;
+                    align-items: center;
+                    text-decoration: none;
+                    color: $color-white !important;
+                    padding: 0 16px;
+    
+                    font-size: 17px;
+                    font-weight: 400;
+                }
+    
+                a:hover {
+                    background-color: #06948c !important;
+                }
+    
+                .active {
+                    background-color: #079A92
+                }
+            }
+        }
+    }
+
+    .header-icon {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+
+        .anticon {
+            font-size: 17px;
+            color: $color-white;
+            cursor: pointer;
+
+            padding: 8px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+
+            display: block;
+            border-radius: 50%;
+            text-align: center;
+            height: 32px;
+            width: 32px;
+        }
+        
+        .anticon:last-child {
+            margin-right: 8px;
+        }
+    }
+
+}
