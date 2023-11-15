@@ -19,6 +19,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { appWithTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { ConfigProvider } from 'antd';
+
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -59,7 +61,14 @@ function App({ Component, pageProps }: any) {
   return (
     <Provider store={store} >
       <StyleProvider hashPriority="high">
-        {renderWithLayout(<Component {...pageProps}/>)}
+        <ConfigProvider
+          theme={{
+            token: {
+              fontFamily: '"M PLUS Rounded 1c", "Droid Sans", Tahoma, Arial, sans-serif',
+            },
+          }}>
+            {renderWithLayout(<Component {...pageProps}/>)}
+        </ConfigProvider>
        </StyleProvider>
       <ToastContainer />
     </Provider>
