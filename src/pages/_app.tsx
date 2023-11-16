@@ -64,14 +64,10 @@ function App({ Component, pageProps }: any) {
     router.push({ pathname, query }, undefined, { locale: userLanguage });
     }
   };
-  
-  // Call setDefaultLocale when the component mounts
-  useEffect(() => {
-    setDefaultLocale();
-  }, []);
 
   useEffect(() => {
     getAllAccountList()
+    setDefaultLocale();
   }, [])
   
   const getAllAccountList = async () => {
