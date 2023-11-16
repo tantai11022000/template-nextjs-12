@@ -20,6 +20,8 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { appWithTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { ConfigProvider } from 'antd';
+import { getItem, storeItem } from '@/utils/StorageUtils'
+import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
 
 
 export async function getStaticProps(context: any) {
@@ -38,6 +40,20 @@ function App({ Component, pageProps }: any) {
     function (page: any) {
       return <Layout>{page}</Layout>;
     };
+
+  useEffect(() => {
+    let storedLanguage = getItem(LANGUAGE_CODE);
+    if (!storedLanguage || storedLanguage.trim() === '') {
+      storedLanguage = 'en';
+      storeItem(LANGUAGE_CODE, storedLanguage);
+    }
+    
+    let storedAcceptLanguage = getItem(LANGUAGE_KEY);
+    if (!storedAcceptLanguage || storedAcceptLanguage.trim() === '') {
+      storedAcceptLanguage = 'en-US';
+      storeItem(LANGUAGE_KEY, storedAcceptLanguage);
+    }
+  }, []);
 
   useEffect(() => {
     getAllAccountList()

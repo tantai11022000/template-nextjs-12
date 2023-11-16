@@ -21,8 +21,8 @@
         "log": "ログ",
 
         "filter_label": {
-            "status": "Status",
-            "bulk_action": "Bulk Action"
+            "status": "ステータス",
+            "bulk_action": "一括操作"
         },
 
         "status_enum": {
@@ -94,6 +94,18 @@
         "budget_update_log": "予算更新ログ",
         "status_update": "ステータスアップデート"
     },
+
+    "target_bidding_page": {
+        "campaign": "キャンペーン",
+        "target_bidding_name": "ターゲット入札名",
+        "target": "目標",
+        "current_bidding": "現在の入札"
+    },
+
+    "account_page": {
+        "account": "アカウント"
+    },
+
 
     "weight_template_page": {
         "weight_template": "ウェイトテンプレート",

@@ -17,6 +17,7 @@ import { USER_STATUS } from '@/enums/status';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { setAccountList } from '@/store/account/accountSlice';
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -67,6 +68,7 @@ export default function Accounts (props: IAccountsProps) {
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         setAccounts(result.data)
+        dispatch(setAccountList({data: result.data}))
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)
@@ -116,7 +118,7 @@ export default function Accounts (props: IAccountsProps) {
         render: (text: any) => <p>{text}</p>,
       },
       {
-        title: <div className='text-center'>Name</div>,
+        title: <div className='text-center'>{t('commons.name')}</div>,
         dataIndex: 'name',
         key: 'name',
         render: (text: any) => <p>{text}</p>,
@@ -142,10 +144,10 @@ export default function Accounts (props: IAccountsProps) {
             let status = ''
             let type = ''
             if (statusData == USER_STATUS.ACTIVE) {
-              status = "ACTIVE"
+              status = t('commons.status_enum.active')
               type = 'success'
             } else if (statusData == USER_STATUS.INACTIVE) {
-              status = 'INACTIVE'
+              status = t('commons.status_enum.inactive')
               type = 'error'
             }
             return <Tag className='text-center uppercase' color={type}>{status} <DownOutlined/></Tag>
@@ -161,7 +163,7 @@ export default function Accounts (props: IAccountsProps) {
         sorter: (a: any, b: any) => a.state - b.state,
       },
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
           return (
@@ -183,11 +185,21 @@ export default function Accounts (props: IAccountsProps) {
     setPagination(pagination)
   }
 
+  const renderTranslateSearchText = (text: any) => {
+    let translate = t("commons.search_by_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateActionButton = (text: any) => {
+    let translate = t("commons.action_type.add_text");
+    return translate.replace("{text}", text);
+  }
+
   return (
     <div>
       <Space className='w-full flex flex-row justify-between'>
-        <SearchInput keyword={keyword} name="keyword" placeholder="Search by Account" onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={'Add Account'} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
+        <SearchInput keyword={keyword} name="keyword" placeholder={renderTranslateSearchText(t('account_page.account'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={renderTranslateActionButton(t('account_page.account'))} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={accounts ? accounts : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

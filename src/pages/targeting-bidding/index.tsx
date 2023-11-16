@@ -18,6 +18,8 @@ import SearchInput from '@/components/commons/textInputs/SearchInput';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+import { TARGET_BIDDING_STATUS } from '@/enums/status';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -84,7 +86,7 @@ const DATA = [
   {
     id: 10,
     campaign: "Campaign A",
-    status: "active",
+    status: 1,
     currentBidding: 10000,
     target: "Target A",
     portfolio: 'Portfolio 1'
@@ -92,7 +94,7 @@ const DATA = [
   {
     id: 20,
     campaign: "Campaign B",
-    status: "inactive",
+    status: 2,
     currentBidding: 20000,
     target: "Target B",
     portfolio: 'Portfolio 2'
@@ -100,7 +102,7 @@ const DATA = [
   {
     id: 30,
     campaign: "Campaign C",
-    status: "inactive",
+    status: 2,
     currentBidding: 30000,
     target: "Target B",
     portfolio: 'Portfolio 2'
@@ -108,7 +110,7 @@ const DATA = [
   {
     id: 40,
     campaign: "Campaign D",
-    status: "active",
+    status: 1,
     currentBidding: 30000,
     target: "Target A",
     portfolio: 'Portfolio 2'
@@ -116,11 +118,13 @@ const DATA = [
 ]
 
 export default function TargetingBidding (props: ITargetingBiddingProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const dispatch = useAppDispatch()
   const currentAccount = useAppSelector(getCurrentAccount)
   const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
+  const [selectedAction, setSelectedAction] = useState<any>('');
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [campaigns, setCampaigns] = useState<any[]>([])
@@ -134,11 +138,13 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   );
 
   const [pagination, setPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 10,
     current: 1,
-    showSizeChanger: true,
-    showQuickJumper: true,
   })
+
+  useEffect(() => {
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
+  }, [t])
 
   useEffect(() => {
     if (currentAccount) getCampaignBudgetsList(currentAccount)
@@ -215,6 +221,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     } else if (value == "schedule_budget_once") {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
     }
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
   
   const onSearchInFilter = (value: string) => {
@@ -268,22 +275,24 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 
   const handleOk = () => {
     setOpenModalUpdateStatus(false);
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
 
   const handleCancel = () => {
     setOpenModalUpdateStatus(false);
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
 
   const columns: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Target</div>,
+        title: <div className='text-center'>{t('target_bidding_page.target')}</div>,
         dataIndex: 'target',
         key: 'target',
         render: (text: any) => <p>{text}</p>,
       },
       {
-        title: <div className='text-center'>Name</div>,
+        title: <div className='text-center'>{t('commons.name')}</div>,
         dataIndex: 'campaign',
         key: 'campaign',
         render: (_: any, record: any) => {
@@ -296,24 +305,21 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
       },
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
           const renderStatus = () => {
             let status = ''
             let type = ''
-            if (text == "active") {
-              status = 'ACTIVE'
+            if (text == TARGET_BIDDING_STATUS.ACTIVE) {
+              status = t('commons.status_enum.active')
               type = 'success'
-            } else if (text == 'inactive') {
-              status = 'INACTIVE'
+            } else if (text == TARGET_BIDDING_STATUS.INACTIVE) {
+              status = t('commons.status_enum.inactive')
               type = 'error'
-            } else if (text == 'upcoming') {
-              status = 'UPCOMING'
-              type = 'processing'
             }
-            return <Tag color={type}>{status}</Tag>
+            return <Tag color={type} className='uppercase'>{status}</Tag>
           }
         return (
             <div className='flex justify-center uppercase'>
@@ -324,7 +330,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: <div className='text-center'>Current Bidding</div>,
+        title: <div className='text-center'>{t('target_bidding_page.current_bidding')}</div>,
         dataIndex: 'currentBidding',
         key: 'currentBidding',
         render: (text: any, record: any, index: number) => {
@@ -347,7 +353,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         }
       },
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
           const {id} = record
@@ -364,57 +370,25 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
     ], [targetBidding, handleToggleEdit, isEditingList]
   )
 
+  const renderTranslateSearchText = (text: any) => {
+    let translate = t("commons.search_by_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateFilterText = (text: any) => {
+    let translate = t("commons.filter_text");
+    return translate.replace("{text}", text);
+  }
+
   return (
-    <div>
-      <div className='flex items-center justify-between'>
-        <SearchInput keyword={keyword} name={"keyword"} placeholder={"Search by Target"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <div className='flex items-center gap-6'>
-          <SelectFilter placeholder={"Select Status"} onChange={onChange} options={statuses}/>
-          <SelectFilter showSearch placeholder={"Select Campaign"} onChange={onChange} options={mappingCampaigns}/>
-          <SelectFilter placeholder={"Select Action"} onChange={onChange} options={bulkAction}/>
+    <>
+      <div className='flex items-center justify-between max-xl:flex-col max-xl:items-stretch'>
+        <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('target_bidding_page.target_bidding_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
+        <div className='flex items-center gap-6 max-xl:mt-3 max-md:flex-col'>
+          <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={onChange} options={statuses}/>
+          <SelectFilter label={t('target_bidding_page.campaign')} showSearch placeholder={renderTranslateFilterText(t('target_bidding_page.campaign'))} onChange={onChange} options={mappingCampaigns}/>
+          <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
         </div>
-        {/* <div className='col-span-2 flex justify-around items-center gap-4'>
-          <div className='flex items-center'>
-            <p className='mr-2'>Status</p>
-            <Select
-              style={{ width: 200 }}
-              defaultValue="all"
-              showSearch
-              placeholder="Select status"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={statuses}
-            />
-          </div>
-          <div className='flex items-center'>
-            <p className='mr-2 text-black'>Campaign</p>
-            <Select
-              style={{ width: 200 }}
-              showSearch
-              placeholder="Select Campaign"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={campaigns}
-            />
-          </div>
-          <div className='flex items-center'>
-            <p className='mr-2 text-black'>Bulk Action</p>
-            <Select
-              style={{ width: 200 }}
-              showSearch
-              placeholder="Select action"
-              optionFilterProp="children"
-              onChange={onChange}
-              onSearch={onSearchInFilter}
-              filterOption={filterOption}
-              options={bulkAction}
-            />
-          </div>
-        </div> */}
       </div>
       <div>
         <TableGeneral loading={loading} columns={columns} data={targetBidding} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
@@ -424,7 +398,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
           <p>Update {selectedRowKeys && selectedRowKeys.length ? selectedRowKeys.length : 0} selected target(s) to status: <Switch defaultChecked /></p>
         </Modal>
       )}
-    </div>
+    </>
   );
 }
 

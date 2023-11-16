@@ -193,7 +193,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         query: {isWeight: true}
       })
     }
-    setSelectedAction("Select Action")
+    setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
   
   const onSearchInFilter = (value: string) => {
@@ -402,10 +402,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }
 
   return (
-    <div>
-      <div className='flex items-center justify-between'>
+    <>
+      <div className='flex items-center justify-between max-lg:flex-col max-lg:items-stretch'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <div className='flex items-center gap-6'>
+        <div className='flex items-center gap-6 max-lg:mt-3'>
           <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={onChange} options={statuses} />
           <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
         </div>
@@ -428,7 +428,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           </Space>
         </Modal>
       )}
-    </div>
+    </>
   );
 }
 
