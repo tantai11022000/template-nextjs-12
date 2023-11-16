@@ -397,7 +397,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const {campaignId, name} = record
           return (
             <div className='flex justify-center'>
-              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() =>router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`)}/>
+              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`, query: { campaignId, name}})}/>
             </div>
           )
         },

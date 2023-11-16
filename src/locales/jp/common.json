@@ -19,6 +19,7 @@
         "setting_type": "設定種類",
         "updated_by": "更新者",
         "log": "ログ",
+        "time": "時間",
 
         "filter_label": {
             "status": "ステータス",
@@ -53,16 +54,26 @@
     },
 
     "metrics": {
-        "imp": "IMP",
+        "imp": "インプレッション",
         "click": "クリック",
         "sale": "セール",
-        "roas": "ROAS"
+        "roas": "ROAS",
+        "cpm": "CPM",
+        "cv": "CV",
+        "cost": "コスト"
     },
 
     "pagination": {
         "next": "次",
         "back": "戻る",
         "page": "ページ"
+    },
+
+    "duration": {
+        "last_7_days": "過去7日間",
+        "last_14_days": "過去14日間",
+        "last_30_days": "過去30日間",
+        "last_90_days": "過去90日間"
     },
 
     "header_bar": {
@@ -92,7 +103,12 @@
 
     "update_log_page": {
         "budget_update_log": "予算更新ログ",
-        "status_update": "ステータスアップデート"
+        "status_update": "ステータスアップデート",
+        "update_budget": "予算を更新する"
+    },
+
+    "campaign_performance_history_log_page": {
+        "title": "「スケジュールログ: {text} - パフォーマンス履歴」"
     },
 
     "target_bidding_page": {

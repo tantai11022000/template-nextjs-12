@@ -19,11 +19,10 @@ import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
 export const getStaticPaths = async () => {
-  const weightTemplateIds: any[] = [];
-  const paths = weightTemplateIds.map((id: any) => ({
-    params: { type: ['edit', id.toString()] },
-  }));
-  return { paths, fallback: true };
+  return {
+    paths: [],
+    fallback: 'blocking'
+  }
 };
 
 export async function getStaticProps(context: any) {

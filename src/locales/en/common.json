@@ -19,6 +19,7 @@
         "setting_type": "Setting Type",
         "updated_by": "Updated By",
         "log": "Log",
+        "time": "Time",
         
         "filter_label": {
             "status": "Status",
@@ -56,13 +57,23 @@
         "imp": "IMP",
         "click": "Click",
         "sale": "Sale",
-        "roas": "ROAS"
+        "roas": "ROAS",
+        "cpm": "CPM",
+        "cv": "CV",
+        "cost": "Cost"
     },
 
     "pagination": {
         "next": "Next",
         "back": "Back",
         "page": "Page"
+    },
+
+    "duration": {
+        "last_7_days": "Last 7 Days",
+        "last_14_days": "Last 14 Days",
+        "last_30_days": "Last 30 Days",
+        "last_90_days": "Last 90 Days"
     },
 
     "header_bar": {
@@ -92,7 +103,12 @@
 
     "update_log_page": {
         "budget_update_log": "Budget Update Log",
-        "status_update": "Status Update"
+        "status_update": "Status Update",
+        "update_budget": "Update Budget"
+    },
+
+    "campaign_performance_history_log_page": {
+        "title": "Schedule Log: {text} - Performance History"
     },
 
     "target_bidding_page": {

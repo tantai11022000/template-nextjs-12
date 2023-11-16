@@ -58,10 +58,10 @@ function App({ Component, pageProps }: any) {
   // }, []);
   const setDefaultLocale = () => {
     const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
-    const { pathname, query } = router;
+    const { pathname, query, asPath } = router;
     if (userLanguage && i18n.locales.includes(userLanguage)) {
       i18n.defaultLocale = userLanguage;
-    router.push({ pathname, query }, undefined, { locale: userLanguage });
+    router.push({ pathname, query }, asPath, { locale: userLanguage });
     }
   };
 

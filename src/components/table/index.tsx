@@ -57,12 +57,11 @@ const TableGeneral = (props: TableProps) => {
           pageSize: pagination.pageSize ? pagination.pageSize : "",
           itemRender: itemRender,
         }}
-        // pagination={pagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
         scroll={{x: true, y: scrollY ? 500 : undefined}}
         locale={{
-          emptyText: t('commons.no_data'), // Customize the "No data" message
+          emptyText: t('commons.no_data'),
         }}
       />
     </div>
