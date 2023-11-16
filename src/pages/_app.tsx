@@ -23,6 +23,7 @@ import { ConfigProvider } from 'antd';
 import { getItem, storeItem } from '@/utils/StorageUtils'
 import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
 import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
+import { useRouter } from 'next/router'
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -35,6 +36,7 @@ export async function getStaticProps(context: any) {
 }
 
 function App({ Component, pageProps }: any) {
+  const router = useRouter()
   const renderWithLayout =
     Component.getLayout ||
     function (page: any) {
@@ -56,11 +58,10 @@ function App({ Component, pageProps }: any) {
   // }, []);
   const setDefaultLocale = () => {
     const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
-    console.log(">>> userLanguage", userLanguage)
+    const { pathname, query } = router;
     if (userLanguage && i18n.locales.includes(userLanguage)) {
-      console.log(">>> i18n.locales.includes(userLanguage)", i18n.locales.includes(userLanguage))
       i18n.defaultLocale = userLanguage;
-      console.log(">>>> i18n.defaultLocale", i18n.defaultLocale)
+    router.push({ pathname, query }, undefined, { locale: userLanguage });
     }
   };
   
