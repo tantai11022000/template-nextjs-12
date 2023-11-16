@@ -55,7 +55,7 @@ function App({ Component, pageProps }: any) {
   //   }
   // }, []);
   const setDefaultLocale = () => {
-    const userLanguage = window.localStorage.getItem('language');
+    const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
     console.log(">>> userLanguage", userLanguage)
     if (userLanguage && i18n.locales.includes(userLanguage)) {
       console.log(">>> i18n.locales.includes(userLanguage)", i18n.locales.includes(userLanguage))
