@@ -22,6 +22,7 @@ import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import FSelect from '@/components/form/FSelect';
 import FRadio from '@/components/form/FRadio';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
+import type { Dayjs } from 'dayjs';
 
 export interface IScheduleBudgetProps {
 }
@@ -122,6 +123,12 @@ const normFile = (e: any) => {
     current: 1,
     total: 0,
   })
+
+  const date = new Date();
+  const [duration, setDuration] = useState<any>({
+    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 5),
+    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
+  });
 
   useEffect(() => {
     if (currentAccount) init();
@@ -296,6 +303,18 @@ const normFile = (e: any) => {
     ], [data]
   )
 
+  const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
+    if (dates) {
+      const duration = {
+        startDate: dateStrings[0],
+        endDate: dateStrings[1]
+      }
+      setDuration(duration)
+    } else {
+      console.log('Clear');
+    }
+  };
+
   return (
     <div>
       <div>
@@ -347,7 +366,7 @@ const normFile = (e: any) => {
             </>
           )}       
           <Form.Item name="time" label="Time">
-            <RangeDatePicker/>
+            <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
           </Form.Item>
           <Form.Item name="budget" label="Budget Change">
             <InputNumber

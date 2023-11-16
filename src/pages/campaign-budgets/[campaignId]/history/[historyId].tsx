@@ -11,72 +11,31 @@ import { useRouter } from 'next/router';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+import { getCampaignPerformanceHistoryLog } from '@/services/campaign-budgets-services';
+import type { Dayjs } from 'dayjs';
 
-export interface IBudgetHistoryProps {
+export const getStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking'
+  }
+};
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
 }
 
-const BUDGET_HISTORY = [
-  {
-    id: 1,
-    before: null,
-    after: 15000,
-    status: "active",
-    updateTime: "2023-08-28T09:27:24.000Z",
-    settingType: "One-time",
-    userUpdate: "Bao",
-    imp: 1000,
-    click: 100,
-    sale: 1000,
-    cpm: 1.1,
-    cv: 1,
-    cost: 10
-  },
-  {
-    id: 2,
-    before: null,
-    after: 10000,
-    status: "upcoming",
-    updateTime: "2023-08-28T02:30:42.000Z",
-    settingType: "One-time",
-    userUpdate: "Tai",
-    imp: 5000,
-    click: 500,
-    sale: 5000,
-    cpm: 5.5,
-    cv: 5,
-    cost: 50
-  },
-  {
-    id: 3,
-    before: 10000,
-    after: 15000,
-    status: "active",
-    updateTime: "2023-08-25T12:10:59.000Z",
-    settingType: "Daily with Weight",
-    userUpdate: "Bao",
-    imp: 3000,
-    click: 300,
-    sale: 3000,
-    cpm: 3.3,
-    cv: 3,
-    cost: 30
-  },
-  {
-    id: 4,
-    before: 10000,
-    after: 15000,
-    status: "inactive",
-    updateTime: "2023-08-25T11:04:54.000Z",
-    settingType: "One-time",
-    userUpdate: "Tai",
-    imp: 9000,
-    click: 900,
-    sale: 9000,
-    cpm: 9.9,
-    cv: 9,
-    cost: 90
-  },
-]
+export interface IBudgetHistoryProps {
+  
+}
 
 const EXPORT_TYPE = [
   {
@@ -90,9 +49,10 @@ const EXPORT_TYPE = [
 ]
 
 export default function BudgetHistory (props: IBudgetHistoryProps) {
-  const { Title } = Typography
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const campaignName = router && router.query && router.query.campaignName ? router.query.campaignName : ""
   const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
   const historyId = router && router.query && router.query.historyId ? router.query.historyId : ""
   const [loading, setLoading] = useState<boolean>(false)
@@ -104,26 +64,41 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
     total: 0,
   })
 
+  const date = new Date();
+  const [duration, setDuration] = useState<any>({
+    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 5),
+    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
+  });
+
   useEffect(() => {
     init()
   }, [])
 
   useEffect(() => {
     if (!historyId || !campaignId) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: campaignId, url: `${BREADCRUMB_CAMPAIGN_BUDGET}/${campaignId}`}, { label: 'History', url: ''}, { label: historyId, url: ``}]}))
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: campaignId, url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}, { label: historyId, url: ``}]}))
   }, [historyId, campaignId])
 
   const init = () => {
-    getBudgetHistory()
+    getBudgetHistory(duration)
   }
 
-  const getBudgetHistory = async () => {
+  const getBudgetHistory = async (duration: any) => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setBudgetHistory(BUDGET_HISTORY)
-        setLoading(false)
-      }, 1000);
+      const {pageSize, current, total} = pagination
+      var params = {
+        page: current,
+        pageSize,
+        total,
+        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD") : "",
+        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD") : "",
+      }
+      const result = await getCampaignPerformanceHistoryLog(campaignId, params)
+      if (result && result.data) {
+        setBudgetHistory(result.data)
+      }
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       console.log(">>> Get Budget History Error", error)
@@ -143,13 +118,13 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   const columnsBudgetLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Time</div>,
+        title: <div className='text-center'>{t('commons.time')}</div>,
         dataIndex: 'updateTime',
         key: 'updateTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("hh:mm:ss") : ""}</p>,
       },
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
@@ -177,7 +152,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: <div className='text-center'>IMP</div>,
+        title: <div className='text-center'>{t('metrics.imp')}</div>,
         dataIndex: 'imp',
         key: 'imp',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -185,7 +160,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
-        title: <div className='text-center'>Click</div>,
+        title: <div className='text-center'>{t('metrics.click')}</div>,
         dataIndex: 'click',
         key: 'click',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -193,7 +168,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.click - b.click
       },
       {
-        title: <div className='text-center'>CPM</div>,
+        title: <div className='text-center'>{t('metrics.cpm')}</div>,
         dataIndex: 'cpm',
         key: 'cpm',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -201,7 +176,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.cpm - b.cpm
       },
       {
-        title: <div className='text-center'>Sale</div>,
+        title: <div className='text-center'>{t('metrics.sale')}</div>,
         dataIndex: 'sale',
         key: 'sale',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -209,7 +184,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
-        title: <div className='text-center'>CV</div>,
+        title: <div className='text-center'>{t('metrics.cv')}</div>,
         dataIndex: 'cv',
         key: 'cv',
         render: (text: any) => <p className='text-end'>{text}</p>,
@@ -217,25 +192,46 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         sorter: (a: any, b: any) => a.cv - b.cv
       },
       {
-        title: <div className='text-center'>Cost</div>,
+        title: <div className='text-center'>{t('metrics.cost')}</div>,
         dataIndex: 'cost',
         key: 'cost',
         render: (text: any) => <p className='text-end'>{text}</p>,
 
         sorter: (a: any, b: any) => a.cost - b.cost
       },
-    ], [budgetHistory]
+    ], [budgetHistory, t]
   )
+
+  const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
+    if (dates) {
+      const duration = {
+        startDate: dateStrings[0],
+        endDate: dateStrings[1]
+      }
+      setDuration(duration)
+      getBudgetHistory(duration)
+    } else {
+      console.log('Clear');
+    }
+  };
+
+  const renderTranslateTitleText = (text: any) => {
+    let translate = t("campaign_performance_history_log_page.title");
+    return translate.replace("{text}", text);
+  }
 
   return (
     <div className='text-black'>
-      <div className='panel-heading flex items-center justify-between'>
-        <h2>Budget Update on 17 23rd-Aug-2023</h2>
+      <div className='panel-heading'>
+        <h2>{renderTranslateTitleText(campaignName ? campaignName : "")}</h2>
+      </div>
+        <div className='flex items-center justify-between mt-5'>
+        <h3>Budget Update on 17 23rd-Aug-2023</h3>
         <Space>
-          <RangeDatePicker/>
+          <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
           <SelectFilter placeholder={"Export"} onChange={handleChange} options={exportType}/>
         </Space>
-      </div>
+        </div>
         <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetHistory} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
     </div>
   );

@@ -19,13 +19,13 @@ import { changeNextPageUrl } from '@/utils/CommonUtils';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
+import type { Dayjs } from 'dayjs';
 
 export const getStaticPaths = async () => {
-  const campaignIds: any[] = [];
-  const paths = campaignIds.map((id: any) => ({
-    params: { type: [id.toString()] },
-  }));
-  return { paths, fallback: true };
+  return {
+    paths: [],
+    fallback: 'blocking'
+  }
 };
 
 export async function getStaticProps(context: any) {
@@ -94,10 +94,28 @@ const UPDATE_BUDGET = [
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { t } = useTranslation()
   const router = useRouter()
-  const id = router && router.query && router.query.campaignId ? router.query.campaignId : ""
+  const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
+  const campaignName = router && router.query && router.query.name ? router.query.name : ""
   const dispatch = useAppDispatch()
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [statusLog, setStatusLog] = useState<any[]>([])
+  const [filterOptions, setFilterOptions] = useState<any[]>([
+    {
+      value: 'one_time',
+      label: t('commons.weight_type.one_time')
+    },
+    {
+      value: 'daily_with_weight',
+      label: t('commons.weight_type.daily_with_weight')
+    },
+  ])
+
+  const date = new Date();
+  const [duration, setDuration] = useState<any>({
+    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 5),
+    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
+  });
+  
   const [loading, setLoading] = useState<boolean>(false)
   const [turnOn, setTurnOn] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
@@ -117,9 +135,9 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   }, [])
 
   useEffect(() => {
-    if (!id) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: id , url: ''}]}))
-  },[id])
+    if (!campaignId) return
+    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: campaignId , url: ''}]}))
+  },[campaignId])
 
   const init = () => {
     getBudgetLog()
@@ -262,14 +280,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                 <Space size="middle" className='flex justify-center'>
                   <EditOutlined className='text-lg cursor-pointer' />
                   <DeleteOutlined className='text-lg cursor-pointer'/>
-                  <FundOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${router.query.campaignId}/history/${id}`)}/>
+                  <FundOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
                   <GoldOutlined className='text-lg cursor-pointer' />
                 </Space>
               </div>
             )
         },
       },
-    ], [budgetLog]
+    ], [budgetLog, t]
   )
 
   const columnsStatusLog: any = useMemo(
@@ -364,10 +382,20 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           )
         },
       },
-    ], [statusLog]
+    ], [statusLog, t]
   )
 
-
+  const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
+    if (dates) {
+      const duration = {
+        startDate: dateStrings[0],
+        endDate: dateStrings[1]
+      }
+      setDuration(duration)
+    } else {
+      console.log('Clear');
+    }
+  };
 
   return (
     <div>
@@ -375,8 +403,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         <div className='panel-heading flex items-center justify-between'>
           <h2>{t('update_log_page.budget_update_log')}</h2>
           <Space>
-            <RangeDatePicker/>
-            <SelectFilter placeholder={"Update Budget"} onChange={handleChange} options={statusLog}/>
+            <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
+            <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChange} options={filterOptions}/>
           </Space>
         </div>
         <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog} pagination={pagination.budgetLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "BUDGET")} />
@@ -384,7 +412,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       <div className='mt-6'>
         <div className='panel-heading flex items-center justify-between'>
           <h2>{t('update_log_page.status_update')}</h2>
-          <RangeDatePicker/>
+          <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
         </div>
         <TableGeneral loading={loading} columns={columnsStatusLog} data={statusLog} pagination={pagination.statusLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "STATUS")} />
       </div>

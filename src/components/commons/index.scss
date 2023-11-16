@@ -211,3 +211,12 @@
     }
 }
 
+.range-date-picker-container {
+
+    .ant-picker {
+        border-radius: 2px;
+        color: $color-text-base;
+        background: $color-main-secondary;
+        box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.04);
+    }
+}
