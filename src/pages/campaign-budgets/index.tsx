@@ -348,7 +348,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('metrics.imp')}</div>,
         dataIndex: 'imp',
         key: 'imp',
-        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
+        render: (_: any, record: any) => {
+          const imp = record.metrics && record.metrics.impressions ? record.metrics.impressions : "-"
+          return <p className='text-end'>{imp}</p>
+        },
 
         sorter: (a: any, b: any) => a.imp - b.imp
       },
@@ -356,7 +359,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('metrics.click')}</div>,
         dataIndex: 'click',
         key: 'click',
-        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
+        render: (_: any, record: any) => {
+          const click = record.metrics && record.metrics.clicks ? record.metrics.clicks : "-"
+          return <p className='text-end'>{click}</p>
+        },
 
         sorter: (a: any, b: any) => a.click - b.click
       },
@@ -364,7 +370,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('metrics.sale')}</div>,
         dataIndex: 'sale',
         key: 'sale',
-        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
+        render: (_: any, record: any) => {
+          const sale = record.metrics && record.metrics.sales ? record.metrics.sales : "-"
+          return <p className='text-end'>{sale}</p>
+        },
 
         sorter: (a: any, b: any) => a.sale - b.sale
       },
@@ -372,7 +381,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('metrics.roas')}</div>,
         dataIndex: 'roas',
         key: 'roas',
-        render: (text: any) => <p className='text-end'>{text || '-'}</p>,
+        render: (_: any, record: any) => {
+          const sale = record.metrics && record.metrics.sales ? record.metrics.sales : 0
+          const cost = record.metrics && record.metrics.cost ? record.metrics.cost : 0
+          const roas = sale && cost ? (sale / cost).toFixed(2) : "-"
+          return <p className='text-end'>{roas}</p>
+        },
         
         sorter: (a: any, b: any) => a.roas - b.roas
       },
