@@ -17,6 +17,8 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
+import { storeItem } from '@/utils/StorageUtils';
+import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys';
 
 const ActiveMenuLink = ({ children, href }: any) => {
     return (
@@ -68,9 +70,15 @@ function HeaderApp() {
   );
 
   const changeLanguage = (newLanguage: any) => {
-    console.log('Changing language to:', newLanguage);
     const { pathname, query } = router;
     router.push({ pathname, query }, undefined, { locale: newLanguage });
+    if (newLanguage == 'jp') {
+      storeItem(LANGUAGE_CODE, 'ja_JP')
+      storeItem(LANGUAGE_KEY, 'ja-JP')
+    } else if (newLanguage == 'en') {
+      storeItem(LANGUAGE_CODE, 'en')
+      storeItem(LANGUAGE_KEY, 'en-US')
+    }
   };
 
   return (
