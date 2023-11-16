@@ -56,8 +56,11 @@ function App({ Component, pageProps }: any) {
   // }, []);
   const setDefaultLocale = () => {
     const userLanguage = window.localStorage.getItem('language');
+    console.log(">>> userLanguage", userLanguage)
     if (userLanguage && i18n.locales.includes(userLanguage)) {
+      console.log(">>> i18n.locales.includes(userLanguage)", i18n.locales.includes(userLanguage))
       i18n.defaultLocale = userLanguage;
+      console.log(">>>> i18n.defaultLocale", i18n.defaultLocale)
     }
   };
   
