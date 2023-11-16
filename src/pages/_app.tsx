@@ -22,7 +22,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { ConfigProvider } from 'antd';
 import { getItem, storeItem } from '@/utils/StorageUtils'
 import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
-
+import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -41,18 +41,29 @@ function App({ Component, pageProps }: any) {
       return <Layout>{page}</Layout>;
     };
 
-  useEffect(() => {
-    let storedLanguage = getItem(LANGUAGE_CODE);
-    if (!storedLanguage || storedLanguage.trim() === '') {
-      storedLanguage = 'en';
-      storeItem(LANGUAGE_CODE, storedLanguage);
-    }
+  // useEffect(() => {
+  //   let storedLanguage = getItem(LANGUAGE_CODE);
+  //   if (!storedLanguage || storedLanguage.trim() === '') {
+  //     storedLanguage = 'en';
+  //     storeItem(LANGUAGE_CODE, storedLanguage);
+  //   }
     
-    let storedAcceptLanguage = getItem(LANGUAGE_KEY);
-    if (!storedAcceptLanguage || storedAcceptLanguage.trim() === '') {
-      storedAcceptLanguage = 'en-US';
-      storeItem(LANGUAGE_KEY, storedAcceptLanguage);
+  //   let storedAcceptLanguage = getItem(LANGUAGE_KEY);
+  //   if (!storedAcceptLanguage || storedAcceptLanguage.trim() === '') {
+  //     storedAcceptLanguage = 'en-US';
+  //     storeItem(LANGUAGE_KEY, storedAcceptLanguage);
+  //   }
+  // }, []);
+  const setDefaultLocale = () => {
+    const userLanguage = window.localStorage.getItem('language');
+    if (userLanguage && i18n.locales.includes(userLanguage)) {
+      i18n.defaultLocale = userLanguage;
     }
+  };
+  
+  // Call setDefaultLocale when the component mounts
+  useEffect(() => {
+    setDefaultLocale();
   }, []);
 
   useEffect(() => {
