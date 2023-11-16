@@ -88,3 +88,38 @@ body {
  {
   border-color: #006400 !important
 }
+
+.index-container {
+  font-family: system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+  height: 100vh;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .main-content {
+   line-height: 48px; 
+
+   .status-code {
+    display: inline-block;
+    margin: 0 20px 0 0;
+    padding-right: 23px;
+    font-size: 24px;
+    font-weight: 500;
+    vertical-align: top;
+
+    border-right: 1px solid rgba(255,255,255,.3);
+
+    color: #FFFFFF;
+   }
+   .content {
+    display:inline-block
+    
+    h2 {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 28px;
+    }
+   }
+  }
+}

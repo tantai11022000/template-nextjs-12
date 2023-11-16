@@ -95,6 +95,17 @@
         "status_update": "Status Update"
     },
 
+    "target_bidding_page": {
+        "campaign": "Campaign",
+        "target_bidding_name": "Target Bidding Name",
+        "target": "Target",
+        "current_bidding": "Current Budget"
+    },
+
+    "account_page": {
+        "account": "Account"
+    },
+
     "weight_template_page": {
         "weight_template": "Weight Template",
         "id": "ID",

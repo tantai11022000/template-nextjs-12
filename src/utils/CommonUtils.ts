@@ -1,6 +1,15 @@
 import qs from 'query-string';
 import { toast } from 'react-toastify';
-import { useTranslation } from 'next-i18next';
+
+const getStoredLanguage = () => {
+  if (typeof window !== 'undefined') {
+    const storedLanguage = localStorage.getItem('language') || 'en';
+    return storedLanguage;
+  }
+  return 'en';
+};
+
+export default getStoredLanguage;
 
 import { NOTIFICATION_DARK, NOTIFICATION_ERROR, NOTIFICATION_INFO, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from './Constants';
 export function cleanObject(obj:any) {
