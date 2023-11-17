@@ -28,7 +28,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 export const getStaticPaths = async () => {
   return {
     paths: [],
-    fallback: true
+    fallback: 'blocking'
   }
 };
 
@@ -39,7 +39,7 @@ export async function getStaticProps(context: any) {
       ...(await serverSideTranslations(locale, ['common'])),
       locale: 'en'
     },
-    revalidate: 10
+    revalidate: 1
   }
 }
 export interface IAddAccountProps {
