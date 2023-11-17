@@ -20,7 +20,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 export const getStaticPaths = async () => {
   return {
     paths: [],
-    fallback: 'blocking'
+    fallback: false
   }
 };
 
@@ -40,6 +40,7 @@ export interface IAddAccountProps {
 export default function AddAccount (props: IAddAccountProps) {
   const [form]:any = Form.useForm();
   const router = useRouter()
+  console.log(">>> router", router)
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
   const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
   const dispatch = useAppDispatch()

@@ -94,7 +94,7 @@ function App({ Component, pageProps }: any) {
               fontFamily: '"M PLUS Rounded 1c", "Droid Sans", Tahoma, Arial, sans-serif',
             },
           }}>
-            {renderWithLayout(<Component {...pageProps}/>)}
+            {renderWithLayout(<Component {...pageProps} key={router.asPath}/>)}
         </ConfigProvider>
        </StyleProvider>
       <ToastContainer />

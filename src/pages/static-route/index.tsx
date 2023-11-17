@@ -18,6 +18,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { setAccountList } from '@/store/account/accountSlice';
+import Link from 'next/link'
+
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -33,6 +35,7 @@ export interface IAccountsProps {
 export default function Accounts (props: IAccountsProps) {
   const  { t } = useTranslation()
   const router = useRouter()
+  console.log(">>> Accounts router", router)
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
@@ -169,8 +172,9 @@ export default function Accounts (props: IAccountsProps) {
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
-                <DeleteOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/update/${record.id}`)}/>
+                {/* <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`/static-route/edit/${record.id}`)}/> */}
+                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.replace({pathname: '/static-route/[slug]/[id]', query: {...router.query, slug: 'edit', id: record.id}})}/>
+                <DeleteOutlined className='text-lg cursor-pointer'/>
               </Space>
             </div>
           )
@@ -199,7 +203,13 @@ export default function Accounts (props: IAccountsProps) {
     <div>
       <Space className='w-full flex flex-row justify-between'>
         <SearchInput keyword={keyword} name="keyword" placeholder={"Search by Static Name"} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={"Static"} onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/add`)}/>
+        {/* <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={"Static"} onClick={() => router.push({pathname: `/static-route/[slug]`, query: {slug: 'add'}})}/> */}
+        <Link href={{
+          pathname: '/static-route/[slug]',
+          query: { slug: 'add' },
+        }}>
+          <ActionButton className={'action-button'} iconOnLeft={<PlusOutlined />} label={"Static"}/>
+        </Link>
       </Space>
       <div>
         <TableGeneral loading={loading} columns={columns} data={accounts ? accounts : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
