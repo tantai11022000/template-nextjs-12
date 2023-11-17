@@ -202,17 +202,6 @@ function AddWeightTemplate() {
       console.log('>>> handle Finish Failed ', e);
     }
 
-    const itemRender = (_: any, type: any, originalElement: any) => {
-      if (type === "prev") {
-        return <a><LeftOutlined /> Back</a>;
-      }
-      if (type === "next") {
-        return <a>Next <RightOutlined/></a>;
-      }
-      
-      return originalElement;
-    };
-
     const handleChangeTimeSlot = (value: any) => {
       setTimeSlot(value)
     }
