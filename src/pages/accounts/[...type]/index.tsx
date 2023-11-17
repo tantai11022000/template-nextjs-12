@@ -17,13 +17,20 @@ import FTextArea from '@/components/form/FTextArea';
 import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
+// export const getStaticPaths = async () => {
+//   const accountIds: any[] = [];
+//   const paths = accountIds.map((id: any) => ({
+//     params: { type: ['edit', id.toString()] },
+//   }));
+//   console.log(">>> paths", paths)
+//   return { paths, fallback: true };
+// };
+
 export const getStaticPaths = async () => {
   return {
     paths: [
-      { params: { type: "edit" }, locale: "en" },
-      { params: { type: "add" }, locale: "en" },
-      { params: { type: "edit" }, locale: "jp" },
-      { params: { type: "add" }, locale: "jp" },
+      { params: { type: ["add"] }, locale: "en" },
+      { params: { type: ["edit"] }, locale: "jp" },
     ],
     fallback: true
   }
