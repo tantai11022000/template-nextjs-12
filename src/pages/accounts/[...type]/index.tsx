@@ -20,18 +20,14 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 // export const getStaticPaths = async () => {
 //   const accountIds: any[] = [];
 //   const paths = accountIds.map((id: any) => ({
-//     params: { type: ['edit', id.toString()] },
+//     params: { type: ['edit', 'add', id.toString()] },
 //   }));
-//   console.log(">>> paths", paths)
 //   return { paths, fallback: true };
 // };
 
 export const getStaticPaths = async () => {
   return {
-    paths: [
-      { params: { type: ["add"] }, locale: "en" },
-      { params: { type: ["edit"] }, locale: "jp" },
-    ],
+    paths: [],
     fallback: true
   }
 };
@@ -43,6 +39,7 @@ export async function getStaticProps(context: any) {
       ...(await serverSideTranslations(locale, ['common'])),
       locale: 'en'
     },
+    revalidate: 10
   }
 }
 export interface IAddAccountProps {
