@@ -38,8 +38,7 @@ export async function getStaticProps(context: any) {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
       locale: 'en'
-    },
-    revalidate: 1
+    }
   }
 }
 export interface IAddAccountProps {
