@@ -56,18 +56,18 @@ function App({ Component, pageProps }: any) {
   //     storeItem(LANGUAGE_KEY, storedAcceptLanguage);
   //   }
   // }, []);
-  // const setDefaultLocale = () => {
-  //   const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
-  //   const { pathname, query, asPath } = router;
-  //   if (userLanguage && i18n.locales.includes(userLanguage)) {
-  //     i18n.defaultLocale = userLanguage;
-  //   router.push({ pathname, query }, asPath, { locale: userLanguage });
-  //   }
-  // };
+  const setDefaultLocale = () => {
+    const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
+    const { pathname, query, asPath } = router;
+    if (userLanguage && i18n.locales.includes(userLanguage)) {
+      i18n.defaultLocale = userLanguage;
+    router.push({ pathname, query }, asPath, { locale: userLanguage });
+    }
+  };
 
   useEffect(() => {
     getAllAccountList()
-    // setDefaultLocale();
+    setDefaultLocale();
   }, [])
   
   const getAllAccountList = async () => {
