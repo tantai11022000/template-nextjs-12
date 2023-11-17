@@ -19,7 +19,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export const getStaticPaths = async () => {
   return {
-    paths: [],
+    paths: [
+      { params: { type: "edit" }, locale: "en" },
+      { params: { type: "add" }, locale: "en" },
+      { params: { type: "edit" }, locale: "jp" },
+      { params: { type: "add" }, locale: "jp" },
+    ],
     fallback: true
   }
 };
