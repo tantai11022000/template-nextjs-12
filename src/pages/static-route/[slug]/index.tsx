@@ -24,11 +24,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 //   }));
 //   return { paths, fallback: true };
 // };
-export async function getServerSideProps(context: any) {
-  return {
-      props: {},
-  };
-}
 
 export const getStaticPaths = async () => {
   return {
