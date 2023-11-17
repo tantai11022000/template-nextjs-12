@@ -17,12 +17,6 @@ import FTextArea from '@/components/form/FTextArea';
 import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
-export async function getServerSideProps(context: any) {
-  return {
-      props: {},
-  };
-}
-
 export const getStaticPaths = async () => {
   const accountIds: any[] = [];
   const paths = accountIds.map((id: any) => ({
