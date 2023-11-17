@@ -18,11 +18,19 @@ import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 
 export const getStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: false
-  }
+  const accountIds: any[] = [];
+  const paths = accountIds.map((id: any) => ({
+    params: { type: ['add'] },
+  }));
+  return { paths, fallback: true };
 };
+
+// export const getStaticPaths = async () => {
+//   return {
+//     paths: [],
+//     fallback: 'blocking'
+//   }
+// };
 
 export async function getStaticProps(context: any) {
   const { locale } = context
