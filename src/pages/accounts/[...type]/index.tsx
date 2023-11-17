@@ -15,24 +15,6 @@ import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 import FTextArea from '@/components/form/FTextArea';
 import { getUsersSystem } from '@/services/users-service';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-
-export const getStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking'
-  }
-};
-
-export async function getStaticProps(context: any) {
-  const { locale } = context
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-      locale: 'en'
-    },
-  }
-}
 export interface IAddAccountProps {
   
 }
