@@ -119,7 +119,12 @@
     },
 
     "account_page": {
-        "account": "アカウント"
+        "account": "アカウント",
+        "client_id": "クライアントID",
+        "secret_id": "シークレットID",
+        "refresh_token": "リフレッシュトークン",
+        "who_can_see": "誰が見ることができますか",
+        "test": "テスト"
     },
 
 

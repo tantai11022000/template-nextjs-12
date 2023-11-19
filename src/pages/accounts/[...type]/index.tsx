@@ -16,18 +16,19 @@ import ActionButton from '@/components/commons/buttons/ActionButton';
 import FTextArea from '@/components/form/FTextArea';
 import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
 
 // export const getStaticPaths = async () => {
 //   const accountIds: any[] = [];
 //   const paths = accountIds.map((id: any) => ({
-//     params: { type: ['edit', 'add', id.toString()] },
+//     params: { type: ['edit', id.toString()] },
 //   }));
 //   return { paths, fallback: true };
 // };
 
 export const getStaticPaths = async () => {
   return {
-    paths: ['accounts/edit/[id]'],
+    paths: [],
     fallback: 'blocking'
   }
 };
@@ -47,6 +48,7 @@ export interface IAddAccountProps {
 
 export default function AddAccount (props: IAddAccountProps) {
   const [form]:any = Form.useForm();
+  const { t } = useTranslation()
   const router = useRouter()
   const id = router && router.query && router.query.type && router.query.type.length ? router.query.type[1] : ""
   const valueEdit = router.query && router.query.type && router.query.type[0] === 'edit' ? true : false
@@ -197,19 +199,19 @@ export default function AddAccount (props: IAddAccountProps) {
       wrapperCol={{ span: 12 }}
       layout="horizontal"
     >
-      <FText name={'name'} label={'Name'}/>
-      <FTextArea name={'description'} label={'Description'}/>
-      <FText name={['setting', 'client_id']} label='Client ID' onChange={handleChangeField}/>
-      <FText name={['setting', 'client_secret']} label='Secret ID' onChange={handleChangeField}/>
-      <FText name={['setting', 'refresh_token']} label='Refresh Token' onChange={handleChangeField}/>
-      <FMultipleCheckbox name={'supervisors'} label='Who can see' data={mappingAccounts} onChange={onChangeCheck} loading={loading.isAccounts}/>
+      <FText name={'name'} label={t('commons.name')}/>
+      <FTextArea name={'description'} label={t('commons.description')}/>
+      <FText name={['setting', 'client_id']} label={t('account_page.client_id')} onChange={handleChangeField}/>
+      <FText name={['setting', 'client_secret']} label={t('account_page.secret_id')} onChange={handleChangeField}/>
+      <FText name={['setting', 'refresh_token']} label={t('account_page.refresh_token')} onChange={handleChangeField}/>
+      <FMultipleCheckbox name={'supervisors'} label={t('account_page.who_can_see')} data={mappingAccounts} onChange={onChangeCheck} loading={loading.isAccounts}/>
 
       <div className='flex justify-center'>
         <Space size="middle" className='w-full flex items-center justify-between'>
-            {loading.isValid ? <Spin/> : <ActionButton disabled={loading.isValid} className={'finish-button'} label={"Test"} onClick={handleCheckValidAccount}/>}
+            {loading.isValid ? <Spin/> : <ActionButton disabled={loading.isValid} className={'finish-button'} label={t('account_page.test')} onClick={handleCheckValidAccount}/>}
           <Space className='flex justify-center'>
-            <ActionButton className={'cancel-button'} label={'Cancel'} onClick={() => router.push(`/accounts`)}/>
-            {loading.isCreate ? <Spin/> : <ActionButton htmlType="submit" disabled={!canCreateAccount} className={'finish-button'} label={loading.isCreate ? <Spin /> : valueEdit ? "Save" : "Create"}/>}
+            <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={() => router.push(`/accounts`)}/>
+            {loading.isCreate ? <Spin/> : <ActionButton htmlType="submit" disabled={!canCreateAccount} className={'finish-button'} label={loading.isCreate ? <Spin /> : valueEdit ? t('commons.action_type.save') : t('commons.action_type.create')}/>}
           </Space>
         </Space>
       </div>

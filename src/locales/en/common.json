@@ -119,7 +119,12 @@
     },
 
     "account_page": {
-        "account": "Account"
+        "account": "Account",
+        "client_id": "Client ID",
+        "secret_id": "Secret ID",
+        "refresh_token": "Refresh Token",
+        "who_can_see": "Who can see",
+        "test": "Test"
     },
 
     "weight_template_page": {
