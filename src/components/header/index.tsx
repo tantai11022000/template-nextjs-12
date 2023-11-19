@@ -79,6 +79,9 @@ function HeaderApp() {
       storeItem(LANGUAGE_CODE, 'en')
       storeItem(LANGUAGE_KEY, 'en-US')
     }
+    router.events.on('routeChangeComplete', () => {
+        router.reload()
+    });
   };
 
   return (
