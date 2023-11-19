@@ -70,8 +70,8 @@ function HeaderApp() {
   );
 
   const changeLanguage = (newLanguage: any) => {
-    const { pathname, query } = router;
-    router.push({ pathname, query }, undefined, { locale: newLanguage });
+    const { pathname, query, asPath } = router;
+    router.push({ pathname, query }, asPath, { locale: newLanguage });
     if (newLanguage == 'jp') {
       storeItem(LANGUAGE_CODE, 'ja_JP')
       storeItem(LANGUAGE_KEY, 'ja-JP')
