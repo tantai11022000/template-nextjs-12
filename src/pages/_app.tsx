@@ -43,19 +43,6 @@ function App({ Component, pageProps }: any) {
       return <Layout>{page}</Layout>;
     };
 
-  // useEffect(() => {
-  //   let storedLanguage = getItem(LANGUAGE_CODE);
-  //   if (!storedLanguage || storedLanguage.trim() === '') {
-  //     storedLanguage = 'en';
-  //     storeItem(LANGUAGE_CODE, storedLanguage);
-  //   }
-    
-  //   let storedAcceptLanguage = getItem(LANGUAGE_KEY);
-  //   if (!storedAcceptLanguage || storedAcceptLanguage.trim() === '') {
-  //     storedAcceptLanguage = 'en-US';
-  //     storeItem(LANGUAGE_KEY, storedAcceptLanguage);
-  //   }
-  // }, []);
   const setDefaultLocale = () => {
     const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
     const { pathname, query, asPath } = router;
