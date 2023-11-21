@@ -28,7 +28,7 @@
     "eslint-config-next": "13.4.19",
     "i18next": "^23.7.3",
     "moment": "^2.29.4",
-    "next": "13.5.5",
+    "next": "12.3",
     "next-i18next": "^15.0.0",
     "postcss": "8.4.29",
     "query-string": "^8.1.0",

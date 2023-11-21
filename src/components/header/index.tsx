@@ -1,8 +1,7 @@
 'use client'
 import { Breadcrumb, Dropdown, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
+
 // import styles from './index.module.scss'
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '../../Constant/index';
 import { MenuOutlined } from '@ant-design/icons';
