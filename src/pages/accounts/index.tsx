@@ -18,7 +18,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { setAccountList } from '@/store/account/accountSlice';
-export async function getServerSideProps(context: any) {
+export async function getStaticProps(context: any) {
   const { locale } = context
   return {
     props: {
