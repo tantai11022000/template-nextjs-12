@@ -26,14 +26,14 @@ import { useTranslation } from 'next-i18next';
 //   return { paths, fallback: true };
 // };
 
-export const getStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking'
-  }
-};
+// export const getStaticPaths = async () => {
+//   return {
+//     paths: [],
+//     fallback: 'blocking'
+//   }
+// };
 
-export async function getStaticProps(context: any) {
+export async function getServerSideProps(context: any) {
   const { locale } = context
   return {
     props: {
