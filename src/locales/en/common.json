@@ -20,6 +20,7 @@
         "updated_by": "Updated By",
         "log": "Log",
         "time": "Time",
+        "activated": "Activated",
         
         "filter_label": {
             "status": "Status",
@@ -44,7 +45,8 @@
             "cancel": "Cancel",
             "submit": "Submit",
             "edit": "Edit",
-            "save": "Save"
+            "save": "Save",
+            "create": "Create"
         },
 
         "weight_type": {
