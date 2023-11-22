@@ -17,6 +17,7 @@ import FTextArea from '@/components/form/FTextArea';
 import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
+import FSwitch from '@/components/form/FSwitch';
 
 // export const getStaticPaths = async () => {
 //   const accountIds: any[] = [];
@@ -64,6 +65,7 @@ export default function AddAccount (props: IAddAccountProps) {
   const [canCreateAccount, setCanCreateAccount] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<any>("")
   const [isFormChanged, setIsFormChanged] = useState(false);
+  const [status, setStatus] = useState<boolean>(false)
 
   useEffect(() => {
     setIsEdit(valueEdit)
@@ -123,11 +125,13 @@ export default function AddAccount (props: IAddAccountProps) {
     try {
       const result = await getAccountInfo(id)
       if (result && result.data) {
-        const { name, setting, description, supervisors } = result.data
+        const { name, setting, description, supervisors, status } = result.data
+        setStatus(status == 1)
         form.setFieldsValue({
           name: name,
           description: description,
           supervisors: supervisors,
+          status: status,
           setting: {
             client_id: setting.client_id,
             client_secret: setting.client_secret,
@@ -205,7 +209,7 @@ export default function AddAccount (props: IAddAccountProps) {
       <FText name={['setting', 'client_secret']} label={t('account_page.secret_id')} onChange={handleChangeField}/>
       <FText name={['setting', 'refresh_token']} label={t('account_page.refresh_token')} onChange={handleChangeField}/>
       <FMultipleCheckbox name={'supervisors'} label={t('account_page.who_can_see')} data={mappingAccounts} onChange={onChangeCheck} loading={loading.isAccounts}/>
-
+      <FSwitch name={'status'} label={t('commons.activated')} status={status} disable={true}/>
       <div className='flex justify-center'>
         <Space size="middle" className='w-full flex items-center justify-between'>
             {loading.isValid ? <Spin/> : <ActionButton disabled={loading.isValid} className={'finish-button'} label={t('account_page.test')} onClick={handleCheckValidAccount}/>}
