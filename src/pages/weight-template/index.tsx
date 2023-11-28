@@ -36,16 +36,20 @@ function WeightTemplate() {
   const [pagination, setPagination] = useState<any>({
     pageSize: 10,
     current: 1,
+    total: 0,
   })
   const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [keyword, setKeyword] = useState<string>("");
 
   useEffect(() => {
-    mapFirstQuery()
-    fetchAllWeightTemplates();
+    // mapFirstQuery()
     dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
   },[])
 
+  useEffect(() => {
+    fetchAllWeightTemplates();
+  }, [pagination.pageSize, pagination.current])
+  
   const handleOnSearch = async(value:string) => {
     setKeyword(value)
     const params = {
@@ -66,11 +70,11 @@ function WeightTemplate() {
       var params = {
         page: current,
         pageSize,
-        total
       }
       const result = await getAllWeightTemplates(params)
       if (result && result.data) {
         setWeightTemplates(result.data)
+        setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)
     } catch (error) {
@@ -81,7 +85,7 @@ function WeightTemplate() {
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
     const {current} = pagination
-    changeNextPageUrl(router,current)
+    // changeNextPageUrl(router,current)
     setPagination(pagination)
   }
 

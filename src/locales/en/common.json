@@ -21,6 +21,11 @@
         "log": "Log",
         "time": "Time",
         "activated": "Activated",
+        "user": "User",
+        "campaign_name": "Campaign Name",
+        "campaign_id": "Campaign ID",
+        "from_time": "From Time",
+        "to_time": "To Time",
         
         "filter_label": {
             "status": "Status",
@@ -46,13 +51,43 @@
             "submit": "Submit",
             "edit": "Edit",
             "save": "Save",
-            "create": "Create"
+            "create": "Create",
+            "finish": "Finish"
         },
 
         "weight_type": {
             "one_time": "One-time",
             "daily_with_weight": "Daily with Weight"
         }
+    },
+
+    "toastify": {
+        "success": {
+            "created_text": "{text} has been created successfully.",
+            "updated_text": "{text} has been updated successfully.",
+            "edited_text": "{text} has been edited successfully.",
+            "deleted_text": "{text} has been deleted successfully.",
+            "added_text": "{text} has been added successfully.",
+            "removed_text": "{text} has been removed successfully.",
+            "generated_text": "{text} has been generated successfully.",
+
+            "created": "Created successfully.",
+            "updated": "Updated successfully.",
+            "edited": "Edited successfully.",
+            "deleted": "Deleted successfully.",
+            "added": "Added successfully.",
+            "removed": "Removed successfully.",
+            "generated": "Generated successfully."
+
+        },
+        "error": {
+
+        }
+    },
+
+    "error_messages": {
+        "no_selected": "No {text} is selected.",
+        "file_empty_or_unreadable": "File is empty or unreadable."
     },
 
     "metrics": {
@@ -72,6 +107,14 @@
     },
 
     "duration": {
+        "today": "Today",
+        "this_week": "This week",
+        "yesterday": "Yesterday",
+        "last_week": "Last week",
+        "last_month": "Last month",
+        "this_month": "This month",
+        "last_year": "Last year",
+        
         "last_7_days": "Last 7 Days",
         "last_14_days": "Last 14 Days",
         "last_30_days": "Last 30 Days",
@@ -106,7 +149,20 @@
     "update_log_page": {
         "budget_update_log": "Budget Update Log",
         "status_update": "Status Update",
-        "update_budget": "Update Budget"
+        "update_budget": "Update Budget",
+        "update_status_schedule": "Update Status Schedule",
+        "update_budget_schedule": "Update Budget Schedule",
+        "export": "Export"
+    },
+
+    "update_campaign_schedule_page": {
+        "update_campaign_budget_schedule": "Update Campaign Budgets Schedule",
+        "update_campaign_status_schedule": "Update Campaign Status Schedule",
+        "partner_account": "Partner Account",
+        "schedule_file": "Schedule File",
+        "main_upload_content": "Drop file here or click to browse",
+        "sub_upload_content": "Allowed file types:",
+        "validate_and_live_edit": "Validate and Live Edit"
     },
 
     "campaign_performance_history_log_page": {

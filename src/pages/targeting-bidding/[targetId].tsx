@@ -122,13 +122,13 @@ export default function TargetDetail (props: ITargetDetailProps) {
 
   const handleOnChangeBudgetTable = (pagination: any, filters: any, sorter: any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setBudgetPagination(pagination)
   }
 
   const handleOnChangeStatusTable = (pagination: any, filters: any, sorter: any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setStatusPagination(pagination)
   }
 

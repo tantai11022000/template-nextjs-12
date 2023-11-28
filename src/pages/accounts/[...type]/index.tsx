@@ -18,6 +18,8 @@ import { getUsersSystem } from '@/services/users-service';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import FSwitch from '@/components/form/FSwitch';
+import { notificationSimple } from '@/utils/CommonUtils';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
 // export const getStaticPaths = async () => {
 //   const accountIds: any[] = [];
@@ -150,18 +152,18 @@ export default function AddAccount (props: IAddAccountProps) {
       if (valueEdit) {
         await editPartnerAccount(id, value)
         dispatch(editAccount({id, value}))
-        toast.success("UPDATE ACCOUNT SUCCESS")
+        notificationSimple(renderTranslateToastifyText(t('commons.user')), NOTIFICATION_SUCCESS)
       } else {
         const result = await createPartnerAccount(value)
         dispatch(addAccount({data: result && result.data ? result.data : ""}))
-        toast.success("CREATED ACCOUNT SUCCESS")
+        notificationSimple(renderTranslateToastifyText(t('commons.user')), NOTIFICATION_SUCCESS)
       }
       setLoading({...loading, isCreate: false})
       router.push(BREADCRUMB_ACCOUNT.url)
     } catch (error: any) {
       console.log(">>>> Create Account Error", error)
       setLoading({...loading, isCreate: false})
-      toast.error(error && error.message ? error.message : "")
+      notificationSimple(error.message, NOTIFICATION_ERROR)
     }
   }
 
@@ -192,6 +194,11 @@ export default function AddAccount (props: IAddAccountProps) {
 
   const handleChangeField = () => {
     setIsFormChanged(true);
+  }
+
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = valueEdit ? t("toastify.success.updated_text") : t("toastify.success.created_text");
+    return translate.replace("{text}", text);
   }
 
   return (

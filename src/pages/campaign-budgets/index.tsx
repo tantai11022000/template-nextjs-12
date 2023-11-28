@@ -67,31 +67,31 @@ const STATUSES = [
 const BULK_ACTION = [
   {
     id: 1,
-    value: "update_status",
+    value: 1,
     label: "Update Status",
     url: ''
   },
   {
     id: 2,
-    value: "schedule_status",
+    value: 2,
     label: "Schedule Status",
     url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`
   },
   {
     id: 3,
-    value: "schedule_budget_once",
+    value: 3,
     label: "Schedule Budget Once",
     url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`
   }, 
   {
     id: 4,
-    value: "schedule_budget_with_weight",
+    value: 4,
     label: "Schedule Budget With Weight",
     url: ''
   }, 
   {
     id: 5,
-    value: "export_schedule",
+    value: 5,
     label: "Export Schedule",
     url: ''
   }, 
@@ -110,11 +110,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
+  const [mappingCampaignBudgets, setMappingCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const [isEditingList, setIsEditingList] = useState(
-    campaignBudgets.map(() => false)
+    mappingCampaignBudgets.map(() => false)
   );
 
   const [pagination, setPagination] = useState<any>({
@@ -124,7 +125,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   })
 
   useEffect(() => {
-    mapFirstQuery()
+    // mapFirstQuery()
     dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET]}))
   }, [])
 
@@ -142,6 +143,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   useEffect(() => {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
+
+  useEffect(() => {
+    const newData = campaignBudgets.map((campaign:any) => {
+      campaign.id = campaign.campaignId
+      return campaign
+    })
+    setMappingCampaignBudgets(newData)
+  }, [campaignBudgets])
   
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
@@ -178,22 +187,29 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     updateUrlQuery(router, params)
   }
 
-  const onChange = (value: string) => {
-    
-    console.log(`selected ${value}`);
-    if (value == "update_status") {
+  const handleSelectedBulkAction = (values: any) => {
+    console.log(">>>> handleSelectedBulkAction value", values);
+    const { value } = values
+    if (value == 1) {
       setOpenModalUpdateStatus(true)
-    } else if (value == "schedule_status") {
+    } else if (value == 2) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
-    } else if (value == "schedule_budget_once") {
+    } else if (value == 3) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`)
-    } else if (value == "schedule_budget_with_weight") {
+    } else if (value == 4) {
       router.push({
         pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-        query: {isWeight: true}
+        query: {
+          isWeight: true,
+          campaignIds: selectedRowKeys
+        }
       })
     }
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
+  };
+
+  const handleSelectedStatus = (value: string) => {
+    console.log(`selected ${value}`);
   };
   
   const onSearchInFilter = (value: string) => {
@@ -205,7 +221,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 
@@ -229,21 +245,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setIsEditingList(updatedIsEditingList);
   };
 
-  const changeLanguage = (newLanguage: any) => {
-    console.log('Changing language to:', newLanguage);
-    const { pathname, query } = router;
-    router.push({ pathname, query }, undefined, { locale: newLanguage });
-  };
-
-  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-    console.log(">>> newSelectedRowKeys", newSelectedRowKeys)
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
+  
   const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[]) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
     getCheckboxProps: (record: any) => ({
       id: record.campaignId,
     }),
-    onChange: onSelectChange,
   };
 
   const handleOk = () => {
@@ -323,7 +332,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const isEditing = isEditingList[index];
 
           const handleBudgetChange = (event: any, index: any) => {
-            const updatedBudgets = [...campaignBudgets];
+            const updatedBudgets = [...mappingCampaignBudgets];
             updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = event.target.value;
             setCampaignBudgets(updatedBudgets);
           };
@@ -402,7 +411,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           )
         },
       },
-    ], [campaignBudgets, handleToggleEdit, isEditingList, t]
+    ], [mappingCampaignBudgets, handleToggleEdit, isEditingList, t]
   )
   
   const renderTranslateSearchText = (text: any) => {
@@ -420,12 +429,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       <div className='flex items-center justify-between max-lg:flex-col max-lg:items-stretch'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6 max-lg:mt-3'>
-          <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={onChange} options={statuses} />
-          <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={onChange} options={bulkAction} value={selectedAction}/>
+          <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
+          <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={handleSelectedBulkAction} options={bulkAction} value={selectedAction}/>
         </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={campaignBudgets ? campaignBudgets : []} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={mappingCampaignBudgets ? mappingCampaignBudgets : []} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal

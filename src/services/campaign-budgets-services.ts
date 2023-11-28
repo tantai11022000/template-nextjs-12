@@ -20,3 +20,13 @@ export const getCampaignPerformanceHistoryLog = async (id: any, params: any) => 
         return Promise.reject(error);
     }
 }
+
+export const uploadBudgetScheduleCSVFile = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadBudgetScheduleCSVFile(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}

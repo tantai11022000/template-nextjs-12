@@ -101,11 +101,11 @@ export default function Accounts (props: IAccountsProps) {
       const result = await updateAccountStatus(id, body)
       if (result && result.message == "OK") {
         await getAllAccounts();
-        notificationSimple("Update Status Success", NOTIFICATION_SUCCESS)
+        notificationSimple(renderTranslateToastifyText(t('commons.status')), NOTIFICATION_SUCCESS)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(">>> Update Account Status Error", error)
-      notificationSimple("Update Status Fail", NOTIFICATION_ERROR)
+      notificationSimple(error.message, NOTIFICATION_ERROR)
     }
   };
 
@@ -181,7 +181,7 @@ export default function Accounts (props: IAccountsProps) {
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 
@@ -192,6 +192,11 @@ export default function Accounts (props: IAccountsProps) {
 
   const renderTranslateActionButton = (text: any) => {
     let translate = t("commons.action_type.add_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.updated_text")
     return translate.replace("{text}", text);
   }
 

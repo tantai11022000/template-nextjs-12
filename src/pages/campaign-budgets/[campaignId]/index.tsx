@@ -20,6 +20,7 @@ import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import type { Dayjs } from 'dayjs';
+import DateTimePicker from '@/components/dateTime/DateTimePicker';
 
 export const getStaticPaths = async () => {
   return {
@@ -82,11 +83,11 @@ const BUDGET_UPDATE_LOG = [
 
 const UPDATE_BUDGET = [
   {
-    value: 'one_time',
+    value: 1,
     label: 'One Time'
   },
   {
-    value: 'daily_with_weight',
+    value: 2,
     label: 'Daily With Weight'
   },
 ]
@@ -101,12 +102,24 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const [statusLog, setStatusLog] = useState<any[]>([])
   const [filterOptions, setFilterOptions] = useState<any[]>([
     {
-      value: 'one_time',
+      value: 1,
       label: t('commons.weight_type.one_time')
     },
     {
-      value: 'daily_with_weight',
+      value: 2,
       label: t('commons.weight_type.daily_with_weight')
+    },
+    {
+      value: 3,
+      label: t('update_log_page.update_status_schedule')
+    },
+    {
+      value: 4,
+      label: t('update_log_page.update_budget_schedule')
+    },
+    {
+      value: 5,
+      label: t('update_log_page.export')
     },
   ])
 
@@ -195,8 +208,18 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     }
   };
 
-  const handleChange = (value: string) => {
+  const handleChange = (value: number) => {
     console.log(`selected ${value}`);
+    switch (value) {
+      case 3:
+        router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
+        break;
+      case 4:
+        router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
+        break;
+      default:
+        break;
+    }
   };
 
   const columnsBudgetLog: any = useMemo(
@@ -387,6 +410,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
 
   const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
     if (dates) {
+      console.log('From: ', dates[0], ', to: ', dates[1]);
+    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
       const duration = {
         startDate: dateStrings[0],
         endDate: dateStrings[1]

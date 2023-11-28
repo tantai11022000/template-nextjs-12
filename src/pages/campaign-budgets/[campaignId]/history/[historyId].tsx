@@ -111,7 +111,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
 
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
   
@@ -219,6 +219,8 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
 
   const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
     if (dates) {
+      console.log('From: ', dates[0], ', to: ', dates[1]);
+      console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
       const duration = {
         startDate: dateStrings[0],
         endDate: dateStrings[1]

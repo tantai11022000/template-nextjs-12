@@ -51,7 +51,7 @@ export const updateUrlQuery = async(router:any, params: any) => {
     await router.push(newURL, undefined, { shallow: true });
 }
 
-export const notificationSimple = (message: string, level: string, position?: string) => {
+export const notificationSimple = (messages: any, level: string, position?: string) => {
   const positionNotification = position ? position : "top-right";
   const configDefault: any = {
     position: positionNotification,
@@ -63,18 +63,74 @@ export const notificationSimple = (message: string, level: string, position?: st
     progress: undefined,
   }
 
-  switch (level) {
-    case NOTIFICATION_SUCCESS:
-      return toast.success(message, configDefault);
-    case NOTIFICATION_WARN:
-      return toast.warn(message, configDefault);
-    case NOTIFICATION_INFO:
-      return toast.info(message, configDefault);
-    case NOTIFICATION_ERROR:
-      return toast.error(message, configDefault);
-    case NOTIFICATION_DARK:
-      return toast.dark(message, configDefault);
-    default:
-      return toast(message, configDefault);
+  if (typeof messages == 'string') {
+    switch (level) {
+      case NOTIFICATION_SUCCESS:
+        return toast.success(messages, configDefault);
+      case NOTIFICATION_WARN:
+        return toast.warn(messages, configDefault);
+      case NOTIFICATION_INFO:
+        return toast.info(messages, configDefault);
+      case NOTIFICATION_ERROR:
+        return toast.error(messages, configDefault);
+      case NOTIFICATION_DARK:
+        return toast.dark(messages, configDefault);
+      default:
+        return toast(messages, configDefault);
+    }
   }
+
+  if (Array.isArray(messages)) {
+    messages.forEach((error: string) => {
+      switch (level) {
+        case NOTIFICATION_SUCCESS:
+          return toast.success(error, configDefault);
+        case NOTIFICATION_WARN:
+          return toast.warn(error, configDefault);
+        case NOTIFICATION_INFO:
+          return toast.info(error, configDefault);
+        case NOTIFICATION_ERROR:
+          return toast.error(error, configDefault);
+        case NOTIFICATION_DARK:
+          return toast.dark(error, configDefault);
+        default:
+          return toast(error, configDefault);
+      }
+    });
+  }
+
+  // switch (level) {
+  //   case NOTIFICATION_SUCCESS:
+  //     return toast.success(message, configDefault);
+  //   case NOTIFICATION_WARN:
+  //     return toast.warn(message, configDefault);
+  //   case NOTIFICATION_INFO:
+  //     return toast.info(message, configDefault);
+  //   case NOTIFICATION_ERROR:
+  //     return toast.error(message, configDefault);
+  //   case NOTIFICATION_DARK:
+  //     return toast.dark(message, configDefault);
+  //   default:
+  //     return toast(message, configDefault);
+  // }
 }
+
+export const readAsBinaryString = (file: any) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      if (event.target) {
+        resolve((event.target as FileReader).result);
+      } else {
+        reject(new Error('Event target is null or undefined.'));
+      }
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsBinaryString(file);
+  });
+};
