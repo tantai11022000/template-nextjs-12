@@ -259,7 +259,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
       },
       {
-        title: <div className='text-center'>{t('commons.from_time')}</div>,
+        title: <div className='text-center'>{t('commons.to_time')}</div>,
         dataIndex: 'toTime',
         key: 'toTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,

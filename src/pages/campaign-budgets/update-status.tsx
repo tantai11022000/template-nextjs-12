@@ -19,6 +19,7 @@ import { changeNextPageUrl } from '@/utils/CommonUtils';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -81,6 +82,7 @@ const FILES = [
 ]
 
 export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps) {
+  const { t } = useTranslation()
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [form]:any = Form.useForm();
@@ -159,16 +161,34 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
     setOpenModalConfirmSetupBudgetSchedule(false);
   };
 
+  const normFile = (e: any) => {
+    console.log('Upload event:', e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
     // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 
+  const renderTranslateFilterText = (text: any) => {
+    let translate = t("commons.filter_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateErrorMessageText = (text: any) => {
+    let translate = t("error_messages.no_selected");
+    return translate.replace("{text}", text);
+  }
+
   const columnsBudgetLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>Status</div>,
+        title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
@@ -193,7 +213,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         sorter: (a: any, b: any) => a.status - b.status,
       },
       {
-        title: <div className='text-center'>Campaign Name</div>,
+        title: <div className='text-center'>{t('commons.campaign_name')}</div>,
         dataIndex: 'campaign',
         key: 'campaign',
         render: (text: any) => <p>{text}</p>,
@@ -202,7 +222,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         sorter: (a: any, b: any) => a.campaign - b.campaign,
       },
       {
-        title: <div className='text-center'>Campaign ID</div>,
+        title: <div className='text-center'>{t('commons.campaign_id')}</div>,
         dataIndex: 'campaignId',
         key: 'campaignId',
         render: (text: any) => <p>{text}</p>,
@@ -220,19 +240,19 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         sorter: (a: any, b: any) => a.budget - b.budget,
       },
       {
-        title: <div className='text-center'>From Time</div>,
+        title: <div className='text-center'>{t('commons.from_time')}</div>,
         dataIndex: 'fromTime',
         key: 'fromTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
       },
       {
-        title: <div className='text-center'>To Time</div>,
+        title: <div className='text-center'>{t('commons.to_time')}</div>,
         dataIndex: 'toTime',
         key: 'toTime',
         render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
       },
       {
-        title: <div className='text-center'>Action</div>,
+        title: <div className='text-center'>{t('commons.action')}</div>,
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
@@ -244,7 +264,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
           )
         },
       },
-    ], [previewFile]
+    ], [previewFile, t]
   )
 
   return (
@@ -252,7 +272,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
       {step == 1 ? (
         <div>
           <div className='panel-heading flex items-center justify-between'>
-            <h2>Update Campaign Status Schedule</h2>
+            <h2>{t('update_campaign_schedule_page.update_campaign_status_schedule')}</h2>
           </div>
           <div className='form-container'>
             <Form
@@ -263,11 +283,11 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
               wrapperCol={{ span: 14 }}
               layout="horizontal"
             >
-              <FSelect name={'partnerAccount'} label={'Partner Account'} placeholder={'Select Partner Account'} options={reGenerateDataAccountList}/>
-              <FUploadFile name={'file'} label={'Schedule File'}/>
+              <FSelect required name={'partnerAccountId'} label={t('update_campaign_schedule_page.partner_account')} placeholder={renderTranslateFilterText(t('update_campaign_schedule_page.partner_account'))} options={reGenerateDataAccountList} errorMessage={renderTranslateErrorMessageText(t('update_campaign_schedule_page.partner_account'))}/>
+              <FUploadFile required name={'file'} label={t('update_campaign_schedule_page.schedule_file')} onUploadFile={normFile} multiple={false} errorMessage={t('error_messages.file_empty_or_unreadable')}/>
 
               <Space size="middle" className='w-full flex justify-end'>
-                <ActionButton htmlType={"submit"} className={'next-button'} iconOnRight={<RightOutlined />} label={'Next'}/>
+                <ActionButton htmlType={"submit"} className={'next-button'} iconOnRight={<RightOutlined />} label={t('pagination.next')}/>
               </Space>
             </Form>
           </div>
@@ -275,12 +295,12 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
       ) : step == 2 ? (
         <div>
           <div className='panel-heading flex items-center justify-between'>
-            <h2>Update Campaign Budgets Schedule - Validate and live Edit</h2>
+            <h2>{t('update_campaign_schedule_page.update_campaign_budget_schedule')} - {t('update_campaign_schedule_page.validate_and_live_edit')}</h2>
           </div>
           <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile ? previewFile : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
           <div className='w-full flex items-center justify-between'>
-            <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={'Back'} onClick={() => setStep(1)}/>
-            <ActionButton className={'finish-button'} label={'Finish'} onClick={handleFinish}/>
+            <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={t('pagination.back')} onClick={() => setStep(1)}/>
+            <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish}/>
           </div>
         </div>
       ) : null}
