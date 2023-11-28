@@ -18,9 +18,10 @@ export default function SelectFilter (props: ISelectFilterProps) {
     <div className='select-filter-container'>
       <Text className='mr-6'>{label}</Text>
       <Select
+        labelInValue
         optionFilterProp="label"
         // style={{width: 250}}
-        className='max-w-[250px] w-[150px]'
+        className='max-w-[250px] w-[200px]'
         showSearch={!showSearch ? false : showSearch}
         defaultValue={defaultValue ? defaultValue : null}
         placeholder={placeholder}

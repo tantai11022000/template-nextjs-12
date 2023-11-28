@@ -24,6 +24,19 @@ import FRadio from '@/components/form/FRadio';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import type { Dayjs } from 'dayjs';
 
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+export async function getStaticProps(context: any) {
+  const { locale } = context
+
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
+
 export interface IScheduleBudgetProps {
 }
 
@@ -102,12 +115,12 @@ const normFile = (e: any) => {
   return e?.fileList;
 };
 
-  const { Text, Title } = Typography
   const [form]:any = Form.useForm();
-  const router = useRouter()
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
-
+  const router = useRouter()
+  const campaignIDs: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : []
+  const [campaignIds, setCampaignIds] = useState<any[]>(campaignIDs);
   const [selectMode, setSelectMode] = useState<string>("exact")
   const [loading, setLoading] = useState<boolean>(false);
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
@@ -153,10 +166,18 @@ const normFile = (e: any) => {
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
     try {
-      var params = {}
+      var params = {
+        pageSize: 999999
+      }
       const result = await getCampaignBudgets(partnerAccountId, params)
-      setCampaignBudgets(result && result.data? result.data : [])
-      setDisplayedCampaigns(result.data.slice(0, 10))
+      if (result && result.data) {
+        const newData = result.data.map((data: any) => {
+          data.isCheck = false
+          return data
+        })
+        setCampaignBudgets(newData)
+        setDisplayedCampaigns(newData.slice(0, 10))
+      }
       setLoading(false)
     } catch (error) {
       console.log(">>> error", error)
@@ -165,7 +186,8 @@ const normFile = (e: any) => {
   }
 
   const onChangeCheck = (value: any) => {
-    console.log(">>> value", value)
+    console.log(">>> onChangeCheck value", value)
+    setCampaignIds(value);
   }
 
   const handleShowMore = () => {
@@ -261,11 +283,12 @@ const normFile = (e: any) => {
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 
-  const onFinish = (values: any) => {
+  const onSaveMode = (values: any) => {
+    const { budgets, partnerAccountId, campaignIds, mode, time, weightTemplate } = values;
     console.log('Received values of form: ', values);
   };
 
@@ -328,12 +351,13 @@ const normFile = (e: any) => {
             <span className='text-red'>Existing Upcoming Schedule</span>
           </Space>
         </Space>
+        <Form >
         <div className='checkbox-group-container'> 
-          <Checkbox.Group onChange={onChangeCheck}>
+          <Checkbox.Group onChange={onChangeCheck} value={campaignIds}>
             <Row>
               {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
                 <Col key={campaign.campaignId} span={8}>
-                  <Checkbox value={campaign.campaignId} className={`${campaign.state != 'paused' ? 'upcoming' : ''}`}>{campaign.name}</Checkbox>
+                  <Checkbox value={campaign.campaignId} className={`${campaign.isHaveSchedule ? 'upcoming' : ''}`}>{campaign.name}</Checkbox>
                 </Col>
               )) : <Spin/>}
             </Row>
@@ -344,46 +368,47 @@ const normFile = (e: any) => {
             <button onClick={() => handleShowMore()}>View more...</button>
           )}
         </div>
-        <Form
-          name="validate_other"
-          {...formItemLayout}
-          onFinish={onFinish}
-          initialValues={{
-            // 'input-number': 3,
-            // 'checkbox-group': ['A', 'B'],
-            // rate: 3.5,
-            // 'color-picker': null,
-          }}
-          labelCol={{ span: 9 }}
-          wrapperCol={{ span: 9 }}
-          layout="horizontal"
-        >
-          <FRadio name={'mode'} label={'Mode'} options={modes} onChange={handleChangeMode} value={selectMode}/>
-          {router && router.query && router.query.isWeight && (
-            <>
-              <FMultipleCheckbox name={'isWeight'} label='Daily with Weight' data={[{value: 'weight', name: ' '}]} />
-              <FSelect name={'weightTemplate'} label={'Weight'} placeholder={'Select Weight Template'} options={weights}/>
-            </>
-          )}       
-          <Form.Item name="time" label="Time">
-            <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
-          </Form.Item>
-          <Form.Item name="budget" label="Budget Change">
-            <InputNumber
-              min={1}
-              defaultValue={100}
-              prefix={selectMode == "percent" ? "" : "￥"}
-              formatter={budgetFormatter}
-              parser={budgetParser}
-              onChange={handleBudgetChange}
-            />    
-          </Form.Item> 
+          <Form
+            name="validate_other"
+            {...formItemLayout}
+            onFinish={onSaveMode}
+            initialValues={{
+              // 'input-number': 3,
+              // 'checkbox-group': ['A', 'B'],
+              // rate: 3.5,
+              // 'color-picker': null,
+            }}
+            labelCol={{ span: 9 }}
+            wrapperCol={{ span: 9 }}
+            layout="horizontal"
+          >
+            <FRadio name={'mode'} label={'Mode'} options={modes} onChange={handleChangeMode} value={selectMode}/>
+            {router && router.query && router.query.isWeight && (
+              <>
+                <FMultipleCheckbox name={'isWeight'} label='Daily with Weight' data={[{value: 'weight', name: ' '}]} />
+                <FSelect name={'weightTemplate'} label={'Weight'} placeholder={'Select Weight Template'} options={weights}/>
+              </>
+            )}       
+            <Form.Item name="time" label="Time">
+              <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
+            </Form.Item>
+            <Form.Item name="budget" label="Budget Change">
+              <InputNumber
+                min={1}
+                defaultValue={100}
+                prefix={selectMode == "percent" ? "" : "￥"}
+                formatter={budgetFormatter}
+                parser={budgetParser}
+                onChange={handleBudgetChange}
+              />    
+            </Form.Item> 
 
-          <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
-            <div className='flex justify-center mt-6'>
-              <ActionButton htmlType={"submit"} className={'finish-button'} label={'Add'} onClick={handleAddSchedule}/>
-            </div>
-          </Form.Item>
+            <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
+              <div className='flex justify-center mt-6'>
+                <ActionButton htmlType={"submit"} className={'finish-button'} label={'Add'} onClick={handleAddSchedule}/>
+              </div>
+            </Form.Item>
+          </Form>
         </Form>
         {/* <Space className='flex items-center justify-between my-6'>
           <Space>

@@ -21,6 +21,11 @@
         "log": "ログ",
         "time": "時間",
         "activated": "有効化済",
+        "user": "ユーザー",
+        "campaign_name": "キャンペーン名",
+        "campaign_id": "キャンペーンID",
+        "from_time": "時間から",
+        "to_time": "時間に",
 
         "filter_label": {
             "status": "ステータス",
@@ -46,13 +51,42 @@
             "submit": "提出する",
             "edit": "編集",
             "save": "保存",
-            "create": "作成する"
+            "create": "作成する",
+            "finish": "完了"
         },
 
         "weight_type": {
             "one_time": "一度",
             "daily_with_weight": "毎日の体重測定"
         }
+    },
+
+    "toastify": {
+        "success": {
+            "created_text": "{text} が正常に作成されました.",
+            "updated_text": "{text} が更新されました.",
+            "edited_text": "{text} は正常に編集されました.",
+            "deleted_text": "{text} は正常に削除されました.",
+            "added_text": "{text} が正常に追加されました.",
+            "removed_text": "{text} は正常に削除されました.",
+            "generated_text": "{text} が正常に生成されました.",
+
+            "created": "作成完了.",
+            "updated": "アップロード完了.",
+            "edited": "正常に編集されました.",
+            "deleted": "正常に削除されました.",
+            "added": "正常に追加されました.",
+            "removed": "正常に削除されました.",
+            "generated": "正常に生成されました."
+        },
+        "error": {
+
+        }
+    },
+
+    "error_messages": {
+        "no_selected": "いいえ {text} 選択されました.",
+        "file_empty_or_unreadable": "ファイルが空か、読み取りができません."
     },
 
     "metrics": {
@@ -72,6 +106,14 @@
     },
 
     "duration": {
+        "today": "今日",
+        "this_week": "今週",
+        "yesterday": "昨日",
+        "last_week": "先週",
+        "last_month": "先月",
+        "this_month": "今月",
+        "last_year": "去年",
+
         "last_7_days": "過去7日間",
         "last_14_days": "過去14日間",
         "last_30_days": "過去30日間",
@@ -106,7 +148,20 @@
     "update_log_page": {
         "budget_update_log": "予算更新ログ",
         "status_update": "ステータスアップデート",
-        "update_budget": "予算を更新する"
+        "update_budget": "予算を更新する",
+        "update_status_schedule": "ステータス更新スケジュール",
+        "update_budget_schedule": "予算スケジュールの更新",
+        "export": "輸出"
+    },
+
+    "update_campaign_schedule_page": {
+        "update_campaign_budget_schedule": "キャンペーン予算スケジュールを更新する",
+        "update_campaign_status_schedule": "キャンペーンステータススケジュールを更新する",
+        "partner_account": "パートナーアカウント",
+        "schedule_file": "スケジュールファイル",
+        "main_upload_content": "ファイルのドロップorクリックして確認",
+        "sub_upload_content": "ファイル形式:",
+        "validate_and_live_edit": "検証とライブ編集"
     },
 
     "campaign_performance_history_log_page": {

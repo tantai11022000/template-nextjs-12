@@ -13,32 +13,24 @@ import FUploadFile from '@/components/form/FUploadFile';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import {
-  DeleteOutlined,
-  EditOutlined
-} from '@ant-design/icons';
+import { EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
 import ActionButton from '@/components/commons/buttons/ActionButton';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+export async function getStaticProps(context: any) {
+  const { locale } = context
+
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 export interface IUpdateCampaignStatusProps {
 }
-
-const PARTNER_ACCOUNT = [
-  {
-    value: 'jack',
-    label: 'Jack',
-  },
-  {
-    value: 'lucy',
-    label: 'Lucy',
-  },
-  {
-    value: 'tom',
-    label: 'Tom',
-  },
-]
 
 const FILES = [
   {
@@ -169,7 +161,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 

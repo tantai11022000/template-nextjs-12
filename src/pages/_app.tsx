@@ -24,6 +24,9 @@ import { getItem, storeItem } from '@/utils/StorageUtils'
 import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
 import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
 import { useRouter } from 'next/router'
+import jaJP from 'antd/locale/ja_JP';
+import enUS from 'antd/locale/en_US';
+
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -37,18 +40,16 @@ export async function getStaticProps(context: any) {
 
 function App({ Component, pageProps }: any) {
   const router = useRouter()
+  const language = typeof window !== 'undefined' && window.localStorage.getItem('language') == 'ja_JP' ? jaJP : enUS;
   const renderWithLayout =
     Component.getLayout ||
     function (page: any) {
       return <Layout>{page}</Layout>;
     };
-
+  
   const setDefaultLocale = () => {
     const userLanguage = window.localStorage.getItem('language') == 'ja_JP' ? 'jp' : 'en';
     const { pathname, query, asPath } = router;
-    console.log('pathname :>> ', pathname);
-    console.log('query :>> ', query);
-    console.log('asPath :>> ', asPath);
     if (userLanguage && i18n.locales.includes(userLanguage)) {
       i18n.defaultLocale = userLanguage;
     router.push({ pathname, query }, asPath, { locale: userLanguage });
@@ -78,7 +79,7 @@ function App({ Component, pageProps }: any) {
   return (
     <Provider store={store} >
       <StyleProvider hashPriority="high">
-        <ConfigProvider
+        <ConfigProvider locale={language}
           theme={{
             token: {
               fontFamily: '"M PLUS Rounded 1c", "Droid Sans", Tahoma, Arial, sans-serif',

@@ -151,7 +151,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   }, [currentAccount])
 
   useEffect(() => {
-    mapFirstQuery()
+    // mapFirstQuery()
     init();
     dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
   }, [])
@@ -233,7 +233,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
     const { current } = pagination
-    changeNextPageUrl(router, current)
+    // changeNextPageUrl(router, current)
     setPagination(pagination)
   }
 
