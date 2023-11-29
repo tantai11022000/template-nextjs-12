@@ -37,6 +37,16 @@ const TableGeneral = (props: TableProps) => {
     return originalElement;
   };
 
+  const tablePagination = pagination ? {
+    showSizeChanger: true,
+    // showQuickJumper: true,
+    pageSizeOptions: ['10', '30', '50', '100'],
+    total: pagination.total ? pagination.total : "",
+    current: pagination.current ? pagination.current : "",
+    pageSize: pagination.pageSize ? pagination.pageSize : "",
+    itemRender: itemRender,
+  } : false
+
   return (
     <div className='custom-table'>
       <Table
@@ -48,15 +58,7 @@ const TableGeneral = (props: TableProps) => {
         columns={columns ? columns.map((column: any) => ({
           ...column,
         })) : []}
-        pagination={{
-          showSizeChanger: true,
-          // showQuickJumper: true,
-          pageSizeOptions: ['10', '20', '50', '100'],
-          total: pagination.total ? pagination.total : "",
-          current: pagination.current ? pagination.current : "",
-          pageSize: pagination.pageSize ? pagination.pageSize : "",
-          itemRender: itemRender,
-        }}
+        pagination={tablePagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
         scroll={{x: true, y: scrollY ? 500 : undefined}}

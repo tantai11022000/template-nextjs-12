@@ -94,7 +94,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
   const [previewFile, setPreviewFile] = useState<any[]>([])
   const [openModalConfirmSetupBudgetSchedule, setOpenModalConfirmSetupBudgetSchedule] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
-    pageSize: 10,
+    pageSize: 30,
     current: 1,
     total: 0,
   })

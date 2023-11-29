@@ -17,3 +17,11 @@ export const uploadBudgetScheduleCSVFile = (id: any, body: any) => {
     return userClient.post(`${campaignsUrl}/upload/schedule-step-1/${id}`, body, {headers: {'Content-Type': 'multipart/form-data'}});
 }
 
+export const setScheduleBudgetForCampaigns = (body: any) => {
+    return userClient.put(`${campaignsUrl}/by-schedule`, body);
+}
+
+export const getScheduleBudgetLog = (paths: any, params: any) => {
+    return userClient.get(`${campaignsUrl}/budget-schedule-log/${paths.campaignId}/${paths.partnerAccountId}`, { params });
+}
+

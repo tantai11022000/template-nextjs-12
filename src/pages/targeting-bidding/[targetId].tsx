@@ -70,12 +70,12 @@ export default function TargetDetail (props: ITargetDetailProps) {
   const dispatch = useAppDispatch()
 
   const [budgetPagination, setBudgetPagination] = useState<any>({
-    pageSize: 3,
+    pageSize: 30,
     current: 1,
     total: 0,
   })
   const [statusPagination, setStatusPagination] = useState<any>({
-    pageSize: 2,
+    pageSize: 30,
     current: 1,
     total: 0,
   })

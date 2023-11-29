@@ -52,7 +52,8 @@
             "edit": "Edit",
             "save": "Save",
             "create": "Create",
-            "finish": "Finish"
+            "finish": "Finish",
+            "add": "Add"
         },
 
         "weight_type": {
@@ -77,7 +78,8 @@
             "deleted": "Deleted successfully.",
             "added": "Added successfully.",
             "removed": "Removed successfully.",
-            "generated": "Generated successfully."
+            "generated": "Generated successfully.",
+            "validation": "Validation successfully."
 
         },
         "error": {
@@ -146,6 +148,24 @@
         "current_budget": "Current Budget"
     },
 
+    "schedule_budget_for_campaign": {
+        "title": "Schedule Budget For Campaigns",
+        "count_existing_upcomning_schedule": "There are {number} Campaigns have existing upcoming schedule.",
+        "note_existing_upcomning_schedule": "Existing Upcoming Schedule",
+        "view_more": "View more...",
+        "mode": "Mode",
+        "time": "Time",
+        "weight": "Weight",
+        "exact": "Exact",
+        "fixed": "Fixed",
+        "daily": "Daily",
+        "budget_change": "Budget Change",
+        "daily_with_weight": "Daily with Weight Template",
+        "weight_template": "Weight Template",
+        "warning_select_at_least_one_campaign": "Please select at least one campaign before saving.",
+        "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0"
+    },
+
     "update_log_page": {
         "budget_update_log": "Budget Update Log",
         "status_update": "Status Update",
@@ -182,7 +202,15 @@
         "secret_id": "Secret ID",
         "refresh_token": "Refresh Token",
         "who_can_see": "Who can see",
-        "test": "Test"
+        "test": "Test",
+
+        "error_messages": {
+            "name": "Name is required.",
+            "client_id": "Client ID is required.",
+            "secret_id": "Secret ID is required.",
+            "refresh_token": "Refresh Token is required.",
+            "who_can_see": "Please select at least one Supervisor before saving."
+        }
     },
 
     "weight_template_page": {

@@ -138,8 +138,9 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   );
 
   const [pagination, setPagination] = useState<any>({
-    pageSize: 10,
+    pageSize: 30,
     current: 1,
+    total: 0
   })
 
   useEffect(() => {

@@ -38,7 +38,7 @@ export default function Accounts (props: IAccountsProps) {
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
   const [pagination, setPagination] = useState<any>({
-    pageSize: 10,
+    pageSize: 30,
     current: 1,
     total: 0,
   })

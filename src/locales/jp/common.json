@@ -52,7 +52,8 @@
             "edit": "編集",
             "save": "保存",
             "create": "作成する",
-            "finish": "完了"
+            "finish": "完了",
+            "add": "追加"
         },
 
         "weight_type": {
@@ -77,7 +78,8 @@
             "deleted": "正常に削除されました.",
             "added": "正常に追加されました.",
             "removed": "正常に削除されました.",
-            "generated": "正常に生成されました."
+            "generated": "正常に生成されました.",
+            "validation": "検証が成功しました."
         },
         "error": {
 
@@ -145,6 +147,24 @@
         "current_budget": "現在の予算"
     },
 
+    "schedule_budget_for_campaign": {
+        "title": "キャンペーンの予算をスケジュールする",
+        "count_existing_upcomning_schedule": "今後のスケジュールが設定されているキャンペーンが {number} 件あります.",
+        "note_existing_upcomning_schedule": "既存の今後のスケジュール",
+        "view_more": "もっと見る...",
+        "mode": "モード",
+        "time": "時間",
+        "weight": "ウェイトテンプレート",
+        "exact": "精度",
+        "fixed": "一定",
+        "daily": "毎日",
+        "budget_change": "予算の変更",
+        "daily_with_weight": "毎日の体重テンプレート",
+        "weight_template": "ウェイトテンプレート",
+        "warning_select_at_least_one_campaign": "保存する前に少なくとも 1 つのキャンペーンを選択してください.",
+        "warning_budget_must_be_greater_than_zero": "予算は0より大きくなければなりません"
+    },
+
     "update_log_page": {
         "budget_update_log": "予算更新ログ",
         "status_update": "ステータスアップデート",
@@ -181,7 +201,15 @@
         "secret_id": "シークレットID",
         "refresh_token": "リフレッシュトークン",
         "who_can_see": "誰が見ることができますか",
-        "test": "テスト"
+        "test": "テスト",
+
+        "error_messages": {
+            "name": "名前は必須です.",
+            "client_id": "クライアントIDが必要です.",
+            "secret_id": "シークレットIDが必要です.",
+            "refresh_token": "リフレッシュトークンが必要です.",
+            "who_can_see": "保存する前に少なくとも 1 人のスーパーバイザを選択してください."
+        }
     },
 
 

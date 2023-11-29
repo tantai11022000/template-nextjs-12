@@ -110,16 +110,15 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
-  const [mappingCampaignBudgets, setMappingCampaignBudgets] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const [isEditingList, setIsEditingList] = useState(
-    mappingCampaignBudgets.map(() => false)
+    campaignBudgets.map(() => false)
   );
 
   const [pagination, setPagination] = useState<any>({
-    pageSize: 10,
+    pageSize: 30,
     current: 1,
     total: 0,
   })
@@ -143,14 +142,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   useEffect(() => {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
-
-  useEffect(() => {
-    const newData = campaignBudgets.map((campaign:any) => {
-      campaign.id = campaign.campaignId
-      return campaign
-    })
-    setMappingCampaignBudgets(newData)
-  }, [campaignBudgets])
   
   const getCampaignBudgetsList = async (partnerAccountId: any) => {
     setLoading(true)
@@ -195,7 +186,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     } else if (value == 2) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == 3) {
-      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`)
+      router.push({
+        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+        query: {
+          campaignIds: selectedRowKeys
+        }
+      })
     } else if (value == 4) {
       router.push({
         pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
@@ -251,7 +247,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       setSelectedRowKeys(selectedRowKeys);
     },
     getCheckboxProps: (record: any) => ({
-      id: record.campaignId,
+      id: record.id,
     }),
   };
 
@@ -332,7 +328,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const isEditing = isEditingList[index];
 
           const handleBudgetChange = (event: any, index: any) => {
-            const updatedBudgets = [...mappingCampaignBudgets];
+            const updatedBudgets = [...campaignBudgets];
             updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = event.target.value;
             setCampaignBudgets(updatedBudgets);
           };
@@ -403,15 +399,15 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
-          const {campaignId, name} = record
+          const {id, name} = record
           return (
             <div className='flex justify-center'>
-              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`, query: { campaignId, name}})}/>
+              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
             </div>
           )
         },
       },
-    ], [mappingCampaignBudgets, handleToggleEdit, isEditingList, t]
+    ], [campaignBudgets, handleToggleEdit, isEditingList, t]
   )
   
   const renderTranslateSearchText = (text: any) => {
@@ -434,7 +430,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={mappingCampaignBudgets ? mappingCampaignBudgets : []} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral loading={loading} columns={columns} data={campaignBudgets ? campaignBudgets : []} rowSelection={rowSelection} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       {openModalUpdateStatus && (
         <Modal

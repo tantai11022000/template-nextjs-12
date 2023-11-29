@@ -5,14 +5,15 @@ import { DatePicker, Space } from 'antd';
 import moment from 'moment';
 import { useTranslation } from 'next-i18next';
 
-export interface IRangeDatePickerProps {
+interface IRangeDatePickerProps {
   onRangeChange: any,
-  duration: any
+  duration: any,
+  showTime?: boolean
 }
 
 const RangeDatePicker = (props: IRangeDatePickerProps) => {
   const { t } = useTranslation()
-  const { onRangeChange, duration } = props
+  const { onRangeChange, duration, showTime } = props
   const { RangePicker } = DatePicker;
 
   const rangePresets: TimeRangePickerProps['presets'] = [
@@ -32,7 +33,7 @@ const RangeDatePicker = (props: IRangeDatePickerProps) => {
   return (
     <div className='range-date-picker-container'>
       <Space direction="vertical" size={12}>
-        <RangePicker showTime format="YYYY/MM/DD HH:mm:ss" defaultValue={[dayjs(duration && duration.startDate ? moment(duration.startDate).format("YYYY/MM/DD") : ""), dayjs(duration && duration.endDate ? moment(duration.endDate).format("YYYY/MM/DD") : "")]} presets={rangePresets} onChange={onRangeChange} />
+        <RangePicker showTime={showTime ? true : false} format={showTime ? "YYYY/MM/DD HH:mm:ss" : "YYYY/MM/DD"} defaultValue={[dayjs(duration && duration.startDate ? moment(duration.startDate).format("YYYY/MM/DD") : ""), dayjs(duration && duration.endDate ? moment(duration.endDate).format("YYYY/MM/DD") : "")]} presets={rangePresets} onChange={onRangeChange} />
       </Space>
     </div>
   )
