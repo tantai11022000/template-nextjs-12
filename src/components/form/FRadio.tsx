@@ -18,12 +18,16 @@ export interface IFRadioProps {
 }
 
 export default function FRadio (props: IFRadioProps) {
-  const {name, label, options, onChange, value, defaultValue} = props
+  const {name, label, options, onChange, value, defaultValue, required, errorMessage} = props
   return (
     <Form.Item
       name={name}
       label={label}
       className='radio-container'
+      rules={[{
+        required: required ? true : false, 
+        message: errorMessage ? errorMessage : 'Please select at least one Mode',
+      }]}
     >
     <Radio.Group onChange={onChange} value={value} defaultValue={defaultValue}>
         {options && options.map((option: any) => <Radio key={option.value} value={option.value}>{option.label}</Radio>)}

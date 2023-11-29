@@ -1,25 +1,32 @@
 import React from 'react';
+import dayjs from 'dayjs';
 import { DatePicker, Space } from 'antd';
-import type { DatePickerProps, RangePickerProps } from 'antd/es/date-picker';
+import type { DatePickerProps } from 'antd/es/date-picker';
+interface IDateTimePickerProps {
 
-const { RangePicker } = DatePicker;
+}
 
-const onChange = (
-  value: DatePickerProps['value'] | RangePickerProps['value'],
-  dateString: [string, string] | string,
-) => {
-  console.log('Selected Time: ', value);
-  console.log('Formatted Selected Time: ', dateString);
+const DateTimePicker = (props: IDateTimePickerProps) => {
+
+  const onChange = (
+    value: DatePickerProps['value'],
+    dateString: [string, string] | string,
+  ) => {
+    console.log('Selected Time: ', value);
+    console.log('Formatted Selected Time: ', dateString);
+  };
+  
+  const onOk = (value: DatePickerProps['value']) => {
+    console.log('onOk: ', value);
+  };
+
+  return (
+    <div className='range-date-picker-container'>
+      <Space direction="vertical" size={12}>
+        <DatePicker defaultValue={dayjs()} showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" onChange={onChange} onOk={onOk} />
+      </Space>
+    </div>
+  )
 };
-
-const onOk = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
-  console.log('onOk: ', value);
-};
-
-const DateTimePicker: React.FC = () => (
-  <Space direction="vertical" size={12}>
-    <DatePicker showTime={{ format: 'HH:mm' }} format="YYYY-MM-DD HH:mm" onChange={onChange} onOk={onOk} />
-  </Space>
-);
 
 export default DateTimePicker;

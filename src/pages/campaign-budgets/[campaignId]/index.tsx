@@ -7,12 +7,14 @@ import TableGeneral from '@/components/table';
 import moment from "moment";
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
-import { useAppDispatch } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import {
   DeleteOutlined,
   EditOutlined,
   FundOutlined,
-  GoldOutlined
+  GoldOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined
 } from '@ant-design/icons';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
@@ -21,6 +23,9 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import type { Dayjs } from 'dayjs';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
+import { getCurrentAccount } from '@/store/account/accountSlice';
+import { getScheduleBudgetLog } from '@/services/campaign-budgets-services';
+import { SCHEDULE_STATUS } from '@/enums/status';
 
 export const getStaticPaths = async () => {
   return {
@@ -95,75 +100,100 @@ const UPDATE_BUDGET = [
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { t } = useTranslation()
   const router = useRouter()
+  const currentAccount = useAppSelector(getCurrentAccount);
   const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
   const campaignName = router && router.query && router.query.name ? router.query.name : ""
   const dispatch = useAppDispatch()
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [statusLog, setStatusLog] = useState<any[]>([])
-  const [filterOptions, setFilterOptions] = useState<any[]>([
+  const [filterModeOptions, setFilterModeOptions] = useState<any[]>([
     {
-      value: 1,
+      value: 'all',
+      label: 'All'
+    },
+    {
+      value: 'one-time',
       label: t('commons.weight_type.one_time')
     },
     {
-      value: 2,
+      value: 'daily',
       label: t('commons.weight_type.daily_with_weight')
     },
+  ])
+  const [mode, setMode] = useState<string>('')
+  const [filterOptions, setFilterOptions] = useState<any[]>([
     {
-      value: 3,
+      value: 1,
       label: t('update_log_page.update_status_schedule')
     },
     {
-      value: 4,
+      value: 2,
       label: t('update_log_page.update_budget_schedule')
     },
     {
-      value: 5,
+      value: 3,
       label: t('update_log_page.export')
     },
   ])
 
   const date = new Date();
   const [duration, setDuration] = useState<any>({
-    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 5),
-    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
+    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30),
+    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
   });
   
   const [loading, setLoading] = useState<boolean>(false)
   const [turnOn, setTurnOn] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     budgetLog: {
-      pageSize: 2,
+      pageSize: 30,
       current: 1,
       total: 0,
     },
     statusLog: {
-      pageSize: 3,
+      pageSize: 2,
       current: 1,
       total: 0,
     }
   })
   useEffect(() => {
-    init()
-  }, [])
+    if (currentAccount) fetchScheduleBudgetLog(mode, duration)
+  }, [currentAccount, pagination.budgetLog.pageSize, pagination.budgetLog.current])
 
   useEffect(() => {
     if (!campaignId) return
     dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: campaignId , url: ''}]}))
   },[campaignId])
-
-  const init = () => {
-    getBudgetLog()
-    getStatusLog()
-  }
   
-  const getBudgetLog = async () => {
+  const fetchScheduleBudgetLog = async (mode: string, duration: any) => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setBudgetLog(BUDGET_UPDATE_LOG)
-        setLoading(false)
-      }, 1000);
+      const {pageSize, current, total} = pagination.budgetLog
+      const paths = {
+        campaignId,
+        partnerAccountId: currentAccount
+      }
+      const params = {
+        page: current,
+        pageSize,
+        total,
+        mode,
+        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD") : "",
+        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD") : "",
+      }
+      const result = await getScheduleBudgetLog(paths, params)
+      if (result && result.data) {
+        setBudgetLog(result.data)
+        setPagination({
+          ...pagination,
+          budgetLog: {
+            ...pagination.budgetLog,
+            pageSize: result.pagination.pageSize,
+            total: result.pagination.total,
+          },
+        });
+      }
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       console.log(">>> Get Budget Log Error", error)
@@ -184,7 +214,6 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   }
 
   const handleOnChangeTable = (pagination: any, type: string) => {
-    console.log(">>> handleOnChangeTable pagination", pagination)
     if (type === "BUDGET") {
       setPagination({
         ...pagination,
@@ -208,17 +237,17 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     }
   };
 
-  const handleChange = (value: number) => {
-    console.log(`selected ${value}`);
-    switch (value) {
-      case 3:
-        router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
-        break;
-      case 4:
-        router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
-        break;
-      default:
-        break;
+  const handleChangeModeFilter = (values: any) => {
+    const { value } = values
+    setMode(value)
+    fetchScheduleBudgetLog(value, duration)
+  };
+
+  const handleChangeUpdateFilter = (value: any) => {
+    if (value.value == 3) {
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
+    } else if (value.value == 4) {
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
     }
   };
 
@@ -226,41 +255,46 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     () => [
       {
         title: <div className='text-center'>{t('commons.before')}</div>,
-        dataIndex: 'before',
-        key: 'before',
+        dataIndex: 'oldBudget',
+        key: 'oldBudget',
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
-        onFilter: (value: string, record: any) => record.before.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.before - b.before,
+        onFilter: (value: string, record: any) => record.oldBudget.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.oldBudget - b.oldBudget,
       },
       {
         title: <div className='text-center'>{t('commons.after')}</div>,
-        dataIndex: 'after',
-        key: 'after',
+        dataIndex: 'newBudget',
+        key: 'newBudget',
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
-        onFilter: (value: string, record: any) => record.after.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.after - b.after,
+        onFilter: (value: string, record: any) => record.newBudget.indexOf(value) === 0,
+        sorter: (a: any, b: any) => a.newBudget - b.newBudget,
       },
       {
         title: <div className='text-center'>{t('commons.status')}</div>,
         dataIndex: 'status',
         key: 'status',
-        render: (text: any) => {
+        render: (_: any, record: any) => {
+          const statusData = record.status
           const renderStatus = () => {
-            let status = ''
+            let status: any = ''
             let type = ''
-            if (text == "active") {
-              status = t('commons.status_enum.active')
-              type = 'success'
-            } else if (text == 'inactive') {
-              status = t('commons.status_enum.inactive')
-              type = 'error'
-            } else if (text == 'upcoming') {
+            if (statusData == SCHEDULE_STATUS.UPCOMING) {
               status = t('commons.status_enum.upcoming')
+              type = 'success'
+            } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
+              status = <CheckCircleOutlined />
+              type = 'warning'
+            } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
+              status = <InfoCircleOutlined />
               type = 'processing'
             }
-            return <Tag color={type} className='uppercase'>{status}</Tag>
+            return (
+              <>
+                {typeof status == 'string' ? <Tag className='text-center uppercase' color={type}>{status}</Tag> : <>{status}</>}
+              </>
+            )
           }
         return (
             <div className='flex justify-center uppercase'>
@@ -272,23 +306,30 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
-        dataIndex: 'updateTime',
-        key: 'updateTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""}</p>,
+        dataIndex: 'updatedDate',
+        key: 'updatedDate',
+        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD | hh:mm:ss") : ""}</p>,
       },
       {
         title: <div className='text-center'>{t('commons.setting_type')}</div>,
-        dataIndex: 'settingType',
-        key: 'settingType',
-        render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
+        dataIndex: 'mode',
+        key: 'mode',
+        render: (_: any, record: any) => {
+          const mode = record.detailedBySetting && record.detailedBySetting.mode ? record.detailedBySetting.mode : ""
+          return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
+        },
 
         sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
-        dataIndex: 'userUpdate',
-        key: 'userUpdate',
-        render: (text: any) => <p>{text}</p>,
+        dataIndex: 'updatedBy',
+        key: 'updatedBy',
+        render: (_: any, record: any) => {
+          const firstName = record.detailedBySetting && record.detailedBySetting.modifier.firstName ? record.detailedBySetting.modifier.firstName : ""
+          const lastName = record.detailedBySetting && record.detailedBySetting.modifier.lastName ? record.detailedBySetting.modifier.lastName : ""
+          return <p className='text-center'>{firstName + ' ' + lastName}</p>
+        },
 
         sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
@@ -410,13 +451,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
 
   const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
     if (dates) {
-      console.log('From: ', dates[0], ', to: ', dates[1]);
-    console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+      // console.log('From: ', dates[0], ', to: ', dates[1]);
+      // console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
       const duration = {
         startDate: dateStrings[0],
         endDate: dateStrings[1]
       }
       setDuration(duration)
+      fetchScheduleBudgetLog(mode, duration)
     } else {
       console.log('Clear');
     }
@@ -429,7 +471,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           <h2>{t('update_log_page.budget_update_log')}</h2>
           <Space>
             <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
-            <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChange} options={filterOptions}/>
+            <SelectFilter placeholder={filterModeOptions[0].label} onChange={handleChangeModeFilter} options={filterModeOptions}/>
+            <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChangeUpdateFilter} options={filterOptions}/>
           </Space>
         </div>
         <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog} pagination={pagination.budgetLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "BUDGET")} />

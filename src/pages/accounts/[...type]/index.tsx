@@ -21,14 +21,6 @@ import FSwitch from '@/components/form/FSwitch';
 import { notificationSimple } from '@/utils/CommonUtils';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
-// export const getStaticPaths = async () => {
-//   const accountIds: any[] = [];
-//   const paths = accountIds.map((id: any) => ({
-//     params: { type: ['edit', id.toString()] },
-//   }));
-//   return { paths, fallback: true };
-// };
-
 export const getStaticPaths = async () => {
   return {
     paths: [],
@@ -65,9 +57,10 @@ export default function AddAccount (props: IAddAccountProps) {
   const [partnerAccount, setPartnerAccount] = useState<any[]>([])
   const [mappingAccounts, setMappingAccounts] = useState<any[]>([])
   const [canCreateAccount, setCanCreateAccount] = useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = useState<any>("")
   const [isFormChanged, setIsFormChanged] = useState(false);
   const [status, setStatus] = useState<boolean>(false)
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [isAmazonInfoChanged, setIsAmazonInfoChanged] = useState<boolean>(false);
 
   useEffect(() => {
     setIsEdit(valueEdit)
@@ -124,6 +117,7 @@ export default function AddAccount (props: IAddAccountProps) {
   }
 
   const handleMapEditData = async () => {
+    setCanCreateAccount(true)
     try {
       const result = await getAccountInfo(id)
       if (result && result.data) {
@@ -146,7 +140,14 @@ export default function AddAccount (props: IAddAccountProps) {
     }
   }
 
+  const onValuesChange = (fieldValues: any) => {
+    if (fieldValues.setting && (fieldValues.setting.client_id || fieldValues.setting.client_secret || fieldValues.setting.refresh_token)) {
+      setIsAmazonInfoChanged(true);
+    }
+  }
+
   const onSave = async (value: any) => {
+    setFormSubmitted(true);
     setLoading({...loading, isCreate: true})
     try {
       if (valueEdit) {
@@ -168,19 +169,20 @@ export default function AddAccount (props: IAddAccountProps) {
   }
 
   const handleCheckValidAccount = async () => {
+    setFormSubmitted(false);
     setLoading({...loading, isValid: true})
     try {
       const values = await form.validateFields();
-      const result = await checkValidAccount(values)
-      if (result && result.data == true) {
+      const result = await checkValidAccount(values.setting)
+      if (result && result.message == "OK") {
         setCanCreateAccount(true)
+        setIsAmazonInfoChanged(false)
       }
       setLoading({...loading, isValid: false})
+      notificationSimple(t('toastify.success.validation'), NOTIFICATION_SUCCESS)
     } catch (error: any) {
       setLoading({...loading, isValid: false})
-      console.log(">>> Test Valid Error", error)
-      toast.error(error && error.message ? error.message : "")
-      setCanCreateAccount(true)
+      notificationSimple(error.message, NOTIFICATION_ERROR)
     }
   }
 
@@ -209,20 +211,21 @@ export default function AddAccount (props: IAddAccountProps) {
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 12 }}
       layout="horizontal"
+      onValuesChange={onValuesChange}
     >
-      <FText name={'name'} label={t('commons.name')}/>
+      <FText required={formSubmitted ? true : false} errorMessage={formSubmitted ? t('account_page.error_messages.name'): ''} name={'name'} label={t('commons.name')}/>
       <FTextArea name={'description'} label={t('commons.description')}/>
-      <FText name={['setting', 'client_id']} label={t('account_page.client_id')} onChange={handleChangeField}/>
-      <FText name={['setting', 'client_secret']} label={t('account_page.secret_id')} onChange={handleChangeField}/>
-      <FText name={['setting', 'refresh_token']} label={t('account_page.refresh_token')} onChange={handleChangeField}/>
-      <FMultipleCheckbox name={'supervisors'} label={t('account_page.who_can_see')} data={mappingAccounts} onChange={onChangeCheck} loading={loading.isAccounts}/>
+      <FText required errorMessage={t('account_page.error_messages.client_id')} name={['setting', 'client_id']} label={t('account_page.client_id')} onChange={handleChangeField}/>
+      <FText required errorMessage={t('account_page.error_messages.secret_id')} name={['setting', 'client_secret']} label={t('account_page.secret_id')} onChange={handleChangeField}/>
+      <FText required errorMessage={t('account_page.error_messages.refresh_token')} name={['setting', 'refresh_token']} label={t('account_page.refresh_token')} onChange={handleChangeField}/>
+      <FMultipleCheckbox required={formSubmitted ? true : false} errorMessage={formSubmitted ? t('account_page.error_messages.who_can_see') : ''} name={'supervisors'} label={t('account_page.who_can_see')} data={mappingAccounts} onChange={onChangeCheck} loading={loading.isAccounts}/>
       <FSwitch name={'status'} label={t('commons.activated')} status={status} disable={true}/>
       <div className='flex justify-center'>
         <Space size="middle" className='w-full flex items-center justify-between'>
             {loading.isValid ? <Spin/> : <ActionButton disabled={loading.isValid} className={'finish-button'} label={t('account_page.test')} onClick={handleCheckValidAccount}/>}
           <Space className='flex justify-center'>
             <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={() => router.push(`/accounts`)}/>
-            {loading.isCreate ? <Spin/> : <ActionButton htmlType="submit" disabled={!canCreateAccount} className={'finish-button'} label={loading.isCreate ? <Spin /> : valueEdit ? t('commons.action_type.save') : t('commons.action_type.create')}/>}
+            {loading.isCreate ? <Spin/> : <ActionButton htmlType="submit" disabled={!canCreateAccount || isAmazonInfoChanged} className={'finish-button'} label={loading.isCreate ? <Spin /> : valueEdit ? t('commons.action_type.save') : t('commons.action_type.create')}/>}
           </Space>
         </Space>
       </div>

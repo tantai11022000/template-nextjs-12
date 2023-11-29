@@ -59,7 +59,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   const [budgetHistory, setBudgetHistory] = useState<any[]>([])
   const [exportType, setExportType] = useState<any[]>(EXPORT_TYPE)
   const [pagination, setPagination] = useState<any>({
-    pageSize: 10,
+    pageSize: 30,
     current: 1,
     total: 0,
   })

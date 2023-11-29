@@ -60,7 +60,7 @@ function AddWeightTemplate() {
     const [loading, setLoading] = useState<boolean>(false)
     const [weights, setWeights] = useState<any>([])
     const [pagination, setPagination] = useState<any>({
-      pageSize: 10,
+      pageSize: 30,
       current: 1,
       total: 0,
     })

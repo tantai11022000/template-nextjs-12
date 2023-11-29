@@ -14,3 +14,10 @@ export enum CAMPAIGN_STATUS {
     ARCHIVED = 3,
     OTHER = 4,
 }
+
+export enum SCHEDULE_STATUS {
+    UPCOMING = 0,
+    SUCCESSFULLY_EXECUTED = 1,
+    FAILED_EXECUTED = 2,
+}
+
