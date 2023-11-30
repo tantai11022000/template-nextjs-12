@@ -6,7 +6,7 @@ const campaignsUrl = '/campaigns';
 
 
 export const getCampaignBudgets = (partnerAccountId: any, params: any) => {
-    return userClient.get(`/campaigns/partner-account/${partnerAccountId}`, { params });
+    return userClient.get(`${campaignsUrl}/partner-account/${partnerAccountId}`, { params });
 }
 
 export const getCampaignPerformanceHistoryLog = (id: any, params: any) => {

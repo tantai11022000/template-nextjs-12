@@ -129,12 +129,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }, [])
 
   useEffect(() => {
-    if (currentAccount) getCampaignBudgetsList(currentAccount)
+    if (currentAccount) getCampaignBudgetsList(currentAccount, keyword)
   }, [currentAccount, pagination.pageSize, pagination.current])
 
   useEffect(() => {
     if (isSync) { 
-      getCampaignBudgetsList(currentAccount)
+      getCampaignBudgetsList(currentAccount, keyword)
       dispatch(setSyncData({data: false}))
     }
   }, [isSync])
@@ -143,14 +143,14 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
   
-  const getCampaignBudgetsList = async (partnerAccountId: any) => {
+  const getCampaignBudgetsList = async (partnerAccountId: any, keywords: string) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = pagination
+      const {pageSize, current} = pagination
       var params = {
         page: current,
         pageSize,
-        total
+        keywords
       }
 
       const result = await getCampaignBudgets(partnerAccountId, params)
@@ -165,7 +165,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }
   }
   
-  const handleSearch= async(value:string) => {
+  const handleSearch= async(value: string) => {
     setKeyword(value)
     const params = {
       keyword: value,
@@ -175,7 +175,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       ...pagination,
       current: 1
     })
-    updateUrlQuery(router, params)
+    getCampaignBudgetsList(currentAccount, value)
+    // updateUrlQuery(router, params)
   }
 
   const handleSelectedBulkAction = (values: any) => {
@@ -270,7 +271,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        // sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
         title: <div className='text-center'>{t('campaign_budget_page.portfolio')}</div>,
@@ -317,7 +318,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             </div>
           );
         },
-        sorter: (a: any, b: any) => a.state - b.state,
+        // sorter: (a: any, b: any) => a.state - b.state,
       },
       {
         title: <div className='text-center'>{t('campaign_budget_page.current_budget')}</div>,
@@ -358,7 +359,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           return <p className='text-end'>{imp}</p>
         },
 
-        sorter: (a: any, b: any) => a.imp - b.imp
+        // sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
         title: <div className='text-center'>{t('metrics.click')}</div>,
@@ -369,7 +370,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           return <p className='text-end'>{click}</p>
         },
 
-        sorter: (a: any, b: any) => a.click - b.click
+        // // sorter: (a: any, b: any) => a.click - b.click
       },
       {
         title: <div className='text-center'>{t('metrics.sale')}</div>,
@@ -380,7 +381,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           return <p className='text-end'>{sale}</p>
         },
 
-        sorter: (a: any, b: any) => a.sale - b.sale
+        // sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
         title: <div className='text-center'>{t('metrics.roas')}</div>,
@@ -393,7 +394,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           return <p className='text-end'>{roas}</p>
         },
         
-        sorter: (a: any, b: any) => a.roas - b.roas
+        // sorter: (a: any, b: any) => a.roas - b.roas
       },
       {
         title: <div className='text-center'>{t('commons.action')}</div>,

@@ -210,7 +210,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('commons.campaign_name')}</div>,
@@ -219,7 +219,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaign - b.campaign,
+        // sorter: (a: any, b: any) => a.campaign - b.campaign,
       },
       {
         title: <div className='text-center'>{t('commons.campaign_id')}</div>,
@@ -228,7 +228,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.campaignId.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaignId - b.campaignId,
+        // sorter: (a: any, b: any) => a.campaignId - b.campaignId,
       },
       {
         title: <div className='text-center'>Budget</div>,
@@ -237,7 +237,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.budget.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.budget - b.budget,
+        // sorter: (a: any, b: any) => a.budget - b.budget,
       },
       {
         title: <div className='text-center'>{t('commons.from_time')}</div>,

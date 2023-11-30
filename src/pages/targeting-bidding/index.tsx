@@ -210,7 +210,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
       ...pagination,
       current: 1
     })
-    updateUrlQuery(router, params)
+    // updateUrlQuery(router, params)
   }
 
   const onChange = (value: string, url: string) => {
@@ -303,7 +303,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
         },
 
         onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
+        // sorter: (a: any, b: any) => a.campaign.localeCompare(b.campaign),
       },
       {
         title: <div className='text-center'>{t('commons.status')}</div>,
@@ -328,7 +328,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('target_bidding_page.current_bidding')}</div>,

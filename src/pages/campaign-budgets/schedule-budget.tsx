@@ -318,7 +318,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         },
 
         onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        // sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
         title: <div className='text-center'>{t('schedule_budget_for_campaign.time')}</div>,
@@ -337,7 +337,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           )
         },
 
-        sorter: (a: any, b: any) => a.imp - b.imp
+        // sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
         title: <div className='text-center'>{t('schedule_budget_for_campaign.weight')}</div>,
@@ -434,7 +434,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               }]}
               className='range-date-picker-container'
             >
-              <DatePicker defaultValue={dayjs()} showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
+              <DatePicker showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
             </Form.Item>
             <Form.Item 
               name="value" 

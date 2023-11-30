@@ -52,17 +52,17 @@ export default function Accounts (props: IAccountsProps) {
   }, [pagination.pageSize, pagination.current])
 
   const init = () => {
-    getAllAccounts()
+    getAllAccounts(keyword)
   }
   
-  const getAllAccounts = async () => {
+  const getAllAccounts = async (keywords: string) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = pagination
+      const {pageSize, current} = pagination
       var params = {
         page: current,
         pageSize,
-        total
+        keywords
       }
 
       const result = await getAllPartnerAccounts(params)
@@ -78,7 +78,7 @@ export default function Accounts (props: IAccountsProps) {
     }
   }
  
-  const handleSearch= async(value:string) => {
+  const handleSearch = async(value: string) => {
     setKeyword(value)
     const params = {
       keyword: value,
@@ -88,7 +88,8 @@ export default function Accounts (props: IAccountsProps) {
       ...pagination,
       current: 1
     })
-    updateUrlQuery(router, params)
+    // updateUrlQuery(router, params)
+    getAllAccounts(value)
   }
 
   const onSearch = (value: string) => {
@@ -100,7 +101,7 @@ export default function Accounts (props: IAccountsProps) {
       const body = { status }
       const result = await updateAccountStatus(id, body)
       if (result && result.message == "OK") {
-        await getAllAccounts();
+        await getAllAccounts(keyword);
         notificationSimple(renderTranslateToastifyText(t('commons.status')), NOTIFICATION_SUCCESS)
       }
     } catch (error: any) {
@@ -124,7 +125,7 @@ export default function Accounts (props: IAccountsProps) {
         render: (text: any) => <p>{text}</p>,
 
         onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        // sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
         title: <div className='text-center'>{t('commons.status')}</div>,
@@ -160,7 +161,7 @@ export default function Accounts (props: IAccountsProps) {
             </div>
           );
         },
-        sorter: (a: any, b: any) => a.state - b.state,
+        // sorter: (a: any, b: any) => a.state - b.state,
       },
       {
         title: <div className='text-center'>{t('commons.action')}</div>,

@@ -47,10 +47,10 @@ function WeightTemplate() {
   },[])
 
   useEffect(() => {
-    fetchAllWeightTemplates();
+    fetchAllWeightTemplates(keyword);
   }, [pagination.pageSize, pagination.current])
   
-  const handleOnSearch = async(value:string) => {
+  const handleOnSearch = async(value: string) => {
     setKeyword(value)
     const params = {
       keyword: value,
@@ -60,16 +60,18 @@ function WeightTemplate() {
       ...pagination,
       current:1
     })
-    updateUrlQuery(router,params)
+    // updateUrlQuery(router,params)
+    fetchAllWeightTemplates(value);
   }
 
-  const fetchAllWeightTemplates = async () => {
+  const fetchAllWeightTemplates = async (keyword: string) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = pagination
+      const {pageSize, current} = pagination
       var params = {
         page: current,
         pageSize,
+        keywords: keyword
       }
       const result = await getAllWeightTemplates(params)
       if (result && result.data) {
