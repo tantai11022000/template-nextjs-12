@@ -64,14 +64,14 @@ function WeightTemplate() {
     fetchAllWeightTemplates(value);
   }
 
-  const fetchAllWeightTemplates = async (keyword: string) => {
+  const fetchAllWeightTemplates = async (keywords: string) => {
     setLoading(true)
     try {
       const {pageSize, current} = pagination
       var params = {
         page: current,
         pageSize,
-        keywords: keyword
+        keywords
       }
       const result = await getAllWeightTemplates(params)
       if (result && result.data) {
