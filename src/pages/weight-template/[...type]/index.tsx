@@ -118,6 +118,7 @@ function AddWeightTemplate() {
             type: type,
             weightSetting: weightSetting
           })
+          setTimeSlot(type)
         }
         setLoading(false)
       } catch (error) {

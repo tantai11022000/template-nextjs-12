@@ -53,7 +53,9 @@
             "save": "Save",
             "create": "Create",
             "finish": "Finish",
-            "add": "Add"
+            "add": "Add",
+            "update": "Update",
+            "confirm": "Confirm"
         },
 
         "weight_type": {
@@ -128,7 +130,21 @@
         "users": "Users",
         "biz_management": "Biz Management",
         "3rd_tracking_tools": "3rd Tracking Tools",
-        "amazon": "Amazon"
+        "amazon": "Amazon",
+        "languages": {
+            "english": "English",
+            "japanese": "Japanese"
+        },
+        "profiles": {
+            "administration": "Administration",
+            "account_settings": "Account Settings",
+            "sign_out": "Sign Out"
+        },
+        "create": {
+            "new_campaign": "New Campaign",
+            "new_client": "New Client",
+            "new_user": "New User"
+        }
     },
 
     "sidebar": {

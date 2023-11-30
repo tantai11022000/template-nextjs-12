@@ -53,7 +53,9 @@
             "save": "保存",
             "create": "作成する",
             "finish": "完了",
-            "add": "追加"
+            "add": "追加",
+            "update": "アップデート",
+            "confirm": "確認する"
         },
 
         "weight_type": {
@@ -127,7 +129,21 @@
         "users": "ユーザー",
         "biz_management": "ビジネス管理",
         "3rd_tracking_tools": "3rd Tracking Tools",
-        "amazon": "Amazon"
+        "amazon": "Amazon",
+        "languages": {
+            "english": "英語",
+            "japanese": "日本語"
+        },
+        "profiles": {
+            "administration": "管理者",
+            "account_settings": "アカウント設定",
+            "sign_out": "サインアウト"
+        },
+        "create": {
+            "new_campaign": "新規キャンペーン",
+            "new_client": "新規クライアント",
+            "new_user": "新規ユーザー"
+        }
     },
 
     "sidebar": {

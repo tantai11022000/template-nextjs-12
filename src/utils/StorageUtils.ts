@@ -66,8 +66,6 @@ import {
   
   export const removeAccessToken = () => {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(OPENLIVE_TOKEN_KEY);
-    localStorage.removeItem(PERMISSION_DATA_KEY);
   }
   
   export const removeRefreshToken = () => {
