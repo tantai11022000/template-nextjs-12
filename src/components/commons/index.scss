@@ -32,12 +32,12 @@
     }
     .ant-input-search >.ant-input-group >.ant-input-group-addon:last-child .ant-input-search-button {
         border-radius: unset;
-        border-start-end-radius: 2px;
-        border-end-end-radius: 2px;
+        border-start-end-radius: 2px !important;
+        border-end-end-radius: 2px !important;
     }
     .ant-input-search .css-dev-only-do-not-override-wqdoyx.ant-input-group .ant-input-affix-wrapper:not(:last-child) {
-        border-start-start-radius: 2px;
-        border-end-start-radius: 2px;
+        border-start-start-radius: 2px !important;
+        border-end-start-radius: 2px !important;
     }
 }
 
