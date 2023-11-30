@@ -47,8 +47,12 @@ function WeightTemplate() {
   },[])
 
   useEffect(() => {
-    fetchAllWeightTemplates(keyword);
+    init()
   }, [pagination.pageSize, pagination.current])
+
+  const init = () => {
+    fetchAllWeightTemplates(keyword)
+  }
   
   const handleOnSearch = async(value: string) => {
     setKeyword(value)
