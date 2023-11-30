@@ -3,6 +3,6 @@ import guestClient from '../config/api/guestClient';
 
 
 export const getSyncData = (id: any) => {
-    return userClient.get(`account/syncs/${id}`);
+    return userClient.post(`account/syncs/${id}`);
 }
 
