@@ -467,12 +467,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   return (
     <div>
       <div>
-        <div className='panel-heading flex items-center justify-between'>
-          <h2>{t('update_log_page.budget_update_log')}</h2>
-          <Space>
+        <div className='panel-heading flex items-center justify-between max-lg:flex-col max-lg:items-start'>
+          <h2 className='max-lg:mb-2'>{t('update_log_page.budget_update_log')}</h2>
+          <Space className='max-sm:flex-col'>
             <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
             <SelectFilter placeholder={filterModeOptions[0].label} onChange={handleChangeModeFilter} options={filterModeOptions}/>
-            <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChangeUpdateFilter} options={filterOptions}/>
+            {/* <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChangeUpdateFilter} options={filterOptions}/> */}
           </Space>
         </div>
         <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog} pagination={pagination.budgetLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "BUDGET")} />

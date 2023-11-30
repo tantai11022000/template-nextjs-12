@@ -74,24 +74,30 @@ const BULK_ACTION = [
   {
     id: 2,
     value: 2,
-    label: "Schedule Status",
+    label: "Update Status Schedule",
     url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`
   },
   {
     id: 3,
     value: 3,
+    label: "Update Budget Schedule",
+    url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`
+  },
+  {
+    id: 4,
+    value: 4,
     label: "Schedule Budget Once",
     url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`
   }, 
   {
-    id: 4,
-    value: 4,
+    id: 5,
+    value: 5,
     label: "Schedule Budget With Weight",
     url: ''
   }, 
   {
-    id: 5,
-    value: 5,
+    id: 6,
+    value: 6,
     label: "Export Schedule",
     url: ''
   }, 
@@ -187,13 +193,15 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     } else if (value == 2) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == 3) {
+      router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
+    }else if (value == 4) {
       router.push({
         pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
         query: {
           campaignIds: selectedRowKeys
         }
       })
-    } else if (value == 4) {
+    } else if (value == 5) {
       router.push({
         pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
         query: {

@@ -12,7 +12,8 @@ import {
   PlusOutlined,
   BellFilled,
   UserOutlined,
-  GlobalOutlined
+  GlobalOutlined,
+  EllipsisOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -38,6 +39,7 @@ function HeaderApp() {
   const [languages, setLanguages] = useState<any[]>([])
   const [create, setCreate] = useState<any[]>([])
   const [profiles, setProfiles] = useState<any[]>([])
+  const [menu, setMenu] = useState<any[]>([])
 
   useEffect(() => {
     setLanguages([
@@ -48,6 +50,13 @@ function HeaderApp() {
       { key: 1, label: t('header_bar.create.new_campaign'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns/add` },
       { key: 2, label: t('header_bar.create.new_client'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/clients/add` },
       { key: 3, label: t('header_bar.create.new_user'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users/login` },
+    ])
+    setMenu([
+      { key: 1, label: t('header_bar.campaigns'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/campaigns` },
+      { key: 2, label: t('header_bar.users'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/users` },
+      { key: 3, label: t('header_bar.biz_management'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/masterboard/clients` },
+      { key: 4, label: t('header_bar.3rd_tracking_tools'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}#/3rd-tracking-tools` },
+      { key: 5, label: t('header_bar.amazon'), url: BREADCRUMB_CAMPAIGN_BUDGET.url },
     ])
     setProfiles([
       { key: 1, label: t('header_bar.profiles.administration'), url: `${process.env.NEXT_PUBLIC_MAIN_URL}/admin` },
@@ -82,11 +91,19 @@ function HeaderApp() {
     </Menu>
   );
 
+  const menuDropdown = (
+    <Menu className='header-menu-wrapper'>
+      {menu.map((item: any) => (
+        <Menu.Item key={item.key} onClick={() => router.push(item.url)}>{item.label}</Menu.Item>
+        ))}
+    </Menu>
+  );
+
   const createDropdown = (
     <Menu>
       {create.map((item: any) => (
         <Menu.Item key={item.key} onClick={() => router.push(item.url)}>{item.label}</Menu.Item>
-      ))}
+        ))}
     </Menu>
   );
 
@@ -144,11 +161,14 @@ function HeaderApp() {
               </ul>
             </nav>
             <div className='header-icon'>
+              <Dropdown overlay={menuDropdown} overlayClassName='header-icon-menu'>
+                <EllipsisOutlined className='menu-icon'/>
+              </Dropdown>
               <Dropdown overlay={createDropdown} placement="bottomRight" arrow>
                 <PlusOutlined />
               </Dropdown>
               <BellFilled />
-              <Dropdown overlay={profileDropdown} placement="bottomRight" arrow>
+              <Dropdown overlay={profileDropdown} placement="bottomRight" arrow >
                 <UserOutlined />
               </Dropdown>
               <Dropdown overlay={languagesDropdown} placement="bottomRight" arrow>
