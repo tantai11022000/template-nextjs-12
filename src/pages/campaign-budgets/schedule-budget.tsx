@@ -70,7 +70,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const campaignIDs: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : [];
+  const campaignIDsFromQuery: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : [];
+  const campaignIDs = Array.isArray(campaignIDsFromQuery) ? campaignIDsFromQuery : [campaignIDsFromQuery];
   const isWeight = router && router.query && router.query.isWeight ? true : false
   const [campaignIds, setCampaignIds] = useState<any[]>(campaignIDs);
   const [selectMode, setSelectMode] = useState<number>(isWeight ? 3 : 0)
