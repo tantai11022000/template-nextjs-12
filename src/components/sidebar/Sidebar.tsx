@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Layout, Menu } from 'antd';
 import { MenuProps } from 'antd';
@@ -41,7 +41,6 @@ export default function SideBar (props: ISideBarProps) {
   const { Sider } = Layout;
   const { menu, setMenu } = props
   const isCollapseMenu = useAppSelector(getCollapseMenu)
-
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
   const items: MenuItem[] = [
@@ -50,6 +49,20 @@ export default function SideBar (props: ISideBarProps) {
     getItems(t('sidebar.accounts'), 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
     getItems(t('sidebar.weight_template'), 'weight-template', 'weight-template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
   ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      setCollapsed(screenWidth < 840);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleClickMenu = (value: string) => {
     setMenu(value)
