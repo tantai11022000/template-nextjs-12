@@ -120,13 +120,13 @@ export default function TargetDetail (props: ITargetDetailProps) {
     }
   }
 
-  const handleOnChangeBudgetTable = (pagination: any, filters: any, sorter: any) => {
+  const handleOnChangeBudgetTable = (pagination: any, filters: any, // sorter: any) => {
     const { current } = pagination
     // changeNextPageUrl(router, current)
     setBudgetPagination(pagination)
   }
 
-  const handleOnChangeStatusTable = (pagination: any, filters: any, sorter: any) => {
+  const handleOnChangeStatusTable = (pagination: any, filters: any, // sorter: any) => {
     const { current } = pagination
     // changeNextPageUrl(router, current)
     setStatusPagination(pagination)
@@ -141,7 +141,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.before.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.before - b.before,
+        // sorter: (a: any, b: any) => a.before - b.before,
       },
       {
         title: <div className='text-center'>After</div>,
@@ -150,7 +150,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.after.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.after - b.after,
+        // sorter: (a: any, b: any) => a.after - b.after,
       },
       {
         title: <div className='text-center'>Status</div>,
@@ -178,7 +178,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>Update Time</div>,
@@ -192,7 +192,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         key: 'settingType',
         render: (text: any) => <p>{text}</p>,
 
-        sorter: (a: any, b: any) => a.settingType - b.settingType
+        // sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>Updated By</div>,
@@ -200,7 +200,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
 
-        sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
+        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
         title: <div className='text-center'>Action</div>,
@@ -264,7 +264,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>Update Time</div>,
@@ -278,7 +278,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         key: 'settingType',
         render: (text: any) => <p>{text}</p>,
 
-        sorter: (a: any, b: any) => a.settingType - b.settingType
+        // sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>Updated By</div>,
@@ -286,7 +286,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
 
-        sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
+        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
         title: <div className='text-center'>Log</div>,

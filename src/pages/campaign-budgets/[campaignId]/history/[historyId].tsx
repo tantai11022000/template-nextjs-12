@@ -152,7 +152,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('metrics.imp')}</div>,
@@ -163,7 +163,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
           return <p className='text-end'>{imp}</p>
         },
 
-        sorter: (a: any, b: any) => a.imp - b.imp
+        // sorter: (a: any, b: any) => a.imp - b.imp
       },
       {
         title: <div className='text-center'>{t('metrics.click')}</div>,
@@ -174,7 +174,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
           return <p className='text-end'>{click}</p>
         },
 
-        sorter: (a: any, b: any) => a.click - b.click
+        // sorter: (a: any, b: any) => a.click - b.click
       },
       {
         title: <div className='text-center'>{t('metrics.cpm')}</div>,
@@ -182,7 +182,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         key: 'cpm',
         render: (text: any) => <p className='text-end'>{text || "-"}</p>,
 
-        sorter: (a: any, b: any) => a.cpm - b.cpm
+        // sorter: (a: any, b: any) => a.cpm - b.cpm
       },
       {
         title: <div className='text-center'>{t('metrics.sale')}</div>,
@@ -193,7 +193,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
           return <p className='text-end'>{sale}</p>
         },
 
-        sorter: (a: any, b: any) => a.sale - b.sale
+        // sorter: (a: any, b: any) => a.sale - b.sale
       },
       {
         title: <div className='text-center'>{t('metrics.cv')}</div>,
@@ -201,7 +201,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         key: 'cv',
         render: (text: any) => <p className='text-end'>{text || "-"}</p>,
 
-        sorter: (a: any, b: any) => a.cv - b.cv
+        // sorter: (a: any, b: any) => a.cv - b.cv
       },
       {
         title: <div className='text-center'>{t('metrics.cost')}</div>,
@@ -212,7 +212,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
           return <p className='text-end'>{cost}</p>
         },
 
-        sorter: (a: any, b: any) => a.cost - b.cost
+        // sorter: (a: any, b: any) => a.cost - b.cost
       },
     ], [budgetHistory, t]
   )

@@ -260,7 +260,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.oldBudget.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.oldBudget - b.oldBudget,
+        // sorter: (a: any, b: any) => a.oldBudget - b.oldBudget,
       },
       {
         title: <div className='text-center'>{t('commons.after')}</div>,
@@ -269,7 +269,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
 
         onFilter: (value: string, record: any) => record.newBudget.indexOf(value) === 0,
-        sorter: (a: any, b: any) => a.newBudget - b.newBudget,
+        // sorter: (a: any, b: any) => a.newBudget - b.newBudget,
       },
       {
         title: <div className='text-center'>{t('commons.status')}</div>,
@@ -302,7 +302,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
@@ -319,7 +319,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
         },
 
-        sorter: (a: any, b: any) => a.settingType - b.settingType
+        // sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
@@ -331,7 +331,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           return <p className='text-center'>{firstName + ' ' + lastName}</p>
         },
 
-        sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
+        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
         title: <div className='text-center'>{t('commons.action')}</div>,
@@ -405,7 +405,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             </div>
         );
         },
-        sorter: (a: any, b: any) => a.status - b.status,
+        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
@@ -419,7 +419,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         key: 'settingType',
         render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
 
-        sorter: (a: any, b: any) => a.settingType - b.settingType
+        // sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
@@ -427,7 +427,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
 
-        sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
+        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
         title: <div className='text-center'>{t('commons.log')}</div>,
