@@ -236,6 +236,7 @@
         "description" : "説明",
         "last_updated": "最終更新",
         "action": "アクション",
+        "clone_weight_template": "ウェイト テンプレートからクローンを作成します: ",
 
         "form": {
             "title": "{action} ウェイトテンプレート",

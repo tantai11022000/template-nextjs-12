@@ -469,7 +469,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       <div>
         <div className='panel-heading flex items-center justify-between max-lg:flex-col max-lg:items-start'>
           <h2 className='max-lg:mb-2'>{t('update_log_page.budget_update_log')}</h2>
-          <Space className='max-sm:flex-col'>
+          <Space className='max-sm:flex-col max-sm:items-start'>
             <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
             <SelectFilter placeholder={filterModeOptions[0].label} onChange={handleChangeModeFilter} options={filterModeOptions}/>
             {/* <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChangeUpdateFilter} options={filterOptions}/> */}

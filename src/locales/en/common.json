@@ -236,6 +236,7 @@
         "description" : "Description",
         "last_updated": "Last Updated",
         "action": "Action",
+        "clone_weight_template": "Clone from Weight Template: ",
 
         "form": {
             "title": "{action} Weight Template",

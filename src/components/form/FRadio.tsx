@@ -14,11 +14,12 @@ export interface IFRadioProps {
   errorMessage?: string,
   onChange?: any,
   value?: any,
-  defaultValue?: any
+  defaultValue?: any,
+  disabled?: boolean
 }
 
 export default function FRadio (props: IFRadioProps) {
-  const {name, label, options, onChange, value, defaultValue, required, errorMessage} = props
+  const {name, label, options, onChange, value, defaultValue, required, errorMessage, disabled = false} = props
   return (
     <Form.Item
       name={name}
@@ -29,7 +30,7 @@ export default function FRadio (props: IFRadioProps) {
         message: errorMessage ? errorMessage : 'Please select at least one Mode',
       }]}
     >
-    <Radio.Group onChange={onChange} value={value} defaultValue={defaultValue}>
+    <Radio.Group onChange={onChange} value={value} defaultValue={defaultValue} disabled={disabled}>
         {options && options.map((option: any) => <Radio key={option.value} value={option.value}>{option.label}</Radio>)}
     </Radio.Group>
     </Form.Item>

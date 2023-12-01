@@ -1,20 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-
 import { Dropdown, Input, Space, Switch, Tag } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-
-import { Select } from 'antd';
 import TableGeneral from '@/components/table';
 import { getCampaignBudgets } from '@/services/campaign-budgets-services';
-import Link from 'next/link';
-import { Button, Modal } from 'antd';
+import { Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount, getIsSyncData, setSyncData } from '@/store/account/accountSlice';
-import { SaveOutlined, EditOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
+import { SaveOutlined, EditOutlined, FileTextOutlined } from '@ant-design/icons';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
@@ -116,13 +112,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
+  console.log(">>> campaignBudgets", campaignBudgets)
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
   const [isEditingList, setIsEditingList] = useState(
     campaignBudgets.map(() => false)
   );
-
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
     current: 1,
@@ -337,10 +332,20 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const isEditing = isEditingList[index];
 
           const handleBudgetChange = (event: any, index: any) => {
+            console.log(">>> event.target.value", event.target.value)
+            console.log(">>> index", index)
             const updatedBudgets = [...campaignBudgets];
             updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = event.target.value;
             setCampaignBudgets(updatedBudgets);
           };
+
+          const onChangeBudgetCampaign = async () => {
+            try {
+              
+            } catch (error) {
+              console.log(">>> Change Budget Campaign error", error)
+            }
+          }
 
           return (
             <div className='flex items-center justify-between'>
@@ -433,9 +438,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     <>
       <div className='flex items-center justify-between max-lg:flex-col max-lg:items-stretch'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <div className='flex items-center gap-6 max-lg:mt-3'>
-          <SelectFilter label={t('commons.filter_label.status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
-          <SelectFilter label={t('commons.filter_label.bulk_action')} placeholder={renderTranslateFilterText(t('commons.action'))} onChange={handleSelectedBulkAction} options={bulkAction} value={selectedAction}/>
+        <div className='flex items-center gap-6 max-lg:mt-3 max-sm:flex-col max-sm:items-start'>
+          <SelectFilter placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
+          <SelectFilter placeholder={renderTranslateFilterText(t('commons.action'))} onChange={handleSelectedBulkAction} options={bulkAction} value={selectedAction}/>
         </div>
       </div>
       <div>

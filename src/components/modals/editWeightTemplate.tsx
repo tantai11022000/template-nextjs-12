@@ -3,182 +3,220 @@ import React, { useEffect, useMemo, useState } from 'react';
 import FRadio from '../form/FRadio';
 import TableGeneral from '../table';
 import FText from '../form/FText';
+import { useTranslation } from 'next-i18next';
+import ActionButton from '../commons/buttons/ActionButton';
+import { useRouter } from 'next/router';
+import { getDaily30MinsSlot } from '@/services/commons-service';
+import { createWeightTemplate, getWeightTemplateDetail } from '@/services/weight-template';
+import { notificationSimple } from '@/utils/CommonUtils';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant';
+import FTextArea from '../form/FTextArea';
 
 export interface IEditWeightTemplateProps {
+  weightTemplate: any,
+  onCancel: any,
+  onOk: any,
+  refreshData: any
 }
-
-const templateRecord = {
-  time: '',
-  weight: 0,
-  estimateBudget: '',
-  accumulativeBudget: ''
-}
-
-interface iRecordTable {
-  time: number,
-  weight: number,
-}
-
-const TIME_SLOT = [
-  {
-    value: 1,
-    label: '1 hour'
-  },
-  {
-    value: 2,
-    label: '30 mins'
-  },
-]
-
-const HOURS_DATA = [
-  {
-    id: 1,
-    time: '',
-    weight: 10,
-    estimateBudget: 50,
-    accumulativeBudget: 50
-  },
-  {
-    id: 2,
-    time: '',
-    weight: 10,
-    estimateBudget: 50,
-    accumulativeBudget: 100
-  },
-  {
-    id: 3,
-    time: '',
-    weight: '',
-    estimateBudget: 50,
-    accumulativeBudget: 150
-  },
-  {
-    id: 4,
-    time: '',
-    weight: 10,
-    estimateBudget: 50,
-    accumulativeBudget: 200
-  },
-  {
-    id: 5,
-    time: '',
-    weight: 10,
-    estimateBudget: 50,
-    accumulativeBudget: 250
-  },
-]
 
 export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
+  const { weightTemplate, onCancel, onOk, refreshData } = props
+  const { t } = useTranslation()
+  const router = useRouter()
   const [form]:any = Form.useForm();
-  const [timeSlots, setTimeSlots] = useState<any[]>(TIME_SLOT)
   const [timeSlot, setTimeSlot] = useState<number>(1)
-  const [dataOneHour, setDataOneHour] = useState<iRecordTable[]>([])
-  const [dataThirtyMins, setDataThirtyMins] = useState<iRecordTable[]>([])
+  const [timeMinutes, setTimeMinutes] = useState<any[]>([])
+  const [timeHours, setTimeHours] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const timeType = [
+    {
+      value: 0,
+      label: t('weight_template_page.form.30_minute')
+    },
+    {
+      value: 1,
+      label: t('weight_template_page.form.1_hour')
+    },
+  ]
 
   useEffect(() => {
-    initDataDefaultTable()
+    init()
+    if (weightTemplate.id) handleMapEditData()
   }, [])
-  
-  const onSave = async (value: any) => {
-    console.log(">>> value", value)
+
+  const init = () => {
+    fetchDaily30MinsSlot()
   }
+
+  const fetchDaily30MinsSlot =async () => {
+    setLoading(true)
+    try {
+      const result = await getDaily30MinsSlot()
+      if (result && result.data) {
+        setTimeMinutes(result.data)
+        const hourData = result.data.filter((time: any, index: number) => index % 2 === 0)
+        setTimeHours(hourData)
+      }
+      setLoading(false)
+    } catch (error) {
+      console.log(">>> Fetch Daily 30Mins Slot Error", error)
+      setLoading(false)
+    }
+  }
+
+  const handleMapEditData = async () => {
+    setLoading(true)
+    try {
+      const result = await getWeightTemplateDetail(weightTemplate.id)
+      if (result && result.data) {
+        const { name, description, type, weightSetting } = result.data
+        form.setFieldsValue({
+          name: name,
+          description: description,
+          type: type,
+          weightSetting: weightSetting
+        })
+        setTimeSlot(type)
+      }
+      setLoading(false)
+    } catch (error) {
+     console.log(">>> Get Account Info Error", error)
+     setLoading(false)
+    }
+  }
+
+  const handleChangeValueTable = (value: number, code: number) => {
+    var newData = timeSlot == 1 ? [...timeHours] : [...timeMinutes];
+    if (code >= 0 && code < newData.length) {
+      newData[code].weight = Number(value);        
+      timeSlot == 1 ? setTimeHours(newData) : setTimeMinutes(newData);
+
+      const totalWeight = newData.reduce((sum, item) => sum + (item.weight || 0), 0);
+      const calculatedPercentage = (totalWeight / 100) * 100;
+      // setPercentage(calculatedPercentage);
+    }
+  };
+  
+  const onSave = async (values: any) => {
+    try {
+      if (values.description === undefined) values.description = ''
+
+      const timeData = timeSlot === 1 ? timeHours : timeMinutes;
+      const { weightSetting } = values;
+      const updatedWeightSetting = timeData.map((item: any, index: number) => ({
+        slot: item.code,
+        time: item.name,
+        weight: weightSetting[index]?.weight || 0,
+      }));
+
+      const updatedValues = {
+        ...values,
+        description: values.description || '',
+        type: timeSlot,
+        weightSetting: updatedWeightSetting,
+        clonedFromWeightTemplateId: weightTemplate && weightTemplate.id ? weightTemplate.id : ""
+      };
+
+      await createWeightTemplate(updatedValues)
+      notificationSimple("Create Weight Template Success", NOTIFICATION_SUCCESS);
+      refreshData()
+      onOk()
+    } catch (error: any) {
+      console.log(">>> Create Weight Template Error", error)
+      notificationSimple(error.message, NOTIFICATION_ERROR);
+    }
+  };
 
   const onSaveFail = (value: any) => {
     console.log('>>> value', value);
   }
 
-  const handleOnChangeForm = (changedValues:any) => {
-    if (changedValues.hasOwnProperty('timeSlot')) {
-      setTimeSlot(+changedValues.timeSlot)
-    }
+  const handleChangeTimeType = (value: any) => {
+    setTimeSlot(value.target.value)
   }
 
-  const initDataDefaultTable = () => {
-    const defaultDataOneHour: any = HOURS_DATA.map((data, index) => ({
-      ...templateRecord,
-      time: index + 1,
-      weight: data.weight,
-      estimateBudget: data.estimateBudget,
-      accumulativeBudget: data.accumulativeBudget,
-    }));
-    setDataOneHour(defaultDataOneHour);
-
-    const defaultDataThirtyMins: any = HOURS_DATA.map((data, index) => ({
-      ...templateRecord,
-      time: index * 30,
-      weight: data.weight,
-      estimateBudget: data.estimateBudget,
-      accumulativeBudget: data.accumulativeBudget,
-    }));
-    setDataThirtyMins(defaultDataThirtyMins);
-  }
-
-  const handleChangeValueTable = (e:any,row: number) => {
-    const {name, value} = e.target;
-    if (timeSlot === 1) {
-      const newData = {...dataOneHour[row],[name]: +value}
-      dataOneHour[row] = newData;
-      setDataOneHour(dataOneHour);
-    } else {
-      const newData = {...dataThirtyMins[row],[name]: +value}
-      dataThirtyMins[row] = newData;
-      setDataThirtyMins(dataThirtyMins);
-    }
+  const renderTranslateInputText = (text: any) => {
+    let translate = t("commons.action_type.input");
+    return translate.replace("{text}", text);
   }
 
   const columns: any = useMemo(
     () => [
       {
-        title: `Time ${timeSlot === 1 ? '(Hours)' : '(Mins)'}`,
-        dataIndex: 'time',
-        key: 'time',
+        title: <div className='text-center'>{`${t('weight_template_page.form.time')} ${timeSlot === 1 ? t('weight_template_page.form.hour') : t('weight_template_page.form.minute')}`}</div>,
+        dataIndex: 'name',
+        key: 'name',
         align: 'center',
         render: (text: any) => <span>{text}</span>
       },
       {
-        title: 'Weight (%)',
+        title: (
+          <div className='text-center'>
+            {t('weight_template_page.form.weight_%')}
+            {/* <div className='text-red'>{percentage}% / 100%</div> */}
+          </div>
+        ),
         dataIndex: 'weight',
         key: 'weight',
-        align: 'center',
-        render: (text: any, index:number) => <Input name='weight' defaultValue={text} onChange={(e:any) => handleChangeValueTable(e,index)} className='flex justify-center' />,
+        render: (text: any, record: any) => {
+          const code = record && record.code ? record.code : '';
+          const weight = record && record.weight ? record.weight : 0;
+          return (
+            <Form.Item
+              name={['weightSetting', code, 'weight']}
+              initialValue={weight}
+              getValueFromEvent={(e) => (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value))}
+            >
+              <Input type='number' min={0} onChange={(e) => handleChangeValueTable(+e.target.value, code)} />
+            </Form.Item>
+          );
+        },
       },
-      {
-        title: 'Estimate Hourly Budget',
-        dataIndex: 'estimateBudget',
-        key: 'estimateBudget',
-        render: (text: any) => <span>{text}</span>
-      },
-      {
-        title: 'Accumulative Budget',
-        dataIndex: 'accumulativeBudget',
-        key: 'accumulativeBudget',
-        render: (text: any) => <span>{text}</span>
-      },
-    ], [dataOneHour, dataThirtyMins, timeSlot])
+      // {
+      //   title: <div className='text-center'>Estimate Hourly Budget</div>,
+      //   dataIndex: 'estimateBudget',
+      //   key: 'estimateBudget',
+      //   render: (text: any) => <span>{text}</span>
+      // },
+      // {
+      //   title: <div className='text-center'>Accumulative Budget</div>,
+      //   dataIndex: 'accumulativeBudget',
+      //   key: 'accumulativeBudget',
+      //   render: (text: any) => <span>{text}</span>
+      // },
+    ], [timeSlot, t])
 
   return (
     <div>
-      <Form
-        form= {form}
-        onValuesChange={handleOnChangeForm}
-        onFinish={onSave}
-        onFinishFailed={onSaveFail}
-        // labelCol={{ span: 4 }}
-        // wrapperCol={{ span: 14 }}
-        // layout="horizontal"
-      >
-        <FRadio name={'timeSlot'} label={''} options={timeSlots}/>
-        <TableGeneral columns={columns} data={timeSlot === 1 ? dataOneHour : dataThirtyMins}/>
+      <div className='panel-heading flex items-center justify-between'>
+        <h2>{t('weight_template_page.clone_weight_template')} {weightTemplate.name}</h2>
+      </div>
+      <div className='form-container'>
+        <Form
+          form= {form}
+          onFinish={onSave}
+          onFinishFailed={onSaveFail}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 14 }}
+          layout="horizontal"
+        > 
+          <FText name={"name"} label={t('commons.name')} errorMessage={renderTranslateInputText(t('commons.name'))} required/>
+          <FTextArea name={"description"} label={t('commons.description')} errorMessage={renderTranslateInputText(t('commons.description'))} />
+          <FRadio disabled name={"type"} value={timeSlot} defaultValue={timeSlot} label={t('weight_template_page.form.time_slot')} options={timeType} onChange={handleChangeTimeType} />
+          
+          <div className='weight-clone-table-css'>
+            <Form.Item name="weightSetting">
+              <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={300} loading={loading}/>
+            </Form.Item>
+          </div>
 
-        <div className='flex items-center justify-between'>
-          <Button type="primary" className='bg-secondary text-white cursor-pointer mr-5'>Apply for this Day Only</Button>
-          <Space className='flex items-center'>
-            <FText name={'templateName'} label={'Template Name'} customCss={'mb-[unset]'} />
-            <Button type="primary" className='bg-secondary text-white cursor-pointer mr-5'>Save As New Template</Button>
+          <Space size="middle" className='w-full flex justify-end mt-8'>
+            <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={onCancel}/>
+            <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')}/>
           </Space>
-        </div>
-      
-      </Form>
+        </Form>
+      </div>
     </div>
   );
 }
