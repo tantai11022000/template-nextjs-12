@@ -425,7 +425,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
             {(selectMode == 3 && isWeight) || selectMode == 3 ? 
             // <div className='flex'>
 
-              <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} specialCustom={<EditOutlined className='ml-6 text-xl cursor-pointer' onClick={() => setOpenModalEditBudgetWeightTemplate(true)} />}/>
+              <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
               // {/* <EditOutlined/> */}
             // {/* </div> */}
             : null}
