@@ -17,7 +17,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { deleteWeightTemplate, getAllWeightTemplates } from '@/services/weight-template';
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
-import EditWeightTemplate from '@/components/modals/EditWeightTemplate';
+import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
