@@ -13,7 +13,6 @@ import FText from '@/components/form/FText';
 import TableGeneral from '@/components/table';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
-import EditWeightTemplate from '@/components/modals/EditWeightTemplate';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
