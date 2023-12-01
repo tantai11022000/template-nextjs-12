@@ -32,6 +32,19 @@
                             }                
                         }
                     }
+
+                    .ant-table-body {
+
+                        .ant-table-tbody {
+
+                            .ant-table-cell {
+
+                                .ant-form-item {
+                                    margin-bottom: unset;
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
@@ -173,6 +186,15 @@
 
 .weight-table-css {
     width: 80%;
+    margin: auto;
+
+    .ant-col-14 {
+        max-width: unset;
+    }
+}
+
+.weight-clone-table-css {
+    width: 100%;
     margin: auto;
 
     .ant-col-14 {

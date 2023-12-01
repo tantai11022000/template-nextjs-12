@@ -13,7 +13,7 @@ import FText from '@/components/form/FText';
 import TableGeneral from '@/components/table';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
-import EditWeightTemplate from '@/components/modals/editWeightTemplate';
+import EditWeightTemplate from '@/components/modals/EditWeightTemplate';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
@@ -82,7 +82,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [modes, setModes] = useState<any[]>(MODES)
   const [showMore, setShowMore] = useState<boolean>(false);
   const [displayedCampaigns, setDisplayedCampaigns] = useState<any[]>([]);
-  const [openModalEditWeightTemplate, setOpenModalEditWeightTemplate] = useState<boolean>(false);
+  const [openModalEditBudgetWeightTemplate, setOpenModalEditBudgetWeightTemplate] = useState<boolean>(false);
   const [selectedWeight, setSelectedWeight] = useState<any>("");
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
@@ -208,15 +208,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const handleEditWeightTemplate = (id: any) => {
-    setOpenModalEditWeightTemplate(!openModalEditWeightTemplate)
+    setOpenModalEditBudgetWeightTemplate(!openModalEditBudgetWeightTemplate)
   }
 
   const handleOk = () => {
-    setOpenModalEditWeightTemplate(false);
+    setOpenModalEditBudgetWeightTemplate(false);
   };
 
   const handleCancel = () => {
-    setOpenModalEditWeightTemplate(false);
+    setOpenModalEditBudgetWeightTemplate(false);
   };
 
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
@@ -423,8 +423,12 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           >
             <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
             {(selectMode == 3 && isWeight) || selectMode == 3 ? 
-              <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates}/>
-            : null}       
+            // <div className='flex'>
+
+              <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} specialCustom={<EditOutlined className='ml-6 text-xl cursor-pointer' onClick={() => setOpenModalEditBudgetWeightTemplate(true)} />}/>
+              // {/* <EditOutlined/> */}
+            // {/* </div> */}
+            : null}
             <Form.Item 
               name="schedule" 
               label={t('schedule_budget_for_campaign.time')}
@@ -478,11 +482,12 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')} onClick={onSaveSchedule}/>
         </div>
       </Form.Item>
-      {openModalEditWeightTemplate && (
-        <Modal width={1000} title="Set Weight for Daily Budget" open={openModalEditWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
-          <EditWeightTemplate/>
+      {openModalEditBudgetWeightTemplate && (
+        <Modal width={1000} title="Set Weight for Daily Budget" open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
+          {/* <EditWeightTemplate/> */}
         </Modal>
       )}
+
     </div>
   );
 }

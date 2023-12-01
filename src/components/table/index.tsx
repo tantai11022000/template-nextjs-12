@@ -19,7 +19,7 @@ interface TableProps {
   handleOnChangeTable?: (pagination:any, filters:any, sorter:any) => void
   customCss?: string,
   loading?: boolean,
-  scrollY?: boolean
+  scrollY?: number
 }
 
 const TableGeneral = (props: TableProps) => {
@@ -61,7 +61,7 @@ const TableGeneral = (props: TableProps) => {
         pagination={tablePagination}
         rowSelection={rowSelection ? rowSelection : null}
         onChange={handleOnChangeTable}
-        scroll={{x: true, y: scrollY ? 500 : undefined}}
+        scroll={{x: true, y: scrollY ? scrollY : undefined}}
         locale={{
           emptyText: t('commons.no_data'),
         }}

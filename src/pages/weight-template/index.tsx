@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import qs from 'query-string';
 import RootLayout from '../../components/layout';
 import DashboardLayout from '../../components/nested-layout/DashboardLayout';
-import { Space } from 'antd';
+import { Modal, Space, Tooltip } from 'antd';
 import TableGeneral from '@/components/table';
 import { DeleteOutlined, EditOutlined, PlusOutlined, CopyOutlined} from '@ant-design/icons';
 import moment from 'moment';
@@ -17,6 +17,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { deleteWeightTemplate, getAllWeightTemplates } from '@/services/weight-template';
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import EditWeightTemplate from '@/components/modals/EditWeightTemplate';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -40,6 +41,11 @@ function WeightTemplate() {
   })
   const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [keyword, setKeyword] = useState<string>("");
+  const [openModalCloneWeightTemplate, setOpenModalCloneWeightTemplate] = useState<boolean>(false)
+  const [weightTemplateInfo, setWeightTemplateInfo] = useState<any>({
+    id: "",
+    name: ""
+  })
 
   useEffect(() => {
     // mapFirstQuery()
@@ -130,6 +136,14 @@ function WeightTemplate() {
     return translate.replace("{text}", text);
   }
 
+  const handleOk = () => {
+    setOpenModalCloneWeightTemplate(false);
+  };
+
+  const handleCancel = () => {
+    setOpenModalCloneWeightTemplate(false);
+  };
+
   const columns: any = useMemo(
     () => [
       {
@@ -164,12 +178,26 @@ function WeightTemplate() {
         width: 100,
         render: (_: any, record: any) => {
           const { id, name } = record
+
+          const handleCloneWeightTemplate = () => {
+            setOpenModalCloneWeightTemplate(!openModalCloneWeightTemplate)
+            setWeightTemplateInfo({id, name})
+          }
+
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <CopyOutlined className='text-lg cursor-pointer' />
-                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
-                <DeleteOutlined className='text-lg cursor-pointer' onClick={() => deleteTemplate(id, name)}/>
+                <Tooltip placement="top" title={"Clone Weight Template"} arrow={true}>
+                  <CopyOutlined className='text-lg cursor-pointer' onClick={handleCloneWeightTemplate} />
+                </Tooltip>
+
+                <Tooltip placement="top" title={"Edit"} arrow={true}>
+                  <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_WEIGHT_TEMPLATE.url}/edit/${record.id}`)}/>
+                </Tooltip>
+
+                <Tooltip placement="top" title={"Delete"} arrow={true}>
+                  <DeleteOutlined className='text-lg cursor-pointer' onClick={() => deleteTemplate(id, name)}/>
+                </Tooltip>
               </Space>
             </div>
           )
@@ -186,6 +214,12 @@ function WeightTemplate() {
       <div>
         <TableGeneral loading={loading} columns={columns} data={weightTemplates} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
       </div>
+
+      {openModalCloneWeightTemplate && (
+        <Modal width={1000} open={openModalCloneWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
+          <EditWeightTemplate weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
+        </Modal>
+      )}
     </div>
   );
 }

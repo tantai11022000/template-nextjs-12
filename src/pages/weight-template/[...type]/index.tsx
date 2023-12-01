@@ -203,7 +203,7 @@ function AddWeightTemplate() {
                 initialValue={weight}
                 getValueFromEvent={(e) => (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value))}
               >
-                <Input type='number' onChange={(e) => handleChangeValueTable(+e.target.value, code)} />
+                <Input type='number' min={0} onChange={(e) => handleChangeValueTable(+e.target.value, code)} />
               </Form.Item>
             );
           },
@@ -229,7 +229,7 @@ function AddWeightTemplate() {
             <FRadio name={"type"} value={timeSlot} defaultValue={timeSlot} label={t('weight_template_page.form.time_slot')} options={timeType} onChange={handleChangeTimeType} />
             <div className='weight-table-css w-[80%] m-auto'>
               <Form.Item name="weightSetting">
-                <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={true} loading={loading}/>
+                <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={500} loading={loading}/>
               </Form.Item>
             </div>
 
