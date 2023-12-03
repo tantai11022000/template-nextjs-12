@@ -3,10 +3,10 @@ import qs from 'query-string';
 import { Dropdown, Input, Space, Switch, Tag } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import TableGeneral from '@/components/table';
-import { getCampaignBudgets } from '@/services/campaign-budgets-services';
+import { changeBudgetCampaign, getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { Modal } from 'antd';
 import { useRouter } from 'next/router';
-import { changeNextPageUrl, updateUrlQuery } from '@/utils/CommonUtils';
+import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount, getIsSyncData, setSyncData } from '@/store/account/accountSlice';
@@ -22,6 +22,7 @@ import SelectFilter from '@/components/commons/filters/SelectFilter';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -110,9 +111,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [selectedAction, setSelectedAction] = useState<any>('');
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
-  const [selectedRowKeys, setSelectedRowKeys] = useState<any>();
+  const [selectedRowKeys, setSelectedRowKeys] = useState<any>()
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
-  console.log(">>> campaignBudgets", campaignBudgets)
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditingList, setIsEditingList] = useState(
@@ -123,6 +123,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     current: 1,
     total: 0,
   })
+  const [changedBudgets, setChangedBudgets] = useState<Array<any>>([]);
 
   useEffect(() => {
     // mapFirstQuery()
@@ -239,9 +240,19 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }
   }
 
-  const handleToggleEdit = (index: any) => {
+  const handleToggleEdit = (IDList: any, index: any) => {
     const updatedIsEditingList = [...isEditingList];
-    updatedIsEditingList[index] = !updatedIsEditingList[index];
+
+    if (IDList == undefined) {
+      updatedIsEditingList[index] = !updatedIsEditingList[index];
+    } else {
+      campaignBudgets.forEach((campaign, index) => {
+        if (IDList.includes(campaign.id)) {
+          updatedIsEditingList[index] = !updatedIsEditingList[index];
+        }
+      });
+    }
+    
     setIsEditingList(updatedIsEditingList);
   };
 
@@ -332,20 +343,42 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const isEditing = isEditingList[index];
 
           const handleBudgetChange = (event: any, index: any) => {
-            console.log(">>> event.target.value", event.target.value)
-            console.log(">>> index", index)
             const updatedBudgets = [...campaignBudgets];
-            updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = event.target.value;
-            setCampaignBudgets(updatedBudgets);
-          };
+            const campaignId = updatedBudgets[index].id;
+            const newBudgetValue = Math.abs(event.target.value);
 
-          const onChangeBudgetCampaign = async () => {
-            try {
-              
-            } catch (error) {
-              console.log(">>> Change Budget Campaign error", error)
+            updatedBudgets[index].adtranAmazonCampaignBudget.dailyBudget = newBudgetValue;
+            setCampaignBudgets(updatedBudgets);
+        
+            const existingChangeIndex = changedBudgets.findIndex((item) => item.campaignId === campaignId);
+            if (existingChangeIndex !== -1) {
+              changedBudgets[existingChangeIndex].value = newBudgetValue;
+            } else {
+              setChangedBudgets((prevChangedBudgets) => [
+                ...prevChangedBudgets,
+                { campaignId: campaignId, value: newBudgetValue },
+              ]);
             }
-          }
+          };
+                
+          const saveChangedBudgets = async () => {
+            try {
+              if (changedBudgets.length === 0) return;
+              const body = {
+                budgets: changedBudgets,
+                partnerAccountId: currentAccount
+              }
+              const result = await changeBudgetCampaign(body)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('campaign_budget_page.budget_campaign')), NOTIFICATION_SUCCESS)
+              }
+              // setChangedBudgets([]);
+              // setSelectedRowKeys([])
+            } catch (error: any) {
+              console.error('Error saving budgets:', error);
+              notificationSimple(error.message, NOTIFICATION_ERROR)
+            }
+          };
 
           return (
             <div className='flex items-center justify-between'>
@@ -356,8 +389,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
                     <Input type='number' min={0} value={budget} onChange={(e) => handleBudgetChange(e, index)} />
                   </div>
               )}
-              <div className='flex ml-2' onClick={() => handleToggleEdit(index)}>
-                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' /> : <EditOutlined className='text-lg cursor-pointer' />}
+              <div className='flex ml-2' onClick={() => handleToggleEdit(selectedRowKeys, index)}>
+                {isEditing ? <SaveOutlined className='text-lg cursor-pointer' onClick={saveChangedBudgets} /> : <EditOutlined className='text-lg cursor-pointer' />}
               </div>
             </div>
           );
@@ -431,6 +464,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const renderTranslateFilterText = (text: any) => {
     let translate = t("commons.filter_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.updated_text");
     return translate.replace("{text}", text);
   }
 

@@ -40,9 +40,20 @@ export const setScheduleBudgetForCampaigns = async (body: any) => {
         return Promise.reject(error);
     }
 }
+
 export const getScheduleBudgetLog = async (paths: any, params: any) => {
     try {
         const response = await campaignBudgetsRepository.getScheduleBudgetLog(paths, params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const changeBudgetCampaign = async (body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.changeBudgetCampaign(body);
         return handleResponse(response);
 
     } catch (error) {

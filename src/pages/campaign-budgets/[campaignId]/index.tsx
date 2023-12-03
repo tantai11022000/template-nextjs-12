@@ -282,13 +282,19 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             let type = ''
             if (statusData == SCHEDULE_STATUS.UPCOMING) {
               status = t('commons.status_enum.upcoming')
-              type = 'success'
+              type = 'warning'
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
               status = <CheckCircleOutlined />
-              type = 'warning'
+              type = 'success'
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
               status = <InfoCircleOutlined />
+              type = 'error'
+            } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
+              status = <InfoCircleOutlined />
               type = 'processing'
+            } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
+              status = <InfoCircleOutlined />
+              type = 'default'
             }
             return (
               <>
@@ -308,7 +314,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
         dataIndex: 'updatedDate',
         key: 'updatedDate',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD | hh:mm:ss") : ""}</p>,
+        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>,
       },
       {
         title: <div className='text-center'>{t('commons.setting_type')}</div>,

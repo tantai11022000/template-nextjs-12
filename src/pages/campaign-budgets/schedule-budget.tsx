@@ -30,6 +30,7 @@ import { ADJUST_CODE } from '@/enums/adjust';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { getAllWeightTemplates } from '@/services/weight-template';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -89,6 +90,10 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     total: 0,
   })
   const [budgets, setBudgets] = useState<any[]>([])
+  const [weightTemplateInfo, setWeightTemplateInfo] = useState<any>({
+    id: "",
+    name: ""
+  })
 
   const date = new Date();
 
@@ -249,7 +254,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const handleOnChangeModeForm = (changedValues: any) => {
-    console.log(">>> changedValues", changedValues)
+    if (changedValues && changedValues.weightTemplateId) setWeightTemplateInfo({...weightTemplateInfo, id: changedValues.weightTemplateId})
   }
 
   const renderTranslateToastifyText = (text: any) => {
@@ -422,11 +427,10 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           >
             <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
             {(selectMode == 3 && isWeight) || selectMode == 3 ? 
-            // <div className='flex'>
-
-              <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
-              // {/* <EditOutlined/> */}
-            // {/* </div> */}
+              <div>
+                <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
+                <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
+              </div>
             : null}
             <Form.Item 
               name="schedule" 
@@ -482,8 +486,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         </div>
       </Form.Item>
       {openModalEditBudgetWeightTemplate && (
-        <Modal width={1000} title="Set Weight for Daily Budget" open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel}>
-          {/* <EditWeightTemplate/> */}
+        <Modal width={1000} open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
+          <EditWeightTemplate title={"Set Weight for daily budget"} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
         </Modal>
       )}
 
