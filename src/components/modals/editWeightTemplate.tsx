@@ -17,11 +17,12 @@ export interface IEditWeightTemplateProps {
   weightTemplate: any,
   onCancel: any,
   onOk: any,
-  refreshData: any
+  refreshData: any,
+  title?: string
 }
 
 export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
-  const { weightTemplate, onCancel, onOk, refreshData } = props
+  const { weightTemplate, onCancel, onOk, refreshData, title } = props
   const { t } = useTranslation()
   const router = useRouter()
   const [form]:any = Form.useForm();
@@ -190,7 +191,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
   return (
     <div>
       <div className='panel-heading flex items-center justify-between'>
-        <h2>{t('weight_template_page.clone_weight_template')} {weightTemplate.name}</h2>
+        <h2>{title ? title : `${t('weight_template_page.clone_weight_template')} ${weightTemplate.name}`}</h2>
       </div>
       <div className='form-container'>
         <Form

@@ -19,5 +19,7 @@ export enum SCHEDULE_STATUS {
     UPCOMING = 0,
     SUCCESSFULLY_EXECUTED = 1,
     FAILED_EXECUTED = 2,
+    IN_QUEUE = 3,
+    PROCESSING = 4,
 }
 

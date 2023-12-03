@@ -160,7 +160,8 @@
     "campaign_budget_page": {
         "campaign_name": "キャンペーン名",
         "portfolio": "ポートフォリオ",
-        "current_budget": "現在の予算"
+        "current_budget": "現在の予算",
+        "budget_campaign": "予算キャンペーン"
     },
 
     "schedule_budget_for_campaign": {

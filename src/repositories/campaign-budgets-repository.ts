@@ -25,3 +25,6 @@ export const getScheduleBudgetLog = (paths: any, params: any) => {
     return userClient.get(`${campaignsUrl}/budget-schedule-log/${paths.campaignId}/${paths.partnerAccountId}`, { params });
 }
 
+export const changeBudgetCampaign = (body: any) => {
+    return userClient.put(`${campaignsUrl}/update-budget`, body);
+}

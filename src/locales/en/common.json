@@ -161,7 +161,8 @@
     "campaign_budget_page": {
         "campaign_name": "Campaign Name",
         "portfolio": "Portfolio",
-        "current_budget": "Current Budget"
+        "current_budget": "Current Budget",
+        "budget_campaign": "Budget Campaign"
     },
 
     "schedule_budget_for_campaign": {
