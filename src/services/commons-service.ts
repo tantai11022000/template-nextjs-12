@@ -10,3 +10,13 @@ export const getDaily30MinsSlot = async () => {
         return Promise.reject(error);
     }
 }
+
+export const getPortfolio = async (id: any) => {
+    try {
+        const response = await commonsRepository.getPortfolio(id);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
