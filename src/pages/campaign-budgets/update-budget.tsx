@@ -320,7 +320,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 
       {openModalConfirmSetupBudgetSchedule && (
         <Modal title="Existing Budget Schedule Warning" open={openModalConfirmSetupBudgetSchedule} onOk={handleOk} onCancel={handleCancel}>
-          <ConfirmSetupBudgetSchedule/>
+          {/* <ConfirmSetupBudgetSchedule/> */}
         </Modal>
       )}
     </>
