@@ -31,3 +31,16 @@ h4.css-dev-only-do-not-override-i0102m.ant-typography {
 .ant-input-number-handler-wrap {
     opacity: unset !important;
 }
+
+.special-customize-form-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    div:first-child, div:last-child {
+        grid-column: span 1 / span 1;
+    }
+
+    .special-customize-form {
+        grid-column: span 2 / span 2;
+    }
+}

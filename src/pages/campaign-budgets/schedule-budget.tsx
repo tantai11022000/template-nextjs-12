@@ -439,69 +439,74 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           </div>
 
           {/* FORM FOR MODE */}
-          <Form
-            form={form}
-            onFinish={onSaveModeForm}
-            onFinishFailed={onSaveModeFormFail}
-            labelCol={{ span: 9 }}
-            wrapperCol={{ span: 9 }}
-            layout="horizontal"
-            initialValues={{
-              'mode': isWeight ? 3 : 0,
-            }}
-            onValuesChange={handleOnChangeModeForm}
-          >
-            <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
-            {(selectMode == 3 && isWeight) || selectMode == 3 ? 
-              <div className='relative'>
-                <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
-                <EditOutlined className='text-xl mb-6 absolute top-0 right-[180px]' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
-              </div>
-            : null}
-            <Form.Item 
-              name="schedule" 
-              label={t('schedule_budget_for_campaign.time')}
-              rules={[{
-                required: true, 
-                message: 'Please choose time',
-              }]}
-              className='range-date-picker-container'
+          <div className='special-customize-form-wrapper'>
+            <div></div>
+            <Form
+              form={form}
+              onFinish={onSaveModeForm}
+              onFinishFailed={onSaveModeFormFail}
+              // labelCol={{ span: 9 }}
+              // wrapperCol={{ span: 9 }}
+              layout="horizontal"
+              initialValues={{
+                'mode': isWeight ? 3 : 0,
+              }}
+              onValuesChange={handleOnChangeModeForm}
+              className='special-customize-form'
             >
-              <DatePicker showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
-            </Form.Item>
-            <Form.Item 
-              name="value" 
-              label={t('schedule_budget_for_campaign.budget_change')}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please input Budget',
-                },
-                ({ getFieldValue }) => ({
-                  validator(_: any, value: any) {
-                    if ((getFieldValue('mode') == 0 || getFieldValue('mode') == 3) && value <= 0) {
-                      return Promise.reject(t('schedule_budget_for_campaign.warning_budget_must_be_greater_than_zero'));
-                    }
-                    return Promise.resolve();
+              <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
+              {(selectMode == 3 && isWeight) || selectMode == 3 ? 
+                <div className='flex'>
+                  <FSelect style={{flex: 1}} required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
+                  <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
+                </div>
+              : null}
+              <Form.Item 
+                name="schedule" 
+                label={t('schedule_budget_for_campaign.time')}
+                rules={[{
+                  required: true, 
+                  message: 'Please choose time',
+                }]}
+                className='range-date-picker-container'
+              >
+                <DatePicker showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
+              </Form.Item>
+              <Form.Item 
+                name="value" 
+                label={t('schedule_budget_for_campaign.budget_change')}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input Budget',
                   },
-                }),
-              ]}
-            >
-              <InputNumber
-                min={selectMode == 0 || selectMode == 3 ? 0 : undefined}
-                prefix={selectMode == 1 ? "" : "￥"}
-                formatter={budgetFormatter}
-                parser={budgetParser}
-                onChange={handleBudgetChange}
-              />    
-            </Form.Item> 
+                  ({ getFieldValue }) => ({
+                    validator(_: any, value: any) {
+                      if ((getFieldValue('mode') == 0 || getFieldValue('mode') == 3) && value <= 0) {
+                        return Promise.reject(t('schedule_budget_for_campaign.warning_budget_must_be_greater_than_zero'));
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
+                ]}
+              >
+                <InputNumber
+                  min={selectMode == 0 || selectMode == 3 ? 0 : undefined}
+                  prefix={selectMode == 1 ? "" : "￥"}
+                  formatter={budgetFormatter}
+                  parser={budgetParser}
+                  onChange={handleBudgetChange}
+                />    
+              </Form.Item> 
 
-            <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
-              <div className='flex justify-center mt-6'>
-                <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.add')}/>
-              </div>
-            </Form.Item>
-          </Form>
+              <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
+                <div className='flex justify-center mt-6'>
+                  <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.add')}/>
+                </div>
+              </Form.Item>
+            </Form>
+            <div></div>
+          </div>
       </div>
       <div>
         <TableGeneral loading={loading} columns={columns} data={budgets} pagination={false} handleOnChangeTable={handleOnChangeTable}/>
