@@ -134,7 +134,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setLoading(true)
     try {
       var params = {
-        pageSize: 999999
+        pageSize: 100
       }
       const result = await getCampaignBudgets(partnerAccountId, params)
       if (result && result.data && result.data.results) {
@@ -453,9 +453,9 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           >
             <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
             {(selectMode == 3 && isWeight) || selectMode == 3 ? 
-              <div>
+              <div className='relative'>
                 <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
-                <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
+                <EditOutlined className='text-xl mb-6 absolute top-0 right-[180px]' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
               </div>
             : null}
             <Form.Item 
