@@ -1,5 +1,7 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useRouter } from 'next/router';
+import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -16,6 +18,11 @@ export interface IAppProps {
 }
 
 export default function App (props: IAppProps) {
+  const router = useRouter()
+  useEffect(() => {
+    router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}`)
+  })
+  
   return (
     <div className='index-container'>
       <div className='main-content'>
