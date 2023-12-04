@@ -7,3 +7,7 @@ export const getDaily30MinsSlot = () => {
     return userClient.get(`${commonsUrl}/daily-30m-slot`);
 }
 
+export const getPortfolio = (id: any) => {
+    return userClient.get(`${commonsUrl}/portfolio/${id}`);
+}
+

@@ -23,6 +23,7 @@ import ActionButton from '@/components/commons/buttons/ActionButton';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { getPortfolio } from '@/services/commons-service';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -128,7 +129,18 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [sort, setSort] = useState<any>({
     orderBy: "",
     sortBy: "asc"
-});
+  });
+  const [portfolio, setPortfolio] = useState<any[]>([])
+  const [mappingPortfolio, setMappingPortfolio] = useState<any[]>([])
+  const [portfolioId, setPortfolioId] = useState<string>("")
+
+  useEffect(() => {
+    const newData = portfolio.map((data: any) => ({
+      value: data.portfolioId,
+      label: data.name
+    }))
+    setMappingPortfolio(newData)
+  }, [portfolio])
 
   useEffect(() => {
     // mapFirstQuery()
@@ -136,12 +148,15 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }, [])
 
   useEffect(() => {
-    if (currentAccount) getCampaignBudgetsList(currentAccount, keyword, status, sort)
+    if (currentAccount) {
+      getCampaignBudgetsList(currentAccount, keyword, status, sort, portfolioId)
+      fetchPortfolio(currentAccount)
+    }
   }, [currentAccount, pagination.pageSize, pagination.current])
 
   useEffect(() => {
     if (isSync) { 
-      getCampaignBudgetsList(currentAccount, keyword, status, sort)
+      getCampaignBudgetsList(currentAccount, keyword, status, sort, portfolioId)
       dispatch(setSyncData({data: false}))
     }
   }, [isSync])
@@ -150,7 +165,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
   
-  const getCampaignBudgetsList = async (partnerAccountId: any, keywords: string, status: number | undefined, sort: any) => {
+  const getCampaignBudgetsList = async (partnerAccountId: any, keywords: string, status: number | undefined, sort: any, portfolioId: string) => {
     setLoading(true)
     try {
       const {pageSize, current} = pagination
@@ -160,6 +175,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         keywords,
         isGetMetric: true,
         status,
+        portfolioId,
         ...sort
       }
 
@@ -174,6 +190,17 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       setLoading(false)
     }
   }
+
+  const fetchPortfolio = async (partnerAccountId: any) => {
+    try {
+      const result = await getPortfolio(partnerAccountId)
+      if (result && result.data){
+        setPortfolio(result.data)
+      }
+    } catch (error) {
+      console.log(">>> fetch Portfolio Error", error)
+    }
+  }
   
   const handleSearch= async(value: string) => {
     setKeyword(value)
@@ -185,7 +212,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       ...pagination,
       current: 1
     })
-    getCampaignBudgetsList(currentAccount, value, status, sort)
+    getCampaignBudgetsList(currentAccount, value, status, sort, portfolioId)
     // updateUrlQuery(router, params)
   }
 
@@ -220,7 +247,13 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const handleSelectedStatus = (values: any) => {
     const { value } = values
     setStatus(value)
-    getCampaignBudgetsList(currentAccount, keyword, value, sort)
+    getCampaignBudgetsList(currentAccount, keyword, value, sort, portfolioId)
+  };
+
+  const handleSelectedPortfolio = (values: any) => {
+    const { value } = values
+    setPortfolioId(value)
+    getCampaignBudgetsList(currentAccount, keyword, status, sort, value)
   };
   
   const onSearchInFilter = (value: string) => {
@@ -243,7 +276,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sortBy: order == "ascend"  ? "asc" : "desc"
       }
     }
-    getCampaignBudgetsList(currentAccount, keyword, status, sort)
+    getCampaignBudgetsList(currentAccount, keyword, status, sort, portfolioId)
     
 
 
@@ -501,10 +534,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   return (
     <>
-      <div className='flex items-center justify-between max-lg:flex-col max-lg:items-stretch'>
+      <div className='flex items-center justify-between max-xl:flex-col max-xl:items-stretch'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
-        <div className='flex items-center gap-6 max-lg:mt-3 max-sm:flex-col max-sm:items-start'>
-          {/* <SelectFilter placeholder={renderTranslateFilterText(t('campaign_budget_page.portfolio'))} onChange={handleSelectedPortfolio} options={statuses} /> */}
+        <div className='flex items-center gap-6 max-xl:mt-3 max-lg:flex-col max-lg:items-start'>
+          <SelectFilter placeholder={renderTranslateFilterText(t('campaign_budget_page.portfolio'))} onChange={handleSelectedPortfolio} options={mappingPortfolio} />
           <SelectFilter placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
           <SelectFilter placeholder={renderTranslateFilterText(t('commons.action'))} onChange={handleSelectedBulkAction} options={bulkAction} value={selectedAction}/>
         </div>
