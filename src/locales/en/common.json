@@ -91,7 +91,8 @@
 
     "error_messages": {
         "no_selected": "No {text} is selected.",
-        "file_empty_or_unreadable": "File is empty or unreadable."
+        "file_empty_or_unreadable": "File is empty or unreadable.",
+        "not_found_page": "This page could not be found."
     },
 
     "metrics": {
