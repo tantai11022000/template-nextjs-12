@@ -12,11 +12,12 @@ export interface IFSelectProps {
   options: IOption[],
   required?: boolean,
   errorMessage?: string,
-  placeholder: string
+  placeholder: string,
+  style?: any
 }
 
 export default function FSelect (props: IFSelectProps) {
-  const {name, label, options, placeholder, required, errorMessage} = props
+  const {name, label, options, placeholder, required, errorMessage, style} = props
   return (
     <Form.Item
       className='select-filter-container'
@@ -26,6 +27,7 @@ export default function FSelect (props: IFSelectProps) {
         required: required ? true : false, 
         message: errorMessage ? errorMessage : 'Please select at least one',
       }]}
+      style={style ? style : ''}
     >
       <Select placeholder={placeholder}>
         {options && options.map((option: any) => <Select.Option key={option.value} value={option.value}>{option.label}</Select.Option>)}
