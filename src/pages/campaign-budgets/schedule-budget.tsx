@@ -457,7 +457,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
               {(selectMode == 3 && isWeight) || selectMode == 3 ? 
                 <div className='flex'>
-                  <FSelect style={{flex: 1}} required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
+                  <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
                   <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
                 </div>
               : null}

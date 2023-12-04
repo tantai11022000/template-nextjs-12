@@ -10,7 +10,6 @@ import FSelect from '@/components/form/FSelect';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getAccountList } from '@/store/account/accountSlice';
 import FUploadFile from '@/components/form/FUploadFile';
-import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
@@ -317,12 +316,6 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           </div>
         </div>
       ) : null}
-
-      {openModalConfirmSetupBudgetSchedule && (
-        <Modal title="Existing Budget Schedule Warning" open={openModalConfirmSetupBudgetSchedule} onOk={handleOk} onCancel={handleCancel}>
-          {/* <ConfirmSetupBudgetSchedule/> */}
-        </Modal>
-      )}
     </>
   );
 }
