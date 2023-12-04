@@ -15,16 +15,11 @@ export async function getStaticProps(context: any) {
   }
 }
 
-export interface IAppProps {
+export interface ICustom404Props {
 }
 
-export default function App (props: IAppProps) {
-  const router = useRouter()
+export default function Custom404 (props: ICustom404Props) {
   const { t } = useTranslation()
-  useEffect(() => {
-    router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}`)
-  })
-  
   return (
     <div className='index-container'>
       <div className='main-content'>

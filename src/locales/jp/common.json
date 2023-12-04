@@ -90,7 +90,8 @@
 
     "error_messages": {
         "no_selected": "いいえ {text} 選択されました.",
-        "file_empty_or_unreadable": "ファイルが空か、読み取りができません."
+        "file_empty_or_unreadable": "ファイルが空か、読み取りができません.",
+        "not_found_page": "このページは見つかりませんでした."
     },
 
     "metrics": {
