@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import { Dropdown, Input, Space, Switch, Tag } from 'antd';
+import { Dropdown, Input, Space, Switch, Tag, Tooltip } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import TableGeneral from '@/components/table';
 import { changeBudgetCampaign, getCampaignBudgets } from '@/services/campaign-budgets-services';
@@ -40,24 +40,24 @@ export interface ICampaignBudgetsProps {
 
 const STATUSES = [
   {
+    id: 1,
+    value: 1,
+    label: "Enable"
+  },
+  {
     id: 2,
-    value: "deliver",
-    label: "In Deliver"
+    value: 2,
+    label: "Paused"
   },
   {
     id: 3,
-    value: "stopped",
-    label: "Stopped"
-  },
-  {
-    id: 4,
-    value: "paused",
-    label: "Paused"
+    value: 3,
+    label: "Archived"
   }, 
   {
-    id: 5,
-    value: "out_budget",
-    label: "Out Budget"
+    id: 4,
+    value: 4,
+    label: "Other"
   }, 
 ]
 
@@ -116,7 +116,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditingList, setIsEditingList] = useState(
-    campaignBudgets.map(() => false)
+    campaignBudgets && campaignBudgets.map(() => false)
   );
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
@@ -124,6 +124,11 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     total: 0,
   })
   const [changedBudgets, setChangedBudgets] = useState<Array<any>>([]);
+  const [status, setStatus] = useState<number | undefined>()
+  const [sort, setSort] = useState<any>({
+    orderBy: "",
+    sortBy: "asc"
+});
 
   useEffect(() => {
     // mapFirstQuery()
@@ -131,12 +136,12 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }, [])
 
   useEffect(() => {
-    if (currentAccount) getCampaignBudgetsList(currentAccount, keyword)
+    if (currentAccount) getCampaignBudgetsList(currentAccount, keyword, status, sort)
   }, [currentAccount, pagination.pageSize, pagination.current])
 
   useEffect(() => {
     if (isSync) { 
-      getCampaignBudgetsList(currentAccount, keyword)
+      getCampaignBudgetsList(currentAccount, keyword, status, sort)
       dispatch(setSyncData({data: false}))
     }
   }, [isSync])
@@ -145,19 +150,22 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   }, [t])
   
-  const getCampaignBudgetsList = async (partnerAccountId: any, keywords: string) => {
+  const getCampaignBudgetsList = async (partnerAccountId: any, keywords: string, status: number | undefined, sort: any) => {
     setLoading(true)
     try {
       const {pageSize, current} = pagination
       var params = {
         page: current,
         pageSize,
-        keywords
+        keywords,
+        isGetMetric: true,
+        status,
+        ...sort
       }
 
       const result = await getCampaignBudgets(partnerAccountId, params)
-      if (result && result.data) {
-        setCampaignBudgets(result.data)
+      if (result && result.data && result.data.results) {
+        setCampaignBudgets(result.data.results)
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)
@@ -177,7 +185,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       ...pagination,
       current: 1
     })
-    getCampaignBudgetsList(currentAccount, value)
+    getCampaignBudgetsList(currentAccount, value, status, sort)
     // updateUrlQuery(router, params)
   }
 
@@ -209,8 +217,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     setSelectedAction(renderTranslateFilterText(t('commons.action')))
   };
 
-  const handleSelectedStatus = (value: string) => {
-    console.log(`selected ${value}`);
+  const handleSelectedStatus = (values: any) => {
+    const { value } = values
+    setStatus(value)
+    getCampaignBudgetsList(currentAccount, keyword, value, sort)
   };
   
   const onSearchInFilter = (value: string) => {
@@ -221,6 +231,22 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
+    console.log(">>> sorter", sorter)
+    const { field, order } = sorter
+    let sort: any = {
+      orderBy: null,
+      sortBy: null
+    }
+    if (order) {
+      sort = {
+        orderBy: field,
+        sortBy: order == "ascend"  ? "asc" : "desc"
+      }
+    }
+    getCampaignBudgetsList(currentAccount, keyword, status, sort)
+    
+
+
     const { current } = pagination
     // changeNextPageUrl(router, current)
     setPagination(pagination)
@@ -284,8 +310,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         key: 'name',
         render: (text: any) => <p>{text}</p>,
 
-        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        sorter: (a: any, b: any) => a.name.localeCompare(b.name),
       },
       {
         title: <div className='text-center'>{t('campaign_budget_page.portfolio')}</div>,
@@ -449,7 +474,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const {id, name} = record
           return (
             <div className='flex justify-center'>
-              <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
+              <Tooltip placement="top" title={"Log"} arrow={true}>
+                <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
+              </Tooltip>
             </div>
           )
         },
@@ -477,6 +504,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       <div className='flex items-center justify-between max-lg:flex-col max-lg:items-stretch'>
           <SearchInput keyword={keyword} name={"keyword"} placeholder={renderTranslateSearchText(t('campaign_budget_page.campaign_name'))} onChange={(event: any) => setKeyword(event.target.value)} onSearch={handleSearch}/>
         <div className='flex items-center gap-6 max-lg:mt-3 max-sm:flex-col max-sm:items-start'>
+          {/* <SelectFilter placeholder={renderTranslateFilterText(t('campaign_budget_page.portfolio'))} onChange={handleSelectedPortfolio} options={statuses} /> */}
           <SelectFilter placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
           <SelectFilter placeholder={renderTranslateFilterText(t('commons.action'))} onChange={handleSelectedBulkAction} options={bulkAction} value={selectedAction}/>
         </div>

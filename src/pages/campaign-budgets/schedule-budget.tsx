@@ -31,6 +31,7 @@ import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { getAllWeightTemplates } from '@/services/weight-template';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
+import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -77,12 +78,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [selectMode, setSelectMode] = useState<number>(isWeight ? 3 : 0)
   const [loading, setLoading] = useState<boolean>(false);
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
+  const [totalCampaignUpcoming, setTotalCampaignUpcoming] = useState<number>()
   const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [mappingWeightTemplates, setMappingWeightTemplates] = useState<any[]>([])
   const [modes, setModes] = useState<any[]>(MODES)
   const [showMore, setShowMore] = useState<boolean>(false);
   const [displayedCampaigns, setDisplayedCampaigns] = useState<any[]>([]);
   const [openModalEditBudgetWeightTemplate, setOpenModalEditBudgetWeightTemplate] = useState<boolean>(false);
+  const [openModalWarning, setOpenModalWarning] = useState<boolean>(false);
+
   const [selectedWeight, setSelectedWeight] = useState<any>("");
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
@@ -133,13 +137,14 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         pageSize: 999999
       }
       const result = await getCampaignBudgets(partnerAccountId, params)
-      if (result && result.data) {
-        const newData = result.data.map((data: any) => {
+      if (result && result.data && result.data.results) {
+        const newData = result.data.results.map((data: any) => {
           data.isCheck = false
           return data
         })
         setCampaignBudgets(newData)
         setDisplayedCampaigns(newData.slice(0, 10))
+        setTotalCampaignUpcoming(result.data.totalCampaignUpcoming)
       }
       setLoading(false)
     } catch (error) {
@@ -223,6 +228,16 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setOpenModalEditBudgetWeightTemplate(false);
   };
 
+  const handleConfirmSettingSchedule = () => {
+    onSaveSchedule()
+    setOpenModalWarning(false);
+    router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+  };
+
+  const handleCancelSettingSchedule = () => {
+    setOpenModalWarning(false);
+  };
+
   const handleOnChangeTable = (pagination:any, filters:any, sorter:any) => {
     const { current } = pagination
     // changeNextPageUrl(router, current)
@@ -268,6 +283,12 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         notificationSimple(t('schedule_budget_for_campaign.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
         return;
       }
+
+      if (hasUpcomingSchedule()) {
+        setOpenModalWarning(true);
+        return;
+      }
+
       const body = {
         budgets: budgets,
         partnerAccountId: currentAccount,
@@ -281,6 +302,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       notificationSimple(error.message, NOTIFICATION_ERROR)
     }
   }
+
+  const hasUpcomingSchedule = () => {
+    console.log(campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule))
+    return campaignBudgets.some((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule);
+  };
 
   const columns: any = useMemo(
     () => [
@@ -386,16 +412,16 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         <div className='panel-heading flex items-center justify-between'>
           <h2>{t('schedule_budget_for_campaign.title')}</h2>
         </div>
-        <Space className='w-full flex items-center justify-between my-6'>
-          {campaignBudgets && campaignBudgets.filter((campaign: any) => campaign.isHaveSchedule == true).length > 0 
-            ? <h3>{renderTranslateCountExistingUpcomingSchedule(campaignBudgets.filter((campaign: any) => campaign.isHaveSchedule == true).length)}</h3>
-            : <h3>{renderTranslateCountExistingUpcomingSchedule(0)}</h3>}
+        {totalCampaignUpcoming && totalCampaignUpcoming > 0 &&
+          <Space className='w-full flex items-center justify-between mt-6'>
+            <h3>{renderTranslateCountExistingUpcomingSchedule(totalCampaignUpcoming)}</h3>
           <Space className='flex items-center'>
             <div className='bg-red p-2 mr-1'></div>
             <span className='text-red'>{t('schedule_budget_for_campaign.note_existing_upcomning_schedule')}</span>
           </Space>
         </Space>
-          <div className='checkbox-group-container'> 
+        }
+          <div className='checkbox-group-container mt-6'> 
             <Checkbox.Group onChange={onChangeCheck} value={campaignIds}>
               <Row>
                 {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
@@ -485,9 +511,16 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')} onClick={onSaveSchedule}/>
         </div>
       </Form.Item>
+
       {openModalEditBudgetWeightTemplate && (
         <Modal width={1000} open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
           <EditWeightTemplate title={"Set Weight for daily budget"} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
+        </Modal>
+      )}
+
+      {openModalWarning && (
+        <Modal open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
+          <ConfirmSetupBudgetSchedule title={'Existing Budget Schedule Warning'} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule)}/>
         </Modal>
       )}
 

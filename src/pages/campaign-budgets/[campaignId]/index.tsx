@@ -314,7 +314,10 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
         dataIndex: 'updatedDate',
         key: 'updatedDate',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>,
+        render: (_: any, record: any) => {
+          const schedule = record.detailedBySetting && record.detailedBySetting.schedule ? record.detailedBySetting.schedule : ""
+          return <p className='text-center'>{schedule ? moment(schedule).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
+        },
       },
       {
         title: <div className='text-center'>{t('commons.setting_type')}</div>,
