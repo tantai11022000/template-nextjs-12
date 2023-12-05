@@ -117,7 +117,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const [keyword, setKeyword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditingList, setIsEditingList] = useState(
-    campaignBudgets && campaignBudgets.map(() => false)
+    campaignBudgets.map(() => false)
   );
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
