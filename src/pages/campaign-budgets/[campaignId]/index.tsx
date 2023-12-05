@@ -315,7 +315,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         dataIndex: 'updatedDate',
         key: 'updatedDate',
         render: (_: any, record: any) => {
-          const schedule = record.detailedBySetting && record.detailedBySetting.schedule ? record.detailedBySetting.schedule : ""
+          const schedule = record.scheduledTime ? record.scheduledTime : ""
           return <p className='text-center'>{schedule ? moment(schedule).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
         },
       },
