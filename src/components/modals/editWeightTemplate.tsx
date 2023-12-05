@@ -73,7 +73,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
       if (result && result.data) {
         const { name, description, type, weightSetting } = result.data
         form.setFieldsValue({
-          name: name,
+          name: "Copy of " + name,
           description: description,
           type: type,
           weightSetting: weightSetting
