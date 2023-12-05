@@ -152,7 +152,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       getCampaignBudgetsList(currentAccount, keyword, status, sort, portfolioId)
       fetchPortfolio(currentAccount)
     }
-  }, [currentAccount, pagination.pageSize, pagination.current])
+  }, [currentAccount, pagination.pageSize, pagination.current, status, sort, portfolioId])
 
   useEffect(() => {
     if (isSync) { 
@@ -217,7 +217,6 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   }
 
   const handleSelectedBulkAction = (values: any) => {
-    console.log(">>>> handleSelectedBulkAction value", values);
     const { value } = values
     if (value == 1) {
       setOpenModalUpdateStatus(true)
@@ -247,24 +246,13 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const handleSelectedStatus = (values: any) => {
     const { value } = values
     setStatus(value)
-    getCampaignBudgetsList(currentAccount, keyword, value, sort, portfolioId)
   };
 
   const handleSelectedPortfolio = (values: any) => {
     const { value } = values
     setPortfolioId(value)
-    getCampaignBudgetsList(currentAccount, keyword, status, sort, value)
   };
-  
-  const onSearchInFilter = (value: string) => {
-    console.log('search:', value);
-  };
-
-  const filterOption = (input: string, option: any) =>
-  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
   const handleOnChangeTable = (pagination:any, filters: any, sorter: any) => {
-    console.log(">>> sorter", sorter)
     const { field, order } = sorter
     let sort: any = {
       orderBy: null,
@@ -276,7 +264,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         sortBy: order == "ascend"  ? "asc" : "desc"
       }
     }
-    getCampaignBudgetsList(currentAccount, keyword, status, sort, portfolioId)
+    setSort(sort)
     
 
 
