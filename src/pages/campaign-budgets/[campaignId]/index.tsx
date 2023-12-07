@@ -314,7 +314,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             } else {
               renderValue = newBudget ? Number(newBudget) % 1 != 0 ? `${Number(newBudget).toFixed(2)}` : `${Number(newBudget)}` : "NA"
             }
-            return <p className={renderColor}> {mode != SETTING_BUDGET_MODE.PERCENTAGE && '￥'}{renderValue}{mode == SETTING_BUDGET_MODE.PERCENTAGE && '%'} {renderAdjust}</p>
+            return (
+              <>
+                {status == SCHEDULE_STATUS.UPCOMING || status == SCHEDULE_STATUS.IN_QUEUE || status == SCHEDULE_STATUS.PROCESSING 
+                  ? <p className={renderColor}> {mode != SETTING_BUDGET_MODE.PERCENTAGE && '￥'}{renderValue}{mode == SETTING_BUDGET_MODE.PERCENTAGE && '%'} {renderAdjust}</p>
+                  : <p>{renderValue}</p>
+                }
+              </>
+            )
           }
           return <p className='text-end'>{renderBudgetValue()}</p>
         }
@@ -428,7 +435,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                 </Space>
               )
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
-              action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined /></Tooltip>
+              action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined className='text-lg'/></Tooltip>
             } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
               action = ''
             } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
