@@ -224,7 +224,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }
   }
   const handleServerResponse = (excel: any) => {
-    const file = new Blob([excel], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8' });
+    const file = new Blob([excel], { type: 'text/csv;charset=utf-8' });
     const fileName = `Export_Campaigns.csv`;
     try {
         FileSaver.saveAs(file, fileName);
