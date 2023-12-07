@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
-import { Space, Switch, Tag } from 'antd';
+import { Space, Switch, Tag, Tooltip } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from "moment-timezone";
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
@@ -15,7 +15,13 @@ import {
   GoldOutlined,
   CheckCircleOutlined,
   InfoCircleOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  LoadingOutlined,
+  UnorderedListOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined
 } from '@ant-design/icons';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
 import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
@@ -28,6 +34,8 @@ import { getCurrentAccount } from '@/store/account/accountSlice';
 import { deleteScheduleById, getScheduleBudgetLog } from '@/services/campaign-budgets-services';
 import { SCHEDULE_STATUS } from '@/enums/status';
 import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { SETTING_BUDGET_MODE } from '@/enums/mode';
+import { ADJUST_CODE } from '@/enums/adjust';
 
 
 export const getStaticPaths = async () => {
@@ -265,18 +273,50 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         title: <div className='text-center'>{t('commons.before')}</div>,
         dataIndex: 'oldBudget',
         key: 'oldBudget',
-        render: (text: any) => {
+        render: (text: any, record: any) => {
           const oldBudget = Number(text)
-          return <p className='text-end'>{oldBudget % 1 != 0 ? `￥ ${oldBudget.toFixed(2)}` : `￥ ${oldBudget}`}</p>
+          return <p className='text-end'>{text ? oldBudget % 1 != 0 ? `￥${Number(text).toFixed(2)}` : `￥${Number(text)}` : "NA"}</p>
         }
       },
       {
         title: <div className='text-center'>{t('commons.after')}</div>,
         dataIndex: 'newBudget',
         key: 'newBudget',
-        render: (text: any) => {
-          const newBudget = Number(text)
-          return <p className='text-end'>{newBudget % 1 != 0 ? `￥ ${newBudget.toFixed(2)}` : `￥ ${newBudget}`}</p>
+        render: (text: any, record: any) => {
+          const { status, newBudget } = record
+          const { adjust, mode, value } = record.detailedBySetting
+          const renderBudgetValue = () => {
+            let renderAdjust: any
+            let renderMode: any
+            let renderValue: any
+            let renderColor = ''
+            if (status == SCHEDULE_STATUS.UPCOMING || status == SCHEDULE_STATUS.IN_QUEUE || status == SCHEDULE_STATUS.PROCESSING) {
+              if (mode == SETTING_BUDGET_MODE.DAILY || mode == SETTING_BUDGET_MODE.EXACT) {
+                renderAdjust = ''
+                renderValue = value
+                renderMode = '￥'
+              } else if (mode == SETTING_BUDGET_MODE.PERCENTAGE || mode == SETTING_BUDGET_MODE.FIXED) {
+                if (mode == SETTING_BUDGET_MODE.PERCENTAGE) {
+                  renderMode = '%'
+                } else {
+                  renderMode = '￥'
+                }
+                if (adjust == ADJUST_CODE.INCREASE) {
+                  renderAdjust = <ArrowUpOutlined />
+                  renderValue = value
+                  renderColor = 'text-green'
+                } else if (adjust == ADJUST_CODE.DECREASE) {
+                  renderAdjust = <ArrowDownOutlined />
+                  renderValue = value
+                  renderColor = 'text-red'
+                }
+              }
+            } else {
+              renderValue = newBudget ? Number(newBudget) % 1 != 0 ? `${Number(newBudget).toFixed(2)}` : `${Number(newBudget)}` : "NA"
+            }
+            return <p className={renderColor}> {mode != SETTING_BUDGET_MODE.PERCENTAGE && '￥'}{renderValue}{mode == SETTING_BUDGET_MODE.PERCENTAGE && '%'} {renderAdjust}</p>
+          }
+          return <p className='text-end'>{renderBudgetValue()}</p>
         }
       },
       {
@@ -292,16 +332,16 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
               status = t('commons.status_enum.upcoming')
               type = 'warning'
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
-              status = <CheckCircleOutlined />
+              status = <Tooltip placement="top" title={t('commons.status_enum.success')} arrow={true}><CheckCircleOutlined /></Tooltip>
               type = 'success'
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
-              status = <InfoCircleOutlined />
+              status = <Tooltip placement="top" title={t('commons.status_enum.fail')} arrow={true}><InfoCircleOutlined /></Tooltip>
               type = 'error'
             } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
-              status = <InfoCircleOutlined />
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_process')} arrow={true}><LoadingOutlined /></Tooltip>
               type = 'processing'
             } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
-              status = <InfoCircleOutlined />
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_queue')} arrow={true}><UnorderedListOutlined /></Tooltip>
               type = 'default'
             }
             return (
@@ -351,40 +391,48 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         key: 'action',
         render: (_: any, record: any) => {
           const statusData = record.status
-          const { status, id, detailedBySettingId } = record
+          const { status, id, detailedBySettingId, note } = record
           const { mode } = record && record.detailedBySetting
           const renderActionType = () => {
             let action: any = ''
             if (statusData == SCHEDULE_STATUS.UPCOMING) {
               action = (
                 <Space size="middle" className='flex justify-center'>
-                  <EditOutlined className='text-lg cursor-pointer' 
-                    onClick={() => router.push({
-                      pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-                      query: {
-                        isEdit: true,
-                        campaignIds: campaignId,
-                        campaignNames: campaignName ? campaignName : "",
-                        scheduleId: detailedBySettingId
-                      }
-                    })}
-                  /> 
-                  <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
+                  <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
+                    <EditOutlined className='text-lg cursor-pointer' 
+                      onClick={() => router.push({
+                        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+                        query: {
+                          isEdit: true,
+                          campaignIds: campaignId,
+                          campaignNames: campaignName ? campaignName : "",
+                          scheduleId: detailedBySettingId
+                        }
+                      })}
+                    />
+                  </Tooltip>
+                  <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
+                    <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
+                  </Tooltip>
                 </Space>
               )
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
               action = (
                 <Space size="middle" className='flex justify-center'>
-                  <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
-                  <GoldOutlined className='text-lg cursor-pointer' />
+                  <Tooltip placement="top" title={t('campaign_performance_history_log_page.performance_history')} arrow={true}>
+                    <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
+                  </Tooltip>
+                  <Tooltip placement="top" title={t('schedule_budget_for_campaign.weight')} arrow={true}>
+                    <GoldOutlined className='text-lg cursor-pointer' />
+                  </Tooltip>
                 </Space>
               )
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
-              action = <FileTextOutlined />
+              action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined /></Tooltip>
             } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
-              action = <InfoCircleOutlined />
+              action = ''
             } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
-              action = <InfoCircleOutlined />
+              action = ''
             }
             return action
           }

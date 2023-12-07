@@ -41,7 +41,12 @@
 
             "active": "アクティブ",
             "inactive": "非活性",
-            "upcoming": "今後の"
+            "upcoming": "今後の",
+
+            "success": "成功",
+            "fail": "失敗した",
+            "in_process": "処理中",
+            "in_queue": "順番待ち"
         },
 
         "action_type" : {
@@ -56,7 +61,10 @@
             "finish": "完了",
             "add": "追加",
             "update": "アップデート",
-            "confirm": "確認する"
+            "confirm": "確認する",
+            "log": "ログ",
+            "delete": "消去",
+            "history": "歴史"
         },
 
         "weight_type": {
@@ -163,7 +171,8 @@
         "campaign_name": "キャンペーン名",
         "portfolio": "ポートフォリオ",
         "current_budget": "現在の予算",
-        "budget_campaign": "予算キャンペーン"
+        "budget_campaign": "予算キャンペーン",
+        "warning_select_at_least_one_campaign": "エクスポートする前に、少なくとも 1 つのキャンペーンを選択してください."
     },
 
     "schedule_budget_for_campaign": {
@@ -204,7 +213,8 @@
     },
 
     "campaign_performance_history_log_page": {
-        "title": "「スケジュールログ: {text} - パフォーマンス履歴」"
+        "title": "「スケジュールログ: {text} - パフォーマンス履歴」",
+        "performance_history": "パフォーマンス履歴」"
     },
 
     "target_bidding_page": {

@@ -29,7 +29,7 @@ import { useTranslation } from 'next-i18next';
 import { ADJUST_CODE } from '@/enums/adjust';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { getAllWeightTemplates } from '@/services/weight-template';
-import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/utils/Constants';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import moment from 'moment-timezone';
@@ -282,7 +282,13 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     }
 
     fieldsValue.value = Math.abs(fieldsValue.value)
-    setBudgets((budgets: any) => [fieldsValue, ...budgets]);
+
+    const validateBudgets = [...budgets]
+    if (validateBudgets.some((budget: any) => budget.schedule == fieldsValue.schedule)) {
+      notificationSimple("The time you are selecting already exists", NOTIFICATION_WARN)
+    } else {
+      setBudgets((budgets: any) => [fieldsValue, ...budgets]);
+    }
   };
 
   const onSaveModeFormFail = (value: any) => {

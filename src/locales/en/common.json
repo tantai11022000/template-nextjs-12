@@ -41,7 +41,12 @@
             
             "active": "Active",
             "inactive": "Inactive",
-            "upcoming": "Upcoming"
+            "upcoming": "Upcoming",
+
+            "success": "Success",
+            "fail": "Fail",
+            "in_process": "In Process",
+            "in_queue": "In Queue"
         },
 
         "action_type" : {
@@ -56,7 +61,10 @@
             "finish": "Finish",
             "add": "Add",
             "update": "Update",
-            "confirm": "Confirm"
+            "confirm": "Confirm",
+            "log": "Log",
+            "delete": "Delete",
+            "history": "History"
         },
 
         "weight_type": {
@@ -164,7 +172,8 @@
         "campaign_name": "Campaign Name",
         "portfolio": "Portfolio",
         "current_budget": "Current Budget",
-        "budget_campaign": "Budget Campaign"
+        "budget_campaign": "Budget Campaign",
+        "warning_select_at_least_one_campaign": "Please select at least one campaign before exporting."
     },
 
     "schedule_budget_for_campaign": {
@@ -205,7 +214,8 @@
     },
 
     "campaign_performance_history_log_page": {
-        "title": "Schedule Log: {text} - Performance History"
+        "title": "Schedule Log: {text} - Performance History",
+        "performance_history": "Performance History"
     },
 
     "target_bidding_page": {

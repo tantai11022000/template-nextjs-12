@@ -219,8 +219,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       }
       const result = await exportCampaignsCSVFile(params, body)
       handleServerResponse(result)
-    } catch (error) {
-      
+    } catch (error: any) {
+      console.log(">>> Export Csv File Error", error)
+      notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
     }
   }
   const handleServerResponse = (excel: any) => {
@@ -256,25 +257,33 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-status`)
     } else if (value == 3) {
       router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/update-budget`)
-    }else if (value == 4) {
-      router.push({
-        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-        query: {
-          campaignIds: selectedRowKeys,
-          campaignNames: selectedRowsWithCampaignName,
-          isHaveSchedule: selectedRowsWithIsHaveSchedule
-        }
-      })
+    } else if (value == 4) {
+      if (selectedRowKeys == undefined) {
+        notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
+      } else {
+        router.push({
+          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+          query: {
+            campaignIds: selectedRowKeys,
+            campaignNames: selectedRowsWithCampaignName,
+            isHaveSchedule: selectedRowsWithIsHaveSchedule
+          }
+        })
+      }
     } else if (value == 5) {
-      router.push({
-        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-        query: {
-          isWeight: true,
-          campaignIds: selectedRowKeys,
-          campaignNames: selectedRowsWithCampaignName,
-          isHaveSchedule: selectedRowsWithIsHaveSchedule
-        }
-      })
+      if (selectedRowKeys == undefined) {
+        notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
+      } else {
+        router.push({
+          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+          query: {
+            isWeight: true,
+            campaignIds: selectedRowKeys,
+            campaignNames: selectedRowsWithCampaignName,
+            isHaveSchedule: selectedRowsWithIsHaveSchedule
+          }
+        })
+      }
     } else if (value == 6) {
       onExportCsvFile(selectedRowKeys, currentAccount, keyword, 0, sort )
     }
@@ -524,8 +533,8 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           const {id, name} = record
           return (
             <div className='flex justify-center'>
-              <Tooltip placement="top" title={"Log"} arrow={true}>
-                <FileTextOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
+              <Tooltip placement="top" title={t('commons.action_type.log')} arrow={true}>
+                <FileTextOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
               </Tooltip>
             </div>
           )

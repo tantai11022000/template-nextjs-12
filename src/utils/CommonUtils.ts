@@ -1,15 +1,13 @@
 import qs from 'query-string';
 import { toast } from 'react-toastify';
 
-const getStoredLanguage = () => {
+export const getStoredLanguage = () => {
   if (typeof window !== 'undefined') {
     const storedLanguage = localStorage.getItem('language') || 'en';
     return storedLanguage;
   }
   return 'en';
 };
-
-export default getStoredLanguage;
 
 import { NOTIFICATION_DARK, NOTIFICATION_ERROR, NOTIFICATION_INFO, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from './Constants';
 export function cleanObject(obj:any) {
@@ -133,4 +131,36 @@ export const readAsBinaryString = (file: any) => {
 
     reader.readAsBinaryString(file);
   });
+};
+
+export const trimFieldValues = (values: any) => {
+  const trimString = (value: string) => (typeof value === 'string' ? value.trim() : value);
+
+    const trimNestedObject = (obj: any) => {
+      const trimmedObj: any = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          const value = obj[key];
+          if (typeof value === 'object' && value !== null) {
+            trimmedObj[key] = trimNestedObject(value);
+          } else {
+            trimmedObj[key] = trimString(value);
+          }
+        }
+      }
+      return trimmedObj;
+    };
+
+    const trimmedValues: any = {};
+    for (const key in values) {
+      if (Object.prototype.hasOwnProperty.call(values, key)) {
+        const value = values[key];
+        if (typeof value === 'object' && value !== null) {
+          trimmedValues[key] = trimNestedObject(value);
+        } else {
+          trimmedValues[key] = trimString(value);
+        }
+      }
+    }
+    return trimmedValues;
 };
