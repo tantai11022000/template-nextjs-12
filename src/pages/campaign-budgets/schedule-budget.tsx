@@ -437,15 +437,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any, index: any) => {
+          const settingScheduleId = record.settingScheduleId
           const onDeleteSchedule = (indexSchedule: any) => {
             const updatedBudgets = budgets.filter((item: any, index: any) => index !== indexSchedule);
             setBudgets(updatedBudgets);
           }
-          const lastIndexOfBudgets = budgets.length - 1;
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                {index === lastIndexOfBudgets ? null : <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(index)}/>}
+                {settingScheduleId ? null : <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(index)}/>}
               </Space>
             </div>
           )
