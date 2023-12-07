@@ -333,23 +333,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const handleMapEditData = async () => {
     try {
       const result = await getScheduleById(scheduleId)
-      console.log(">>> result", result)
       if (result && result.data) {
         const { mode, adjust, value, schedule } = result.data
         form.setFieldsValue({
           mode: mode,
           adjust: adjust,
-          value: value,
+          value: adjust != 2 ? Math.abs(value) : -Math.abs(value),
           schedule: moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`)
         })
-        // setBudgets([
-        //   {
-        //     mode: mode,
-        //     adjust: adjust,
-        //     value: value,
-        //     schedule: moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD HH:mm")
-        //   }
-        // ])
+        setSelectMode(mode)
       }
     } catch (error) {
      console.log(">>> Get Account Info Error", error)
