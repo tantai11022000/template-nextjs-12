@@ -28,3 +28,19 @@ export const getScheduleBudgetLog = (paths: any, params: any) => {
 export const changeBudgetCampaign = (body: any) => {
     return userClient.put(`${campaignsUrl}/update-budget`, body);
 }
+
+export const deleteScheduleById = (params: any) => {
+    return userClient.delete(`${campaignsUrl}/${params.partnerAccountId}/${params.scheduleId}`);
+}
+
+export const getScheduleById = (id: any) => {
+    return userClient.get(`${campaignsUrl}/getSettingBudgetById/${id}`);
+}
+
+export const exportCampaignsCSVFile = (params: any, body: any) => {
+    return userClient.post(`${campaignsUrl}/exportCSV/schedule`, body, {
+        params, responseType: 'arraybuffer', headers: {
+            'Content-Disposition': 'attachment; filename="example.csv"'
+        }
+    });
+}

@@ -4,7 +4,7 @@ import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
 import { Space, Switch, Tag } from 'antd';
 import TableGeneral from '@/components/table';
-import moment from "moment";
+import moment from "moment-timezone";
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
@@ -14,18 +14,21 @@ import {
   FundOutlined,
   GoldOutlined,
   CheckCircleOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
-import { changeNextPageUrl } from '@/utils/CommonUtils';
+import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import type { Dayjs } from 'dayjs';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { getScheduleBudgetLog } from '@/services/campaign-budgets-services';
+import { deleteScheduleById, getScheduleBudgetLog } from '@/services/campaign-budgets-services';
 import { SCHEDULE_STATUS } from '@/enums/status';
+import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
+
 
 export const getStaticPaths = async () => {
   return {
@@ -251,25 +254,30 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     }
   };
 
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.deleted_text")
+    return translate.replace("{text}", text);
+  }
+
   const columnsBudgetLog: any = useMemo(
     () => [
       {
         title: <div className='text-center'>{t('commons.before')}</div>,
         dataIndex: 'oldBudget',
         key: 'oldBudget',
-        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
-
-        onFilter: (value: string, record: any) => record.oldBudget.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.oldBudget - b.oldBudget,
+        render: (text: any) => {
+          const oldBudget = Number(text)
+          return <p className='text-end'>{oldBudget % 1 != 0 ? `￥ ${oldBudget.toFixed(2)}` : `￥ ${oldBudget}`}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.after')}</div>,
         dataIndex: 'newBudget',
         key: 'newBudget',
-        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
-
-        onFilter: (value: string, record: any) => record.newBudget.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.newBudget - b.newBudget,
+        render: (text: any) => {
+          const newBudget = Number(text)
+          return <p className='text-end'>{newBudget % 1 != 0 ? `￥ ${newBudget.toFixed(2)}` : `￥ ${newBudget}`}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.status')}</div>,
@@ -302,13 +310,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
               </>
             )
           }
-        return (
-            <div className='flex justify-center uppercase'>
-              {renderStatus()}
-            </div>
-        );
+          return (
+              <div className='flex justify-center uppercase'>
+                {renderStatus()}
+              </div>
+          );
         },
-        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
@@ -316,8 +323,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         key: 'updatedDate',
         render: (_: any, record: any) => {
           const schedule = record.scheduledTime ? record.scheduledTime : ""
-          return <p className='text-center'>{schedule ? moment(schedule).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
-        },
+          return <p className='text-center'>{schedule ? moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.setting_type')}</div>,
@@ -326,9 +333,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (_: any, record: any) => {
           const mode = record.detailedBySetting && record.detailedBySetting.mode ? record.detailedBySetting.mode : ""
           return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.settingType - b.settingType
+        }
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
@@ -338,26 +343,71 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           const firstName = record.detailedBySetting && record.detailedBySetting.modifier.firstName ? record.detailedBySetting.modifier.firstName : ""
           const lastName = record.detailedBySetting && record.detailedBySetting.modifier.lastName ? record.detailedBySetting.modifier.lastName : ""
           return <p className='text-center'>{firstName + ' ' + lastName}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
+        }
       },
       {
         title: <div className='text-center'>{t('commons.action')}</div>,
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
-            const {id} = record
-            return (
-              <div className='flex justify-center'>
+          const statusData = record.status
+          const { status, id, detailedBySettingId } = record
+          const { mode } = record && record.detailedBySetting
+          const renderActionType = () => {
+            let action: any = ''
+            if (statusData == SCHEDULE_STATUS.UPCOMING) {
+              action = (
                 <Space size="middle" className='flex justify-center'>
-                  <EditOutlined className='text-lg cursor-pointer' />
-                  <DeleteOutlined className='text-lg cursor-pointer'/>
-                  <FundOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
+                  <EditOutlined className='text-lg cursor-pointer' 
+                    onClick={() => router.push({
+                      pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+                      query: {
+                        isEdit: true,
+                        campaignIds: campaignId,
+                        campaignNames: campaignName ? campaignName : "",
+                        scheduleId: detailedBySettingId
+                      }
+                    })}
+                  /> 
+                  <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
+                </Space>
+              )
+            } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
+              action = (
+                <Space size="middle" className='flex justify-center'>
+                  <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
                   <GoldOutlined className='text-lg cursor-pointer' />
                 </Space>
-              </div>
-            )
+              )
+            } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
+              action = <FileTextOutlined />
+            } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
+              action = <InfoCircleOutlined />
+            } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
+              action = <InfoCircleOutlined />
+            }
+            return action
+          }
+
+          const onDeleteSchedule = async (id: any) => {
+            try {
+              const params = {
+                partnerAccountId: currentAccount,
+                scheduleId: id
+              }
+              const result = await deleteScheduleById(params)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
+              }
+            } catch (error) {
+              
+            }
+          }
+          return (
+            <div className='flex justify-center'>
+              {renderActionType()}
+            </div>
+          )
         },
       },
     ], [budgetLog, t]
@@ -408,13 +458,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             }
             return <Tag color={type} className='uppercase'>{status}</Tag>
           }
-        return (
-            <div className='flex justify-center uppercase'>
-              {renderStatus()}
-            </div>
-        );
+          return (
+              <div className='flex justify-center uppercase'>
+                {renderStatus()}
+              </div>
+          );
         },
-        // sorter: (a: any, b: any) => a.status - b.status,
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
@@ -427,16 +476,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         dataIndex: 'settingType',
         key: 'settingType',
         render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
-
-        // sorter: (a: any, b: any) => a.settingType - b.settingType
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
         dataIndex: 'userUpdate',
         key: 'userUpdate',
         render: (text: any) => <p>{text}</p>,
-
-        // sorter: (a: any, b: any) => a.userUpdate - b.userUpdate
       },
       {
         title: <div className='text-center'>{t('commons.log')}</div>,

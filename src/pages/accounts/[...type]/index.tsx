@@ -66,10 +66,6 @@ export default function AddAccount (props: IAddAccountProps) {
     setIsEdit(valueEdit)
     if (valueEdit) {
       handleMapEditData()
-    } else {
-      form.setFieldsValue({
-        timeSlot: 1
-      })
     }
   },[router])
 

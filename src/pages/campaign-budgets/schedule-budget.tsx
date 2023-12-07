@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import FMultipleCheckbox from '@/components/form/FMultipleCheckbox';
-import { getCampaignBudgets, setScheduleBudgetForCampaigns } from '@/services/campaign-budgets-services';
+import { getCampaignBudgets, getScheduleById, setScheduleBudgetForCampaigns } from '@/services/campaign-budgets-services';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount } from '@/store/account/accountSlice';
 import { Button, Checkbox, Col, Form, InputNumber, Modal, Radio, Row, Select, Space, Spin, Typography, Slider, DatePicker } from 'antd';
@@ -32,6 +32,7 @@ import { getAllWeightTemplates } from '@/services/weight-template';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
+import moment from 'moment-timezone';
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -71,14 +72,30 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const currentAccount = useAppSelector(getCurrentAccount)
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const campaignIDsFromQuery: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : [];
-  const campaignIDs = Array.isArray(campaignIDsFromQuery) ? campaignIDsFromQuery : [campaignIDsFromQuery];
+
+  const scheduleId: any = router && router.query && router.query.scheduleId ? router.query.scheduleId : '';
+
+  const campaignIDsQuery: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : [];
+  const campaignIDsFromQuery = Array.isArray(campaignIDsQuery) ? campaignIDsQuery : [campaignIDsQuery];
+  
+  const campaignNamesQuery: any = router && router.query && router.query.campaignNames && router.query.campaignNames.length ? router.query.campaignNames : [];
+  const campaignNamesFromQuery = Array.isArray(campaignNamesQuery) ? campaignNamesQuery : [campaignNamesQuery];
+
+  const isHaveScheduleQuery: any = router && router.query && router.query.isHaveSchedule && router.query.isHaveSchedule.length ? router.query.isHaveSchedule : [];
+  const isHaveScheduleFromQuery = Array.isArray(isHaveScheduleQuery) ? isHaveScheduleQuery.map(value => value === 'true') : [isHaveScheduleQuery === 'true'];
+  
+  const campaignIDs = Array.isArray(campaignIDsQuery) ? campaignIDsQuery : [campaignIDsQuery];
+
+  const [campaignId, setCampaignId] = useState(campaignIDsFromQuery)
+  const [campaignName, setCampaignName] = useState(campaignNamesFromQuery)
+  const [campaignHaveSchedule, setCampaignHaveSchedule] = useState(isHaveScheduleFromQuery)
+  
   const isWeight = router && router.query && router.query.isWeight ? true : false
+  const valueEdit = router && router.query && router.query.isEdit ? true : false
   const [campaignIds, setCampaignIds] = useState<any[]>(campaignIDs);
   const [selectMode, setSelectMode] = useState<number>(isWeight ? 3 : 0)
   const [loading, setLoading] = useState<boolean>(false);
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
-  const [totalCampaignUpcoming, setTotalCampaignUpcoming] = useState<number>()
   const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [mappingWeightTemplates, setMappingWeightTemplates] = useState<any[]>([])
   const [modes, setModes] = useState<any[]>(MODES)
@@ -86,6 +103,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [displayedCampaigns, setDisplayedCampaigns] = useState<any[]>([]);
   const [openModalEditBudgetWeightTemplate, setOpenModalEditBudgetWeightTemplate] = useState<boolean>(false);
   const [openModalWarning, setOpenModalWarning] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false)
+  const [isScheduleNeedEdit, setIsScheduleNeedEdit] = useState<boolean>(true)
 
   const [selectedWeight, setSelectedWeight] = useState<any>("");
   const [pagination, setPagination] = useState<any>({
@@ -99,7 +118,29 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     name: ""
   })
 
-  const date = new Date();
+  useEffect(() => {
+    setIsEdit(valueEdit)
+    if (valueEdit) {
+      handleMapEditData()
+    }
+  },[router])
+
+  useEffect(() => {
+    const newData = campaignId.map((id: any, index: any) => ({
+      id,
+      name: campaignName[index],
+      isHaveSchedule: campaignHaveSchedule[index],
+    }));
+    setCampaignBudgets(newData)
+    setDisplayedCampaigns(newData.slice(0, 10))
+  }, [router.query.campaignIds, router.query.campaignNames, router.query.isHaveSchedule])
+
+  useEffect(() => {
+    setCampaignId(campaignIDsFromQuery)
+    setCampaignName(campaignNamesFromQuery)
+    setCampaignHaveSchedule(campaignHaveSchedule)
+  }, [router.query.campaignIds, router.query.campaignNames, router.query.isHaveSchedule])
+  
 
   useEffect(() => {
     if (currentAccount) init();
@@ -126,31 +167,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }, [weightTemplates])
 
   const init = () => {
-    getCampaignBudgetsList(currentAccount)
     fetchAllWeightTemplates()
-  }
-
-  const getCampaignBudgetsList = async (partnerAccountId: any) => {
-    setLoading(true)
-    try {
-      var params = {
-        pageSize: 100
-      }
-      const result = await getCampaignBudgets(partnerAccountId, params)
-      if (result && result.data && result.data.results) {
-        const newData = result.data.results.map((data: any) => {
-          data.isCheck = false
-          return data
-        })
-        setCampaignBudgets(newData)
-        setDisplayedCampaigns(newData.slice(0, 10))
-        setTotalCampaignUpcoming(result.data.totalCampaignUpcoming)
-      }
-      setLoading(false)
-    } catch (error) {
-      console.log(">>> error", error)
-      setLoading(false)
-    }
   }
 
   const fetchAllWeightTemplates = async () => {
@@ -170,7 +187,6 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const onChangeCheck = (value: any) => {
-    console.log(">>> onChangeCheck value", value)
     setCampaignIds(value);
   }
 
@@ -245,6 +261,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const onSaveModeForm = (fieldsValue: any) => {
+    if (isScheduleNeedEdit && valueEdit) {
+      fieldsValue.settingScheduleId = Number(scheduleId);
+      setIsScheduleNeedEdit(false); 
+    }
+
     if (fieldsValue.mode == 0 ) {
       fieldsValue.adjust = 0
       fieldsValue.schedule = fieldsValue && fieldsValue.schedule ? fieldsValue.schedule.format('YYYY-MM-DD HH:mm') : ""
@@ -303,10 +324,41 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     }
   }
 
+  const handleMapEditData = async () => {
+    try {
+      const result = await getScheduleById(scheduleId)
+      console.log(">>> result", result)
+      if (result && result.data) {
+        const { mode, adjust, value, schedule } = result.data
+        form.setFieldsValue({
+          mode: mode,
+          adjust: adjust,
+          value: value,
+          schedule: moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`)
+        })
+        // setBudgets([
+        //   {
+        //     mode: mode,
+        //     adjust: adjust,
+        //     value: value,
+        //     schedule: moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD HH:mm")
+        //   }
+        // ])
+      }
+    } catch (error) {
+     console.log(">>> Get Account Info Error", error)
+    }
+  }
+
   const hasUpcomingSchedule = () => {
     console.log(campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule))
     return campaignBudgets.some((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule);
   };
+
+  const onGoToCampaignScheduleBudget = (event: any, id: any, name: any) => {
+    event.preventDefault()
+    router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})
+  }
 
   const columns: any = useMemo(
     () => [
@@ -345,10 +397,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               {renderAdjustName()} {renderModeName()}
             </div>
           )
-        },
-
-        onFilter: (value: string, record: any) => record.name.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.name.localeCompare(b.name),
+        }
       },
       {
         title: <div className='text-center'>{t('schedule_budget_for_campaign.time')}</div>,
@@ -365,9 +414,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           return (
             <div className='flex justify-center'>{mode != SETTING_BUDGET_MODE.PERCENTAGE && "￥"} {value} {mode == SETTING_BUDGET_MODE.PERCENTAGE && "%"}</div>
           )
-        },
-
-        // sorter: (a: any, b: any) => a.imp - b.imp
+        }
       },
       {
         title: <div className='text-center'>{t('schedule_budget_for_campaign.weight')}</div>,
@@ -383,11 +430,16 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
-        render: (_: any, record: any) => {
+        render: (_: any, record: any, index: any) => {
+          const onDeleteSchedule = (indexSchedule: any) => {
+            const updatedBudgets = budgets.filter((item: any, index: any) => index !== indexSchedule);
+            setBudgets(updatedBudgets);
+          }
+          const lastIndexOfBudgets = budgets.length - 1;
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <DeleteOutlined className='text-lg cursor-pointer'/>
+                {index === lastIndexOfBudgets ? null : <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(index)}/>}
               </Space>
             </div>
           )
@@ -412,21 +464,23 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         <div className='panel-heading flex items-center justify-between'>
           <h2>{t('schedule_budget_for_campaign.title')}</h2>
         </div>
-        {totalCampaignUpcoming && totalCampaignUpcoming > 0 &&
+        {campaignBudgets && campaignBudgets.filter((campaign: any) => campaign.isHaveSchedule == true).length > 0 &&
           <Space className='w-full flex items-center justify-between mt-6'>
-            <h3>{renderTranslateCountExistingUpcomingSchedule(totalCampaignUpcoming)}</h3>
+            <h3>{renderTranslateCountExistingUpcomingSchedule(campaignBudgets.filter((campaign: any) => campaign.isHaveSchedule == true).length)}</h3>
           <Space className='flex items-center'>
             <div className='bg-red p-2 mr-1'></div>
             <span className='text-red'>{t('schedule_budget_for_campaign.note_existing_upcomning_schedule')}</span>
           </Space>
         </Space>
         }
-          <div className='checkbox-group-container mt-6'> 
+          <div className='checkbox-group-container my-6'> 
             <Checkbox.Group onChange={onChangeCheck} value={campaignIds}>
               <Row>
                 {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
                   <Col key={campaign.id} span={8}>
-                    <Checkbox value={campaign.id.toString()} className={`${campaign.isHaveSchedule ? 'upcoming' : ''}`}>{campaign.name}</Checkbox>
+                    <Checkbox value={campaign.id.toString()} className={`${campaign.isHaveSchedule ? 'upcoming' : ''}`}>
+                      <p onClick={(e) => onGoToCampaignScheduleBudget(e, campaign.id, campaign.name)}>{campaign.name}</p>
+                    </Checkbox>
                   </Col>
                 )) : <Spin/>}
               </Row>

@@ -170,8 +170,8 @@ export default function Accounts (props: IAccountsProps) {
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
-                <DeleteOutlined className='text-lg cursor-pointer'/>
+                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
+                {/* <DeleteOutlined className='text-lg cursor-pointer'/> */}
               </Space>
             </div>
           )

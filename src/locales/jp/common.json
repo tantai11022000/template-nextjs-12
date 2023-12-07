@@ -22,6 +22,7 @@
         "time": "時間",
         "activated": "有効化済",
         "user": "ユーザー",
+        "schedule": "スケジュール",
         "campaign_name": "キャンペーン名",
         "campaign_id": "キャンペーンID",
         "from_time": "時間から",

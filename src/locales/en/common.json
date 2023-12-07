@@ -22,6 +22,7 @@
         "time": "Time",
         "activated": "Activated",
         "user": "User",
+        "schedule": "Schedule",
         "campaign_name": "Campaign Name",
         "campaign_id": "Campaign ID",
         "from_time": "From Time",

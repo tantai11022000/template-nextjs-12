@@ -60,3 +60,33 @@ export const changeBudgetCampaign = async (body: any) => {
         return Promise.reject(error);
     }
 }
+
+export const deleteScheduleById = async (params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.deleteScheduleById(params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getScheduleById = async (id: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleById(id);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const exportCampaignsCSVFile = async (params: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.exportCampaignsCSVFile(params, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
