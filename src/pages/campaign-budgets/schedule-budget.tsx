@@ -33,6 +33,8 @@ import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/u
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import moment from 'moment-timezone';
+import type { RangePickerProps } from 'antd/es/date-picker';
+
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -105,7 +107,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [openModalWarning, setOpenModalWarning] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false)
   const [isScheduleNeedEdit, setIsScheduleNeedEdit] = useState<boolean>(true)
-
+  const [isShowEditIcon, setIsShowEditIcon] = useState<boolean>(false)
   const [selectedWeight, setSelectedWeight] = useState<any>("");
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
@@ -296,7 +298,10 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const handleOnChangeModeForm = (changedValues: any) => {
-    if (changedValues && changedValues.weightTemplateId) setWeightTemplateInfo({...weightTemplateInfo, id: changedValues.weightTemplateId})
+    if (changedValues && changedValues.weightTemplateId) {
+      setIsShowEditIcon(true)
+      setWeightTemplateInfo({...weightTemplateInfo, id: changedValues.weightTemplateId})
+    }
   }
 
   const renderTranslateToastifyText = (text: any) => {
@@ -349,7 +354,6 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const hasUpcomingSchedule = () => {
-    console.log(campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule))
     return campaignBudgets.some((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule);
   };
 
@@ -357,6 +361,10 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     event.preventDefault()
     router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})
   }
+
+  const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    return current && current < dayjs().endOf('day');
+  };
 
   const columns: any = useMemo(
     () => [
@@ -509,8 +517,8 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               <FRadio required name={'mode'} label={t('schedule_budget_for_campaign.mode')} options={modes} onChange={handleChangeMode} value={selectMode}/>
               {(selectMode == 3 && isWeight) || selectMode == 3 ? 
                 <div className='flex'>
-                  <FSelect required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
-                  <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>
+                  <FSelect customCss={'max-w-[1000px] w-[1000px]'} required name={'weightTemplateId'} label={t('schedule_budget_for_campaign.weight_template')} placeholder={renderTranslateFilterText(t('schedule_budget_for_campaign.weight_template'))} options={mappingWeightTemplates} />
+                  {isShowEditIcon && <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>}
                 </div>
               : null}
               <Form.Item 
@@ -522,7 +530,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
                 }]}
                 className='range-date-picker-container'
               >
-                <DatePicker showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
+                <DatePicker disabledDate={selectMode == 3 ? disabledDate: undefined} showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
               </Form.Item>
               <Form.Item 
                 name="value" 
