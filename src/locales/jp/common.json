@@ -259,6 +259,8 @@
         "last_updated": "最終更新",
         "action": "アクション",
         "clone_weight_template": "ウェイト テンプレートからクローンを作成します: ",
+        "set_weight_for_daily_budget": "1 日の予算の重みを設定する",
+        "preview_weight_template": "ウェイトテンプレートのプレビュー",
 
         "form": {
             "title": "{action} ウェイトテンプレート",

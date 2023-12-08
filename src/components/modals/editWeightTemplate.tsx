@@ -17,12 +17,13 @@ export interface IEditWeightTemplateProps {
   weightTemplate: any,
   onCancel: any,
   onOk: any,
-  refreshData: any,
-  title?: string
+  refreshData?: any,
+  title?: string,
+  preview?: boolean
 }
 
 export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
-  const { weightTemplate, onCancel, onOk, refreshData, title } = props
+  const { weightTemplate, onCancel, onOk, refreshData, title, preview } = props
   const { t } = useTranslation()
   const router = useRouter()
   const [form]:any = Form.useForm();
@@ -30,6 +31,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
   const [timeMinutes, setTimeMinutes] = useState<any[]>([])
   const [timeHours, setTimeHours] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [weightTemplateName, setWeightTemplateName] = useState<string>("")
   const timeType = [
     {
       value: 0,
@@ -73,12 +75,13 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
       if (result && result.data) {
         const { name, description, type, weightSetting } = result.data
         form.setFieldsValue({
-          name: "Copy of " + name,
+          name: !preview ? `Copy of ${name}` : name,
           description: description,
           type: type,
           weightSetting: weightSetting
         })
         setTimeSlot(type)
+        setWeightTemplateName(name)
       }
       setLoading(false)
     } catch (error) {
@@ -191,7 +194,10 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
   return (
     <div>
       <div className='panel-heading flex items-center justify-between'>
-        <h2>{title ? title : `${t('weight_template_page.clone_weight_template')} ${weightTemplate.name}`}</h2>
+        {preview 
+          ? <h2>{title ? `${title}: ${weightTemplateName}` : ""}</h2>
+          : <h2>{title ? title : `${t('weight_template_page.clone_weight_template')} ${weightTemplate.name}`}</h2>
+        }
       </div>
       <div className='form-container'>
         <Form
@@ -201,6 +207,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 14 }}
           layout="horizontal"
+          disabled={preview}
         > 
           <FText name={"name"} label={t('commons.name')} errorMessage={renderTranslateInputText(t('commons.name'))} required/>
           <FTextArea name={"description"} label={t('commons.description')} errorMessage={renderTranslateInputText(t('commons.description'))} />
@@ -211,11 +218,12 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
               <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={300} loading={loading}/>
             </Form.Item>
           </div>
-
-          <Space size="middle" className='w-full flex justify-end mt-8'>
-            <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={onCancel}/>
-            <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')}/>
-          </Space>
+          {!preview && (
+            <Space size="middle" className='w-full flex justify-end mt-8'>
+              <ActionButton className={'cancel-button'} label={t('commons.action_type.cancel')} onClick={onCancel}/>
+              <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')}/>
+            </Space>
+          )}
         </Form>
       </div>
     </div>

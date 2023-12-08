@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { useRouter } from 'next/router';
-import { Space, Switch, Tag, Tooltip } from 'antd';
+import { Modal, Space, Switch, Tag, Tooltip } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from "moment-timezone";
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
@@ -36,6 +36,7 @@ import { SCHEDULE_STATUS } from '@/enums/status';
 import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { ADJUST_CODE } from '@/enums/adjust';
+import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 
 
 export const getStaticPaths = async () => {
@@ -117,6 +118,11 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const dispatch = useAppDispatch()
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [statusLog, setStatusLog] = useState<any[]>([])
+  const [openModalPreviewWeightTemplate, setOpenModalPreviewWeightTemplate] = useState<boolean>(false);
+  const [weightTemplateInfo, setWeightTemplateInfo] = useState<any>({
+    id: "",
+    name: ""
+  })
   const [filterModeOptions, setFilterModeOptions] = useState<any[]>([
     {
       value: 'all',
@@ -267,6 +273,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     return translate.replace("{text}", text);
   }
 
+  const handleOk = () => {
+    setOpenModalPreviewWeightTemplate(false);
+  };
+
+  const handleCancel = () => {
+    setOpenModalPreviewWeightTemplate(false);
+  };
+
   const columnsBudgetLog: any = useMemo(
     () => [
       {
@@ -397,7 +411,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         render: (_: any, record: any) => {
           const statusData = record.status
           const { status, id, detailedBySettingId, note } = record
-          const { mode } = record && record.detailedBySetting
+          const { mode, adtranWeightTemplateId } = record && record.detailedBySetting
+
+          const handleOpenWeightTemplateInfo = (id: any) => {
+            setWeightTemplateInfo({...weightTemplateInfo, id: adtranWeightTemplateId})
+            setOpenModalPreviewWeightTemplate(!openModalPreviewWeightTemplate)
+          }
           const renderActionType = () => {
             let action: any = ''
             if (statusData == SCHEDULE_STATUS.UPCOMING) {
@@ -422,16 +441,26 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                 </Space>
               )
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
-              action = (
-                <Space size="middle" className='flex justify-center'>
-                  <Tooltip placement="top" title={t('campaign_performance_history_log_page.performance_history')} arrow={true}>
-                    <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
-                  </Tooltip>
-                  <Tooltip placement="top" title={t('schedule_budget_for_campaign.weight')} arrow={true}>
-                    <GoldOutlined className='text-lg cursor-pointer' />
-                  </Tooltip>
-                </Space>
-              )
+              if (mode == SETTING_BUDGET_MODE.DAILY) {
+                action = (
+                  <Space size="middle" className='flex justify-center'>
+                    <Tooltip placement="top" title={t('campaign_performance_history_log_page.performance_history')} arrow={true}>
+                      <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
+                    </Tooltip>
+                    <Tooltip placement="top" title={t('weight_template_page.preview_weight_template')} arrow={true}>
+                      <GoldOutlined className='text-lg cursor-pointer' onClick={() => handleOpenWeightTemplateInfo(adtranWeightTemplateId)} />
+                    </Tooltip>
+                  </Space>
+                )
+              } else {
+                action = (
+                  <Space size="middle" className='flex justify-center'>
+                    <Tooltip placement="top" title={t('campaign_performance_history_log_page.performance_history')} arrow={true}>
+                      <FundOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}/history/${id}`, query: { campaignName }})}/>
+                    </Tooltip>
+                  </Space>
+                )
+              }
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
               action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined className='text-lg'/></Tooltip>
             } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
@@ -591,6 +620,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         </div>
         <TableGeneral loading={loading} columns={columnsStatusLog} data={statusLog} pagination={pagination.statusLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "STATUS")} />
       </div>
+
+      {openModalPreviewWeightTemplate && (
+        <Modal width={1000} open={openModalPreviewWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
+          <EditWeightTemplate preview title={t('weight_template_page.preview_weight_template')} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel}/>
+        </Modal>
+      )}
     </div>
   );
 }

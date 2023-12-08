@@ -571,7 +571,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
       {openModalEditBudgetWeightTemplate && (
         <Modal width={1000} open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
-          <EditWeightTemplate title={"Set Weight for daily budget"} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
+          <EditWeightTemplate title={t('weight_template_page.set_weight_for_daily_budget')} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
         </Modal>
       )}
 

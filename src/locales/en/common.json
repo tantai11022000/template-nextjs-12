@@ -259,6 +259,8 @@
         "last_updated": "Last Updated",
         "action": "Action",
         "clone_weight_template": "Clone from Weight Template: ",
+        "set_weight_for_daily_budget": "Set Weight for daily budget",
+        "preview_weight_template": "Preview Weight Template",
 
         "form": {
             "title": "{action} Weight Template",
