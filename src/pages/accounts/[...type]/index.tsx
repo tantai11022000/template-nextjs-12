@@ -70,10 +70,10 @@ export default function AddAccount (props: IAddAccountProps) {
   },[router])
 
   useEffect(() => {
-    let breadcrumb = [BREADCRUMB_ACCOUNT];
+    let breadcrumb = [{label: t('breadcrumb.accounts') , url: '/accounts'}];
   
     if (valueEdit) breadcrumb.push({ label: id, url: '' })
-    else breadcrumb.push(BREADCRUMB_ADD)
+    else breadcrumb.push({label: t('breadcrumb.add') , url: ''})
     dispatch(setBreadcrumb({data: breadcrumb}))
   },[valueEdit, id])
 

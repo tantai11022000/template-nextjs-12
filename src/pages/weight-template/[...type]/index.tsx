@@ -72,9 +72,9 @@ function AddWeightTemplate() {
       setIsEdit(valueEdit)
       if (valueEdit) {
         handleMapEditData()
-        dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_EDIT, { label: id, url: '' }]}))
+        dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}, {label: t('breadcrumb.edit') , url: ''}, { label: id, url: '' }]}))
       } else {
-        dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE, BREADCRUMB_ADD]}))
+        dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}, {label: t('breadcrumb.add') , url: ''}]}))
       }
     },[router])
 
