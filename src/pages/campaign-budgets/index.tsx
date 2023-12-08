@@ -147,7 +147,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   useEffect(() => {
     // mapFirstQuery()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}]}))
   }, [])
 
   useEffect(() => {

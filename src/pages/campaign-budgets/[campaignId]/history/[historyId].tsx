@@ -76,7 +76,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
 
   useEffect(() => {
     if (!historyId || !campaignId) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, { label: campaignId, url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}, { label: historyId, url: ``}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, { label: campaignName, url: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaignId}`}, { label: t('breadcrumb.performance_history'), url: ``}]}))
   }, [historyId, campaignId])
 
   const init = () => {
@@ -91,8 +91,8 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         page: current,
         pageSize,
         total,
-        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD") : "",
-        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD") : "",
+        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD HH:mm") : "",
+        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD HH:mm") : "",
       }
       const result = await getCampaignPerformanceHistoryLog(campaignId, params)
       if (result && result.data) {
@@ -123,7 +123,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         key: 'updateTime',
         render: (_: any, record: any) => {
           const time = record.date ? record.date : "-"
-          return <p className='text-end'>{moment(time).format("hh:mm:ss")}</p>
+          return <p className='text-center'>{moment(time).format("YYYY-MM-DD | HH:mm:ss")}</p>
         },
       },
       {
@@ -146,13 +146,12 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
             }
             return <Tag color={type}>{status}</Tag>
           }
-        return (
-            <div className='flex justify-center uppercase'>
-              {renderStatus()}
-            </div>
-        );
-        },
-        // sorter: (a: any, b: any) => a.status - b.status,
+          return (
+              <div className='flex justify-center uppercase'>
+                {renderStatus()}
+              </div>
+          );
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.imp')}</div>,
@@ -161,9 +160,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         render: (_: any, record: any) => {
           const imp = record.metrics && record.metrics.impressions ? record.metrics.impressions : "-"
           return <p className='text-end'>{imp}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.imp - b.imp
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.click')}</div>,
@@ -172,17 +169,13 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         render: (_: any, record: any) => {
           const click = record.metrics && record.metrics.clicks ? record.metrics.clicks : "-"
           return <p className='text-end'>{click}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.click - b.click
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.cpm')}</div>,
         dataIndex: 'cpm',
         key: 'cpm',
-        render: (text: any) => <p className='text-end'>{text || "-"}</p>,
-
-        // sorter: (a: any, b: any) => a.cpm - b.cpm
+        render: (text: any) => <p className='text-end'>{text || "-"}</p>
       },
       {
         title: <div className='text-center'>{t('metrics.sale')}</div>,
@@ -191,9 +184,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         render: (_: any, record: any) => {
           const sale = record.metrics && record.metrics.sales ? record.metrics.sales : "-"
           return <p className='text-end'>{sale}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.sale - b.sale
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.cv')}</div>,
@@ -210,9 +201,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         render: (_: any, record: any) => {
           const cost = record.metrics && record.metrics.cost ? record.metrics.cost : "-"
           return <p className='text-end'>{cost}</p>
-        },
-
-        // sorter: (a: any, b: any) => a.cost - b.cost
+        }
       },
     ], [budgetHistory, t]
   )
@@ -245,7 +234,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         <div className='flex items-center justify-between mt-5'>
         <h3>Budget Update on 17 23rd-Aug-2023</h3>
         <Space>
-          <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
+          <RangeDatePicker showTime duration={duration} onRangeChange={onRangeChange}/>
           <SelectFilter placeholder={"Export"} onChange={handleChange} options={exportType}/>
         </Space>
         </div>

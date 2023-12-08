@@ -49,7 +49,7 @@ function WeightTemplate() {
 
   useEffect(() => {
     // mapFirstQuery()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}]}))
   },[])
 
   useEffect(() => {

@@ -165,7 +165,16 @@
     },
 
     "breadcrumb": {
-
+        "campaign_budgets": "Campaign Budgets",
+        "target_bidding": "Target Bidding",
+        "accounts": "Accounts",
+        "weight_template": "Weight Template",
+        "add": "Add",
+        "edit": "Edit",
+        "schedule_budget": "Schedule Budget",
+        "update_budget": "Update Campaign Budget",
+        "update_status": "Update Campaign Status",
+        "performance_history": "Performance History"
     },
 
     "campaign_budget_page": {

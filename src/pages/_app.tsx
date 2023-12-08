@@ -68,8 +68,9 @@ function App({ Component, pageProps }: any) {
       }
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
-        store.dispatch(setAccountList({data: result.data}))
-        store.dispatch(setCurrentAccount({data: result.data[0].id}))
+        const activeAccounts = result.data.filter((account: any) => account.status == 1)
+        store.dispatch(setAccountList({data: activeAccounts}))
+        store.dispatch(setCurrentAccount({data: activeAccounts[0].id}))
       }
     } catch (error) {
       console.log(">>> Get All Partner Accounts Error", error)

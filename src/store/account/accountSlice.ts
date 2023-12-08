@@ -36,7 +36,7 @@ const slice = createSlice({
       state,
       { payload: { data } }: PayloadAction<{ data: IAccount[] }>
     ) => {
-      state.accounts = data.filter((account: any) => account.status == 1);
+      state.accounts = data ? data : [];
     },
 
     setCurrentAccount: (

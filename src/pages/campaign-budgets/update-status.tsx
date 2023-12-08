@@ -108,7 +108,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 
   useEffect(() => {
     init()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Update Campaign Status' , url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: t('breadcrumb.update_status') , url: ''}]}))
   }, [])
 
   const init = () => {

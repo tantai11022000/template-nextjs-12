@@ -173,7 +173,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
 
   useEffect(() => {
     if (!campaignId) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: campaignId , url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: campaignName , url: ''}]}))
   },[campaignId])
   
   const fetchScheduleBudgetLog = async (mode: string, duration: any) => {
@@ -311,14 +311,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                   renderColor = 'text-red'
                 }
               }
-            } else {
-              renderValue = newBudget ? Number(newBudget) % 1 != 0 ? `${Number(newBudget).toFixed(2)}` : `${Number(newBudget)}` : "NA"
             }
             return (
               <>
                 {status == SCHEDULE_STATUS.UPCOMING || status == SCHEDULE_STATUS.IN_QUEUE || status == SCHEDULE_STATUS.PROCESSING 
                   ? <p className={renderColor}> {mode != SETTING_BUDGET_MODE.PERCENTAGE && '￥'}{renderValue}{mode == SETTING_BUDGET_MODE.PERCENTAGE && '%'} {renderAdjust}</p>
-                  : <p>{renderValue}</p>
+                  : <p>{newBudget ? Number(newBudget) % 1 != 0 ? `￥${Number(newBudget).toFixed(2)}` : `￥${Number(newBudget)}` : "NA"}</p>
                 }
               </>
             )
@@ -339,16 +337,16 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
               status = t('commons.status_enum.upcoming')
               type = 'warning'
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
-              status = <Tooltip placement="top" title={t('commons.status_enum.success')} arrow={true}><CheckCircleOutlined /></Tooltip>
+              status = <Tooltip placement="top" title={t('commons.status_enum.success')} arrow={true}><CheckCircleOutlined className='text-lg'/></Tooltip>
               type = 'success'
             } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
-              status = <Tooltip placement="top" title={t('commons.status_enum.fail')} arrow={true}><InfoCircleOutlined /></Tooltip>
+              status = <Tooltip placement="top" title={t('commons.status_enum.fail')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
               type = 'error'
             } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
-              status = <Tooltip placement="top" title={t('commons.status_enum.in_process')} arrow={true}><LoadingOutlined /></Tooltip>
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_process')} arrow={true}><LoadingOutlined className='text-lg'/></Tooltip>
               type = 'processing'
             } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
-              status = <Tooltip placement="top" title={t('commons.status_enum.in_queue')} arrow={true}><UnorderedListOutlined /></Tooltip>
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_queue')} arrow={true}><UnorderedListOutlined className='text-lg' /></Tooltip>
               type = 'default'
             }
             return (

@@ -155,7 +155,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }, [campaignBudgets]);
 
   useEffect(() => {
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Schedule Budget' , url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: t('breadcrumb.schedule_budget') , url: ''}]}))
   },[])
 
   useEffect(() => {

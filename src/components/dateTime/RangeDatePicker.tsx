@@ -33,7 +33,7 @@ const RangeDatePicker = (props: IRangeDatePickerProps) => {
   return (
     <div className='range-date-picker-container'>
       <Space direction="vertical" size={12}>
-        <RangePicker showTime={showTime ? true : false} format={showTime ? "YYYY/MM/DD HH:mm:ss" : "YYYY/MM/DD"} defaultValue={[dayjs(duration && duration.startDate ? moment(duration.startDate).format("YYYY/MM/DD") : ""), dayjs(duration && duration.endDate ? moment(duration.endDate).format("YYYY/MM/DD") : "")]} presets={rangePresets} onChange={onRangeChange} />
+        <RangePicker showTime={showTime ? true : false} format={showTime ? "YYYY/MM/DD HH:mm" : "YYYY/MM/DD"} defaultValue={[dayjs(duration && duration.startDate ? moment(duration.startDate).format("YYYY/MM/DD") : ""), dayjs(duration && duration.endDate ? moment(duration.endDate).format("YYYY/MM/DD") : "")]} presets={rangePresets} onChange={onRangeChange} />
       </Space>
     </div>
   )

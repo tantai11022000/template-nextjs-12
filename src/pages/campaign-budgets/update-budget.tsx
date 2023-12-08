@@ -109,7 +109,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 
   useEffect(() => {
     init()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_CAMPAIGN_BUDGET, {label: 'Update Campaign Budget' , url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: t('breadcrumb.update_budget') , url: ''}]}))
   }, [])
 
   const init = () => {

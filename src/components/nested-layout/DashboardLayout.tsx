@@ -83,7 +83,7 @@ const DashboardLayout = (props: any) => {
             <div className='flex items-center justify-between px-6 py-4 max-h-[36px] bg-[#f5f5f5] max-md:flex-col max-md:items-start'>
               <Breadcrumbs/>
                 {showGlobalButton.partnerAccount &&
-                  <div className='flex items-center max-md: mt-2'>
+                  <div className='flex items-center max-md:mt-2'>
                       <div className='select-filter-container mr-3'>
                         <Select
                           labelInValue

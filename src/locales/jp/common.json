@@ -164,7 +164,16 @@
     },
 
     "breadcrumb": {
-
+        "campaign_budgets": "キャンペーンの予算",
+        "target_bidding": "ターゲット入札",
+        "accounts": "アカウント",
+        "weight_template": "ウェイトテンプレート",
+        "add": "追加",
+        "edit": "編集",
+        "schedule_budget": "予算をスケジュールする",
+        "update_budget": "キャンペーン予算を更新する",
+        "update_status": "キャンペーンステータスの更新",
+        "performance_history": "パフォーマンス履歴」"
     },
 
     "campaign_budget_page": {

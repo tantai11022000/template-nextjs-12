@@ -17,7 +17,7 @@ import { USER_STATUS } from '@/enums/status';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
-import { setAccountList } from '@/store/account/accountSlice';
+import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice';
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -44,7 +44,7 @@ export default function Accounts (props: IAccountsProps) {
   })
 
   useEffect(() => {
-    dispatch(setBreadcrumb({data: [BREADCRUMB_ACCOUNT]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.accounts') , url: '/accounts'}]}))
   }, [])
 
   useEffect(() => {
@@ -68,7 +68,9 @@ export default function Accounts (props: IAccountsProps) {
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         setAccounts(result.data)
-        dispatch(setAccountList({data: result.data}))
+        const activeAccounts = result.data.filter((account: any) => account.status == 1)
+        dispatch(setAccountList({data: activeAccounts}))
+        dispatch(setCurrentAccount({data: activeAccounts[0].id}))
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)

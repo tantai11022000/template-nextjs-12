@@ -17,6 +17,24 @@ import {
   GoldOutlined
 } from '@ant-design/icons';
 import { changeNextPageUrl } from '@/utils/CommonUtils';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
+import { useTranslation } from 'next-i18next';
+export const getStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking'
+  }
+};
+
+export async function getStaticProps(context: any) {
+  const { locale } = context
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+      locale: 'en'
+    },
+  }
+}
 
 export interface ITargetDetailProps {
 }
@@ -61,7 +79,7 @@ const BUDGET_UPDATE_LOG = [
 ]
 
 export default function TargetDetail (props: ITargetDetailProps) {
-  const { Title } = Typography
+  const { t } = useTranslation()
   const router = useRouter()
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetLog, setBudgetLog] = useState<any[]>([])
@@ -86,7 +104,7 @@ export default function TargetDetail (props: ITargetDetailProps) {
 
   useEffect(() => {
     if (!id) return
-    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING, {label: id, url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}, {label: id, url: ''}]}))
   }, [id])
 
   const init = () => {

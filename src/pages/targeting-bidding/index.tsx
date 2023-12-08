@@ -154,7 +154,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   useEffect(() => {
     // mapFirstQuery()
     init();
-    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}]}))
   }, [])
 
   useEffect(() => {
