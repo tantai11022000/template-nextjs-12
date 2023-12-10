@@ -27,6 +27,7 @@
         "campaign_id": "キャンペーンID",
         "from_time": "時間から",
         "to_time": "時間に",
+        "all": "全て",
 
         "filter_label": {
             "status": "ステータス",
@@ -82,6 +83,7 @@
             "added_text": "{text} が正常に追加されました.",
             "removed_text": "{text} は正常に削除されました.",
             "generated_text": "{text} が正常に生成されました.",
+            "uploaded_text": "{text} は正常にアップロードされました.",
 
             "created": "作成完了.",
             "updated": "アップロード完了.",
@@ -100,6 +102,8 @@
     "error_messages": {
         "no_selected": "いいえ {text} 選択されました.",
         "file_empty_or_unreadable": "ファイルが空か、読み取りができません.",
+        "field_empty_or_unreadable": "フィールドが空であるか、読み取り不能です.",
+        "field_empty_or_unreadable_and_upload_again": "一部のフィールドが空であるか、読み取り不能です. 修正して再度アップロードしてください.",
         "not_found_page": "このページは見つかりませんでした."
     },
 
@@ -275,5 +279,18 @@
             "hour": "時間",
             "time": "時間"
         }
+    },
+
+    "upload_csv": {
+        "status": "ステータス",
+        "campaign_name": "キャンペーン名",
+        "campaign_id": "キャンペーンID",
+        "budget": "予算",
+        "update_schedule": "更新スケジュール",
+        "mode": "モード",
+        "trend": "トレンド",
+        "weight_template_id": "ウェイトテンプレートID",
+        "rows_passed": "渡された行数",
+        "rows_failed": "行が失敗しました"
     }
 }

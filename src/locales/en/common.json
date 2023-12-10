@@ -27,6 +27,7 @@
         "campaign_id": "Campaign ID",
         "from_time": "From Time",
         "to_time": "To Time",
+        "all": "All",
         
         "filter_label": {
             "status": "Status",
@@ -82,6 +83,7 @@
             "added_text": "{text} has been added successfully.",
             "removed_text": "{text} has been removed successfully.",
             "generated_text": "{text} has been generated successfully.",
+            "uploaded_text": "{text} has been uploaded successfully.",
 
             "created": "Created successfully.",
             "updated": "Updated successfully.",
@@ -101,6 +103,8 @@
     "error_messages": {
         "no_selected": "No {text} is selected.",
         "file_empty_or_unreadable": "File is empty or unreadable.",
+        "field_empty_or_unreadable": "Field is empty or unreadable.",
+        "field_empty_or_unreadable_and_upload_again": "Some fields are empty or unreadable. Please correct and upload again.",
         "not_found_page": "This page could not be found."
     },
 
@@ -275,5 +279,18 @@
             "hour": "Hours",
             "time": "Time"
         }
+    },
+
+    "upload_csv": {
+        "status": "Status",
+        "campaign_name": "Campaign Name",
+        "campaign_id": "Campaign ID",
+        "budget": "Budget",
+        "update_schedule": "Update Schedule",
+        "mode": "Mode",
+        "trend": "Trend",
+        "weight_template_id": "Weight Template ID",
+        "rows_passed": "Rows passed",
+        "rows_failed": "Rows failed"
     }
 }

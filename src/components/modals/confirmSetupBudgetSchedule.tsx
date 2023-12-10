@@ -98,7 +98,7 @@ export default function ConfirmSetupBudgetSchedule (props: IConfirmSetupBudgetSc
         key: 'action',
         align: 'center',
         render: (_: any, record: any) => {
-          const {id, name} = record
+          const { id, name } = record
           return (
             <Link href={{pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}}}>
               <a target="_blank" rel="noopener noreferrer">View Schedule</a>

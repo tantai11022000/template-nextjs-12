@@ -31,6 +31,16 @@ export const uploadBudgetScheduleCSVFile = async (id: any, body: any) => {
     }
 }
 
+export const uploadBudgetScheduleCSVFile2 = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadBudgetScheduleCSVFile2(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const setScheduleBudgetForCampaigns = async (body: any) => {
     try {
         const response = await campaignBudgetsRepository.setScheduleBudgetForCampaigns(body);

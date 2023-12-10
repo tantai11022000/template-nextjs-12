@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Button, Form, Modal, Select, Space, Tag, Typography } from 'antd';
+import { Button, Form, Modal, Select, Space, Tag, Tooltip, Typography } from 'antd';
 import UploadFile from '@/components/uploadFile';
 import TableGeneral from '@/components/table';
 import Link from 'next/link';
@@ -12,14 +12,16 @@ import { getAccountList } from '@/store/account/accountSlice';
 import FUploadFile from '@/components/form/FUploadFile';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { EditOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { EditOutlined, LeftOutlined, RightOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
-import { changeNextPageUrl, readAsBinaryString } from '@/utils/CommonUtils';
+import { changeNextPageUrl, notificationSimple, readAsBinaryString } from '@/utils/CommonUtils';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { uploadBudgetScheduleCSVFile } from '@/services/campaign-budgets-services';
+import { uploadBudgetScheduleCSVFile, uploadBudgetScheduleCSVFile2 } from '@/services/campaign-budgets-services';
 import { useTranslation } from 'next-i18next';
+import { NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/utils/Constants';
+import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 export async function getStaticProps(context: any) {
   const { locale } = context
 
@@ -87,12 +89,18 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
   const router = useRouter()
   const [form]:any = Form.useForm();
   const accountList = useAppSelector(getAccountList);
-
+  const [file, setFile] = useState<any>()
+  const [partnerAccountId, setPartnerAccountId] = useState<any>()
   const [loading, setLoading] = useState<boolean>(false)
   const [reGenerateDataAccountList, setReGenerateDataAccountList] = useState<any[]>([])
   const [step, setStep] = useState<number>(1)
+  const [mappingData, setMappingData] = useState<any[]>([])
   const [previewFile, setPreviewFile] = useState<any[]>([])
-  const [openModalConfirmSetupBudgetSchedule, setOpenModalConfirmSetupBudgetSchedule] = useState<boolean>(false)
+  const [totalError, setTotalError] = useState<number>(0)
+  const [totalPassed, setTotalPassed] = useState<number>(0)
+  const [campaignsHaveSchedule, setCampaignsHaveSchedule] = useState<any[]>([])
+  const [openModalWarning, setOpenModalWarning] = useState<boolean>(false)
+  const [errorFiles, setErrorFiles] = useState<any>()
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
     current: 1,
@@ -108,69 +116,79 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
   }, [accountList])
 
   useEffect(() => {
-    init()
+    const newData = previewFile.map((item: any, index: any) => ({
+      item,
+      errorFields: errorFiles[index + 1]
+    }))
+    setMappingData(newData)
+  }, [previewFile, errorFiles])
+  
+
+  useEffect(() => {
     dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: t('breadcrumb.update_budget') , url: ''}]}))
   }, [])
 
-  const init = () => {
-    getFilePreview()
-  }
-  
-  const getFilePreview = async () => {
-    setLoading(true)
-    try {
-      setTimeout(() => {
-        setPreviewFile(FILES)
-        setLoading(false)
-      }, 1000);
-    } catch (error) {
-      setLoading(false)
-      console.log(">>> Get File Preview Error", error)
-    }
-  }
-
-  const onChange = (value: string) => {
-    console.log(`selected ${value}`);
-  };
-  
-  const onSearch = (value: string) => {
-    console.log('search:', value);
-  };
-
-  const filterOption = (input: string, option: any) =>
-  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
-  const onSave = async (value: any) => {
-    console.log(">>>> value", value)
+  const onUploadCSVFile = async (value: any) => {
     try {
       const { partnerAccountId, file } = value;
-
+      setFile(file)
+      setPartnerAccountId(partnerAccountId)
       const CSVFile = file && file.length && file[0] && file[0].originFileObj ? file[0].originFileObj : null
       var formData = new FormData();
       formData.append('file', CSVFile);
       
       const result = await uploadBudgetScheduleCSVFile(partnerAccountId, formData)
-      console.log(">>> result", result)
+      if (result && result.data) {
+        setPreviewFile(result.data.results)
+        setErrorFiles(result.data.errorsFile)
+        setTotalError(result.data.totalError)
+        setTotalPassed(result.data.totalPassed)
+        setCampaignsHaveSchedule(result.data.infoCampaignHaveSchedule)
+
+      }
     } catch (error) {
-      
+      console.log(">>> Upload CSV File Error", error)
     }
     setStep(2)
   }
 
-  const onSaveFail = (value: any) => {
+  const onUploadCSVFileFail = (value: any) => {
     console.log('>>> value', value);
   }
 
-  const handleFinish = () => {
-    setOpenModalConfirmSetupBudgetSchedule(!openModalConfirmSetupBudgetSchedule)
+  const handleFinish = async () => {
+    try {
+      if (totalError <= 0) {
+        if (campaignsHaveSchedule && campaignsHaveSchedule.length) {
+          setOpenModalWarning(true)
+          return
+        }
+        const CSVFile = file && file.length && file[0] && file[0].originFileObj ? file[0].originFileObj : null
+        var formData = new FormData();
+        formData.append('file', CSVFile);
+        
+        const result = await uploadBudgetScheduleCSVFile2(partnerAccountId, formData)
+        if (result && result.data && result.data.status == "OK") {
+          notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
+        }
+        router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+      } else {
+        notificationSimple(t('error_messages.field_empty_or_unreadable_and_upload_again'), NOTIFICATION_WARN)
+      }
+    } catch (error) {
+      console.log(">>> Upload CSV File Error", error)
+    }
   }
 
-  const handleOk = () => {
-    setOpenModalConfirmSetupBudgetSchedule(false);
+  const handleConfirmSettingSchedule = () => {
+    handleFinish()
+    setOpenModalWarning(false);
+    notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
+    router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
   };
 
-  const handleCancel = () => {
-    setOpenModalConfirmSetupBudgetSchedule(false);
+  const handleCancelSettingSchedule = () => {
+    setOpenModalWarning(false);
   };
 
   const normFile = (e: any) => {
@@ -197,10 +215,15 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
     return translate.replace("{text}", text);
   }
 
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.uploaded_text")
+    return translate.replace("{text}", text);
+  }
+
   const columnsBudgetLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>{t('commons.status')}</div>,
+        title: <div className='text-center'>{t('upload_csv.status')}</div>,
         dataIndex: 'status',
         key: 'status',
         render: (text: any) => {
@@ -221,66 +244,125 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
               {renderStatus()}
             </div>
         );
-        },
-        // sorter: (a: any, b: any) => a.status - b.status,
+        }
       },
       {
-        title: <div className='text-center'>{t('commons.campaign_name')}</div>,
-        dataIndex: 'campaign',
-        key: 'campaign',
-        render: (text: any) => <p>{text}</p>,
-
-        onFilter: (value: string, record: any) => record.campaign.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.campaign - b.campaign,
-      },
-      {
-        title: <div className='text-center'>{t('commons.campaign_id')}</div>,
+        title: <div className='text-center'>{t('upload_csv.campaign_id')}</div>,
         dataIndex: 'campaignId',
         key: 'campaignId',
-        render: (text: any) => <p>{text}</p>,
-
-        onFilter: (value: string, record: any) => record.campaignId.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.campaignId - b.campaignId,
-      },
-      {
-        title: <div className='text-center'>Budget</div>,
-        dataIndex: 'budget',
-        key: 'budget',
-        render: (text: any) => <p className='text-end'>{text ? `￥ ${text}` : "NA"}</p>,
-
-        onFilter: (value: string, record: any) => record.budget.indexOf(value) === 0,
-        // sorter: (a: any, b: any) => a.budget - b.budget,
-      },
-      {
-        title: <div className='text-center'>{t('commons.from_time')}</div>,
-        dataIndex: 'fromTime',
-        key: 'fromTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
-      },
-      {
-        title: <div className='text-center'>{t('commons.to_time')}</div>,
-        dataIndex: 'toTime',
-        key: 'toTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""} GMT+9</p>,
-      },
-      {
-        title: <div className='text-center'>{t('commons.action')}</div>,
-        dataIndex: 'action',
-        key: 'action',
-        render: (_: any, record: any) => {
-          const {id} = record
+        render: (text: any, record: any) => {
+          const campaignId = record && record.item && record.item.campaignId ? record.item.campaignId : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'campaignId') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'campaignId'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
           return (
-              <Space size="middle" className='w-full flex justify-center'>
-                  <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}/history`)}/>
-              </Space>
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={checkHaveErrorField ? 'text-red' : ''}>{campaignId}</p>
+            </Tooltip>
           )
-        },
+        }
       },
-    ], [previewFile, t]
+      {
+        title: <div className='text-center'>{t('upload_csv.campaign_name')}</div>,
+        dataIndex: 'campaignName',
+        key: 'campaignName',
+        render: (text: any, record: any) => {
+          const campaignName = record && record.item && record.item.campaignName ? record.item.campaignName : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'campaignName') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'campaignName'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={checkHaveErrorField ? 'text-red' : ''}>{campaignName}</p>
+            </Tooltip>
+          )
+        }
+      },
+      {
+        title: <div className='text-center'>{t('upload_csv.update_schedule')}</div>,
+        dataIndex: 'schedule',
+        key: 'schedule',
+        render: (text: any, record: any) => {
+          const schedule = record && record.item && record.item.schedule ? record.item.schedule : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'schedule') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'schedule'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={checkHaveErrorField ? 'text-red' : ''}>{moment(schedule).format("YYYY-MM-DD | HH:mm:ss")}</p>
+            </Tooltip>
+          )
+        }
+      },
+      {
+        title: <div className='text-center'>{t('upload_csv.mode')}</div>,
+        dataIndex: 'mode',
+        key: 'mode',
+        render: (text: any, record: any) => {
+          const mode = record && record.item && record.item.mode ? record.item.mode : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'mode') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'mode'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{mode}</p>
+            </Tooltip>
+          )
+        }
+      },
+      {
+        title: <div className='text-center'>{t('upload_csv.trend')}</div>,
+        dataIndex: 'trend',
+        key: 'trend',
+        render: (text: any, record: any) => {
+          const trend = record && record.item && record.item.trend ? record.item.trend : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'trend') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'trend'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{trend}</p>
+            </Tooltip>
+          )
+        }
+      },
+      {
+        title: <div className='text-center'>{t('upload_csv.budget')}</div>,
+        dataIndex: 'value',
+        key: 'value',
+        render: (text: any, record: any) => {
+          const value = record && record.item && record.item.value ? record.item.value : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'value') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'value'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{value ? `￥ ${value}` : "NA"}</p>
+            </Tooltip>
+          )
+        }
+      },  
+      {
+        title: <div className='text-center'>{t('upload_csv.weight_template_id')}</div>,
+        dataIndex: 'weightTemplateId',
+        key: 'weightTemplateId',
+        render: (text: any, record: any) => {
+          const weightTemplateId = record && record.item && record.item.weightTemplateId ? record.item.weightTemplateId : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'weightTemplateId') : []
+          const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'weightTemplateId'
+          const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
+          return (
+            <Tooltip placement="top" title={errorMessage} arrow={true}>
+              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{weightTemplateId}</p>
+            </Tooltip>
+          )
+        }
+      },
+    ], [mappingData, t]
   )
 
   return (
-    <>
+    <div>
       {step == 1 ? (
         <div>
           <div className='panel-heading flex items-center justify-between'>
@@ -289,8 +371,8 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           <div className='form-container'>
             <Form
               form= {form}
-              onFinish={onSave}
-              onFinishFailed={onSaveFail}
+              onFinish={onUploadCSVFile}
+              onFinishFailed={onUploadCSVFileFail}
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 14 }}
               layout="horizontal"
@@ -309,14 +391,24 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           <div className='panel-heading flex items-center justify-between'>
             <h2>{t('update_campaign_schedule_page.update_campaign_budget_schedule')} - {t('update_campaign_schedule_page.validate_and_live_edit')}</h2>
           </div>
-          <TableGeneral loading={loading} columns={columnsBudgetLog} data={previewFile ? previewFile : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+          <div className='w-full items-center justify-center mt-4'>
+            <h3 className='w-full items-center justify-center'>{t('upload_csv.rows_passed')}: {totalPassed}</h3>
+            <h3 className='w-full items-center justify-center'>{t('upload_csv.rows_failed')}: {totalError}</h3>
+          </div>
+          <TableGeneral loading={loading} columns={columnsBudgetLog} data={mappingData ? mappingData  : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
           <div className='w-full flex items-center justify-between'>
             <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={t('pagination.back')} onClick={() => setStep(1)}/>
             <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish}/>
           </div>
         </div>
       ) : null}
-    </>
+
+      {openModalWarning && (
+        <Modal open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
+          <ConfirmSetupBudgetSchedule title={'Existing Budget Schedule Warning'} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignsHaveSchedule}/>
+        </Modal>
+      )}
+    </div>
   );
 }
 
