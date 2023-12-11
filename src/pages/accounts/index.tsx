@@ -71,10 +71,13 @@ export default function Accounts (props: IAccountsProps) {
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         setAccounts(result.data)
+
         const activeAccounts = result.data.filter((account: any) => account.status == 1)
         dispatch(setAccountList({data: activeAccounts}))
-        dispatch(setCurrentAccount({data: currentAccount ? currentAccount : activeAccounts[0].id}))
-        storeItem(CURRENT_ACCOUNT, activeAccounts[0].id)
+
+        const isCurrentAccount = result.data.find((account: any) => account.id == currentAccount)
+        dispatch(setCurrentAccount({data: isCurrentAccount.status == 2 ? activeAccounts[0].id : currentAccount}))
+        storeItem(CURRENT_ACCOUNT, isCurrentAccount.status == 2 ? activeAccounts[0].id : currentAccount)
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)
