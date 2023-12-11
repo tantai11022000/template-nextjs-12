@@ -155,8 +155,8 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
 
   const date = new Date();
   const [duration, setDuration] = useState<any>({
-    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 30),
-    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+    startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
+    endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1),
   });
   
   const [loading, setLoading] = useState<boolean>(false)
@@ -410,8 +410,9 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         key: 'action',
         render: (_: any, record: any) => {
           const statusData = record.status
-          const { status, id, detailedBySettingId, note } = record
+          const { status, id, detailedBySettingId, note, scheduledTime } = record
           const { mode, adtranWeightTemplateId } = record && record.detailedBySetting
+          const today = new Date();
 
           const handleOpenWeightTemplateInfo = (id: any) => {
             setWeightTemplateInfo({...weightTemplateInfo, id: adtranWeightTemplateId})
@@ -420,26 +421,53 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           const renderActionType = () => {
             let action: any = ''
             if (statusData == SCHEDULE_STATUS.UPCOMING) {
-              action = (
-                <Space size="middle" className='flex justify-center'>
-                  <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
-                    <EditOutlined className='text-lg cursor-pointer' 
-                      onClick={() => router.push({
-                        pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-                        query: {
-                          isEdit: true,
-                          campaignIds: campaignId,
-                          campaignNames: campaignName ? campaignName : "",
-                          scheduleId: detailedBySettingId
-                        }
-                      })}
-                    />
-                  </Tooltip>
-                  <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
-                    <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
-                  </Tooltip>
-                </Space>
-              )
+              if (mode == SETTING_BUDGET_MODE.DAILY) {
+                if (moment(today).format("YYYY-MM-DD") != moment(scheduledTime).format("YYYY-MM-DD")) {
+                  action = (
+                    <Space size="middle" className='flex justify-center'>
+                      <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
+                        <EditOutlined className='text-lg cursor-pointer' 
+                          onClick={() => router.push({
+                            pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+                            query: {
+                              isEdit: true,
+                              campaignIds: campaignId,
+                              campaignNames: campaignName ? campaignName : "",
+                              scheduleId: detailedBySettingId
+                            }
+                          })}
+                        />
+                      </Tooltip>
+                      <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
+                        <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
+                      </Tooltip>
+                    </Space>
+                  )
+                } else {
+                  action = ''
+                }
+              } else {
+                action = (
+                  <Space size="middle" className='flex justify-center'>
+                    <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
+                      <EditOutlined className='text-lg cursor-pointer' 
+                        onClick={() => router.push({
+                          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+                          query: {
+                            isEdit: true,
+                            campaignIds: campaignId,
+                            campaignNames: campaignName ? campaignName : "",
+                            scheduleId: detailedBySettingId
+                          }
+                        })}
+                      />
+                    </Tooltip>
+                    <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
+                      <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
+                    </Tooltip>
+                  </Space>
+                )
+              }
             } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
               if (mode == SETTING_BUDGET_MODE.DAILY) {
                 action = (
@@ -626,6 +654,12 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           <EditWeightTemplate preview title={t('weight_template_page.preview_weight_template')} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel}/>
         </Modal>
       )}
+
+      {/* {openModalConfirm && (
+        <Modal open={openModalConfirm} onOk={confirmDelete} onCancel={cancelDelete} footer={null}>
+          <ModalConfirmDelete openModal={openModalConfirm} onOk={confirmDelete} onCancel={cancelDelete}/>
+        </Modal>
+      )} */}
     </div>
   );
 }
