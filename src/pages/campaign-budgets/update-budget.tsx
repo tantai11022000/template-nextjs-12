@@ -12,7 +12,7 @@ import { getAccountList } from '@/store/account/accountSlice';
 import FUploadFile from '@/components/form/FUploadFile';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { EditOutlined, LeftOutlined, RightOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, LeftOutlined, RightOutlined, InfoCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, notificationSimple, readAsBinaryString } from '@/utils/CommonUtils';
 import ActionButton from '@/components/commons/buttons/ActionButton';
@@ -20,7 +20,7 @@ import ActionButton from '@/components/commons/buttons/ActionButton';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { uploadBudgetScheduleCSVFile, uploadBudgetScheduleCSVFile2 } from '@/services/campaign-budgets-services';
 import { useTranslation } from 'next-i18next';
-import { NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/utils/Constants';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/utils/Constants';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -144,12 +144,12 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         setTotalError(result.data.totalError)
         setTotalPassed(result.data.totalPassed)
         setCampaignsHaveSchedule(result.data.infoCampaignHaveSchedule)
-
-      }
-    } catch (error) {
+        setStep(2)
+      } 
+    } catch (error: any) {
       console.log(">>> Upload CSV File Error", error)
+      notificationSimple(error.message, NOTIFICATION_ERROR)
     }
-    setStep(2)
   }
 
   const onUploadCSVFileFail = (value: any) => {
@@ -184,7 +184,9 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
     handleFinish()
     setOpenModalWarning(false);
     notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
-    router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+    setTimeout(() => {
+      router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+    }, 1000);
   };
 
   const handleCancelSettingSchedule = () => {
@@ -226,18 +228,19 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         title: <div className='text-center'>{t('upload_csv.status')}</div>,
         dataIndex: 'status',
         key: 'status',
-        render: (text: any) => {
+        render: (text: any, record: any) => {
+          const errorFields = record && record.errorFields ? record.errorFields : []
           const renderStatus = () => {
-            let status = ''
+            let status : any = ''
             let type = ''
-            if (text == "valid") {
-              status = 'VALID'
+            if (errorFields.length > 0) {
+              status = <Tooltip placement="top" title={t('commons.status_enum.fail')} arrow={true}><InfoCircleOutlined className='text-lg text-red'/></Tooltip>
               type = 'success'
-            } else if (text == 'invalid') {
-              status = 'invalid'
+            } else {
+              status = <Tooltip placement="top" title={t('commons.status_enum.success')} arrow={true}><CheckCircleOutlined className='text-lg'/></Tooltip>
               type = 'error'
             }
-            return <Tag color={type}>{status}</Tag>
+            return <>{status}</>
           }
         return (
             <div className='flex justify-center uppercase'>
@@ -337,7 +340,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
           return (
             <Tooltip placement="top" title={errorMessage} arrow={true}>
-              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{value ? `￥ ${value}` : "NA"}</p>
+              <p className={`text-center ${checkHaveErrorField ? 'text-red' : ''}`}>{value ? `￥${value}` : "NA"}</p>
             </Tooltip>
           )
         }
@@ -347,7 +350,8 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         dataIndex: 'weightTemplateId',
         key: 'weightTemplateId',
         render: (text: any, record: any) => {
-          const weightTemplateId = record && record.item && record.item.weightTemplateId ? record.item.weightTemplateId : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+          const mode = record && record.item && record.item.mode ? record.item.mode : ""
+          const weightTemplateId = mode == 'DAILY' ? record && record.item && record.item.weightTemplateId ? record.item.weightTemplateId : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip> : " - "
           const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'weightTemplateId') : []
           const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'weightTemplateId'
           const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
@@ -378,7 +382,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
               layout="horizontal"
             >
               <FSelect required name={'partnerAccountId'} label={t('update_campaign_schedule_page.partner_account')} placeholder={renderTranslateFilterText(t('update_campaign_schedule_page.partner_account'))} options={reGenerateDataAccountList} errorMessage={renderTranslateErrorMessageText(t('update_campaign_schedule_page.partner_account'))}/>
-              <FUploadFile required name={'file'} label={t('update_campaign_schedule_page.schedule_file')} onUploadFile={normFile} multiple={false} errorMessage={t('error_messages.file_empty_or_unreadable')}/>
+              <FUploadFile acceptType={'.csv'} required name={'file'} label={t('update_campaign_schedule_page.schedule_file')} onUploadFile={normFile} multiple={false} errorMessage={t('error_messages.file_empty_or_unreadable')}/>
 
               <Space size="middle" className='w-full flex justify-end'>
                 <ActionButton htmlType={"submit"} className={'next-button'} iconOnRight={<RightOutlined />} label={t('pagination.next')}/>
@@ -391,9 +395,9 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           <div className='panel-heading flex items-center justify-between'>
             <h2>{t('update_campaign_schedule_page.update_campaign_budget_schedule')} - {t('update_campaign_schedule_page.validate_and_live_edit')}</h2>
           </div>
-          <div className='w-full items-center justify-center mt-4'>
-            <h3 className='w-full items-center justify-center'>{t('upload_csv.rows_passed')}: {totalPassed}</h3>
-            <h3 className='w-full items-center justify-center'>{t('upload_csv.rows_failed')}: {totalError}</h3>
+          <div className='w-full text-center mt-4'>
+            <h3 className='w-full flex items-center justify-center'>{t('upload_csv.rows_passed')}: <h3 className='text-green ml-1'>{totalPassed}</h3></h3>
+            <h3 className='w-full flex items-center justify-center'>{t('upload_csv.rows_failed')}: <h3 className='text-red ml-1'>{totalError}</h3></h3>
           </div>
           <TableGeneral loading={loading} columns={columnsBudgetLog} data={mappingData ? mappingData  : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
           <div className='w-full flex items-center justify-between'>
@@ -404,7 +408,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
       ) : null}
 
       {openModalWarning && (
-        <Modal open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
+        <Modal width={1000} open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
           <ConfirmSetupBudgetSchedule title={'Existing Budget Schedule Warning'} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignsHaveSchedule}/>
         </Modal>
       )}
