@@ -11,6 +11,8 @@ import ActionButton from '../commons/buttons/ActionButton';
 import {CloudSyncOutlined} from '@ant-design/icons';
 import { useTranslation } from 'next-i18next';
 import { getSyncData } from '@/services/globals-service';
+import { getItem, storeItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 const DashboardLayout = (props: any) => {
   const { t } = useTranslation()
@@ -19,7 +21,8 @@ const DashboardLayout = (props: any) => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentAccount = getItem(CURRENT_ACCOUNT)
+  const [currentAcc, setCurrentAcc] = useState<any>(currentAccount)
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [menu, setMenu] = useState<string>("campaign-budgets")
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
@@ -51,6 +54,11 @@ const DashboardLayout = (props: any) => {
   }, [router.pathname])
 
   useEffect(() => {
+    setCurrentAcc(currentAccount)
+  }, [currentAccount])
+  
+
+  useEffect(() => {
     const option = accountList.map((account:any) => ({
       value: account.id,
       key: account.id,
@@ -61,6 +69,8 @@ const DashboardLayout = (props: any) => {
 
   const onChangeAccount = (account: any) => {
     dispatch(setCurrentAccount({data: account.value}))
+    storeItem(CURRENT_ACCOUNT, account.value)
+    setCurrentAcc(account.value)
   }
 
   const handleSyncData = async (id: any) => {
@@ -92,11 +102,11 @@ const DashboardLayout = (props: any) => {
                           placeholder="Select Account"
                           optionFilterProp="label"
                           onChange={onChangeAccount}
-                          value={currentAccount}
+                          value={Number(currentAcc)}
                           options={optionAccount}
                           />
                       </div>
-                    <ActionButton className={'action-button'} iconOnLeft={<CloudSyncOutlined />} label={t('commons.synchronize')} onClick={() => handleSyncData(currentAccount)}/>
+                    <ActionButton className={'action-button'} iconOnLeft={<CloudSyncOutlined />} label={t('commons.synchronize')} onClick={() => handleSyncData(currentAcc)}/>
                   </div>
                 }
                 </div>

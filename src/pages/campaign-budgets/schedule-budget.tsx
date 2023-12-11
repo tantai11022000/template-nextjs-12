@@ -287,9 +287,19 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
     const validateBudgets = [...budgets]
     if (validateBudgets.some((budget: any) => budget.schedule == fieldsValue.schedule)) {
-      notificationSimple("The time you are selecting already exists", NOTIFICATION_WARN)
+      notificationSimple(t('schedule_budget_for_campaign.the_time_already_exists'), NOTIFICATION_WARN)
     } else {
-      setBudgets((budgets: any) => [fieldsValue, ...budgets]);
+      const today = new Date()
+      if (fieldsValue.mode == 3) {
+        if (moment(today).format("YYYY-MM-DD") == moment(fieldsValue.schedule).format("YYYY-MM-DD")) {
+          notificationSimple(t('schedule_budget_for_campaign.schedule_must_be_in_the_future'), NOTIFICATION_ERROR)
+          return
+        } else {
+          setBudgets((budgets: any) => [fieldsValue, ...budgets]);
+        }
+      } else {
+        setBudgets((budgets: any) => [fieldsValue, ...budgets]);
+      }
     }
   };
 
@@ -339,12 +349,13 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     try {
       const result = await getScheduleById(scheduleId)
       if (result && result.data) {
-        const { mode, adjust, value, schedule } = result.data
+        const { mode, adjust, value, schedule, adtranWeightTemplateId } = result.data
         form.setFieldsValue({
           mode: mode,
           adjust: adjust,
           value: adjust != 2 ? Math.abs(value) : -Math.abs(value),
-          schedule: moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`)
+          schedule: dayjs(schedule),
+          weightTemplateId: adtranWeightTemplateId ? adtranWeightTemplateId : ""
         })
         setSelectMode(mode)
       }
@@ -363,7 +374,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const disabledDate: RangePickerProps['disabledDate'] = (current) => {
-    return current && current < dayjs().endOf('day');
+    if (selectMode === 3) {
+      return current && current < dayjs().endOf('day');
+    } else {
+      return current && current < dayjs().subtract(1, 'day').endOf('day');
+    }
   };
 
   const columns: any = useMemo(
@@ -521,17 +536,24 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
                   {isShowEditIcon && <EditOutlined className='text-xl mb-6 ml-5' onClick={() => setOpenModalEditBudgetWeightTemplate(true)}/>}
                 </div>
               : null}
-              <Form.Item 
-                name="schedule" 
-                label={t('schedule_budget_for_campaign.time')}
-                rules={[{
-                  required: true, 
-                  message: 'Please choose time',
-                }]}
-                className='range-date-picker-container'
-              >
-                <DatePicker disabledDate={selectMode == 3 ? disabledDate: undefined} showTime={selectMode == 3 ? false : true} format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} />
-              </Form.Item>
+              <div className='flex items-center'>
+                <Form.Item 
+                  name="schedule" 
+                  label={t('schedule_budget_for_campaign.time')}
+                  rules={[{
+                    required: true, 
+                    message: 'Please choose time',
+                  }]}
+                  className='range-date-picker-container'
+                >
+                  <DatePicker 
+                    disabledDate={disabledDate}
+                    showTime={selectMode == 3 ? false : true} 
+                    format={selectMode == 3 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm"} 
+                  />
+                </Form.Item>
+                <p className='mb-6 ml-5'>GMT+9</p>
+              </div>
               <Form.Item 
                 name="value" 
                 label={t('schedule_budget_for_campaign.budget_change')}

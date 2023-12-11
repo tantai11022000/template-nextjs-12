@@ -21,7 +21,7 @@ import { appWithTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { ConfigProvider } from 'antd';
 import { getItem, storeItem } from '@/utils/StorageUtils'
-import { LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
+import { CURRENT_ACCOUNT, LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
 import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
 import { useRouter } from 'next/router'
 import jaJP from 'antd/locale/ja_JP';
@@ -71,6 +71,7 @@ function App({ Component, pageProps }: any) {
         const activeAccounts = result.data.filter((account: any) => account.status == 1)
         store.dispatch(setAccountList({data: activeAccounts}))
         store.dispatch(setCurrentAccount({data: activeAccounts[0].id}))
+        storeItem(CURRENT_ACCOUNT, activeAccounts[0].id)
       }
     } catch (error) {
       console.log(">>> Get All Partner Accounts Error", error)

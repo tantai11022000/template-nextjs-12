@@ -18,6 +18,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice';
+import { getItem, storeItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -34,6 +36,7 @@ export default function Accounts (props: IAccountsProps) {
   const  { t } = useTranslation()
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
@@ -70,7 +73,8 @@ export default function Accounts (props: IAccountsProps) {
         setAccounts(result.data)
         const activeAccounts = result.data.filter((account: any) => account.status == 1)
         dispatch(setAccountList({data: activeAccounts}))
-        dispatch(setCurrentAccount({data: activeAccounts[0].id}))
+        dispatch(setCurrentAccount({data: currentAccount ? currentAccount : activeAccounts[0].id}))
+        storeItem(CURRENT_ACCOUNT, activeAccounts[0].id)
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)

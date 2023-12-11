@@ -25,6 +25,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { getPortfolio } from '@/services/commons-service';
 import FileSaver from 'file-saver';
+import { getItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -105,7 +107,7 @@ const BULK_ACTION = [
 export default function CampaignBudgets (props: ICampaignBudgetsProps) {
   const { t } = useTranslation()
   const router = useRouter()
-  const currentAccount = useAppSelector(getCurrentAccount)
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const isSync = useAppSelector(getIsSyncData)
   const dispatch = useAppDispatch()
 

@@ -203,7 +203,9 @@
         "daily_with_weight": "毎日の体重テンプレート",
         "weight_template": "ウェイトテンプレート",
         "warning_select_at_least_one_campaign": "保存する前に少なくとも 1 つのキャンペーンを選択してください.",
-        "warning_budget_must_be_greater_than_zero": "予算は0より大きくなければなりません"
+        "warning_budget_must_be_greater_than_zero": "予算は0より大きくなければなりません",
+        "the_time_already_exists": "選択した時刻はすでに存在します.",
+        "schedule_must_be_in_the_future": "スケジュールは今日ではなく将来にする必要があります."
     },
 
     "update_log_page": {
@@ -287,6 +289,7 @@
         "campaign_name": "キャンペーン名",
         "campaign_id": "キャンペーンID",
         "budget": "予算",
+        "value": "価値",
         "update_schedule": "更新スケジュール",
         "mode": "モード",
         "trend": "トレンド",

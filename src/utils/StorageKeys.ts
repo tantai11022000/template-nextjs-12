@@ -13,3 +13,4 @@ export const LOGIN_REFERER = 'loginReferer'
 export const REMEMBER_ME = 'rememberMe'
 
 export const CURRENT_MENU = 'currentMenu'
+export const CURRENT_ACCOUNT = 'account'

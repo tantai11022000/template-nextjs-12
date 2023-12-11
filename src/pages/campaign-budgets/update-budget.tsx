@@ -286,13 +286,14 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         dataIndex: 'schedule',
         key: 'schedule',
         render: (text: any, record: any) => {
+          const mode = record && record.item && record.item.mode ? record.item.mode : ""
           const schedule = record && record.item && record.item.schedule ? record.item.schedule : <Tooltip placement="top" title={t('error_messages.field_empty_or_unreadable')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
           const errorFields = record && record.errorFields ? record.errorFields.filter((field: any) => field.key == 'schedule') : []
           const checkHaveErrorField = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].key == 'schedule'
           const errorMessage = errorFields && errorFields.length > 0 && errorFields[0] && errorFields[0].message ? errorFields[0].message : ""
           return (
             <Tooltip placement="top" title={errorMessage} arrow={true}>
-              <p className={checkHaveErrorField ? 'text-red' : ''}>{moment(schedule).format("YYYY-MM-DD | HH:mm:ss")}</p>
+              <p className={checkHaveErrorField ? 'text-red' : ''}>{mode == 'DAILY' ? moment(schedule).format("YYYY-MM-DD") : moment(schedule).format("YYYY-MM-DD | HH:mm:ss")}</p>
             </Tooltip>
           )
         }
@@ -330,7 +331,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
         }
       },
       {
-        title: <div className='text-center'>{t('upload_csv.budget')}</div>,
+        title: <div className='text-center'>{t('upload_csv.value')}</div>,
         dataIndex: 'value',
         key: 'value',
         render: (text: any, record: any) => {

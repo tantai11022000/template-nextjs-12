@@ -37,6 +37,8 @@ import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { ADJUST_CODE } from '@/enums/adjust';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
+import { getItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 
 export const getStaticPaths = async () => {
@@ -112,7 +114,7 @@ const UPDATE_BUDGET = [
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { t } = useTranslation()
   const router = useRouter()
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
   const campaignName = router && router.query && router.query.name ? router.query.name : ""
   const dispatch = useAppDispatch()
@@ -422,7 +424,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             let action: any = ''
             if (statusData == SCHEDULE_STATUS.UPCOMING) {
               if (mode == SETTING_BUDGET_MODE.DAILY) {
-                if (moment(today).format("YYYY-MM-DD") != moment(scheduledTime).format("YYYY-MM-DD")) {
+                if (moment.tz(today, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD") != moment.tz(scheduledTime, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD")) {
                   action = (
                     <Space size="middle" className='flex justify-center'>
                       <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>

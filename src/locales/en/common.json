@@ -204,7 +204,9 @@
         "daily_with_weight": "Daily with Weight Template",
         "weight_template": "Weight Template",
         "warning_select_at_least_one_campaign": "Please select at least one campaign before saving.",
-        "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0"
+        "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0",
+        "the_time_already_exists": "The time you are selecting already exists.",
+        "schedule_must_be_in_the_future": "The schedule needs to be in the future, not today."
     },
 
     "update_log_page": {
@@ -287,6 +289,7 @@
         "campaign_name": "Campaign Name",
         "campaign_id": "Campaign ID",
         "budget": "Budget",
+        "value": "Value",
         "update_schedule": "Update Schedule",
         "mode": "Mode",
         "trend": "Trend",
