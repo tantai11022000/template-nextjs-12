@@ -145,7 +145,11 @@ export default function AddAccount (props: IAddAccountProps) {
   const onSave = async (value: any) => {
     setFormSubmitted(true);
     setLoading({...loading, isCreate: true})
+    const trimmedName = value && value.name ? value.name.trim() : "";
     try {
+      if (trimmedName == '') {
+        throw new Error(t('account_page.error_messages.name_not_be_empty'));
+      }
       if (valueEdit) {
         await editPartnerAccount(id, value)
         dispatch(editAccount({id, value}))
