@@ -251,7 +251,8 @@
             "client_id": "Client ID is required.",
             "secret_id": "Secret ID is required.",
             "refresh_token": "Refresh Token is required.",
-            "who_can_see": "Please select at least one Supervisor before saving."
+            "who_can_see": "Please select at least one Supervisor before saving.",
+            "name_not_be_empty": "Name can not be empty"
         }
     },
 
