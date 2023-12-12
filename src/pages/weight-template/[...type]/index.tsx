@@ -17,6 +17,7 @@ import TableGeneral from '@/components/table';
 import { notificationSimple } from '@/utils/CommonUtils';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { getDaily30MinsSlot } from '@/services/commons-service';
+import TableWeightTemplate from '@/components/table-weight-template';
 
 export const getStaticPaths = async () => {
   return {
@@ -83,8 +84,13 @@ function AddWeightTemplate() {
       try {
         const result = await getDaily30MinsSlot()
         if (result && result.data) {
-          setTimeMinutes(result.data)
-          const hourData = result.data.filter((time: any, index: number) => index % 2 === 0)
+          const minsData = result.data.map((item:any) => ({
+            slot: item.code,
+            time: item.name,
+            weight: 0
+          }))
+          setTimeMinutes(minsData)
+          const hourData = minsData.filter((time: any, index: number) => index % 2 === 0)
           setTimeHours(hourData)
         }
         setLoading(false)
@@ -94,16 +100,16 @@ function AddWeightTemplate() {
       }
     }
 
-    const handleChangeValueTable = (value: number, code: number) => {
-      var newData = timeSlot == 1 ? [...timeHours] : [...timeMinutes];
-      if (code >= 0 && code < newData.length) {
-        newData[code].weight = Number(value);        
-        timeSlot == 1 ? setTimeHours(newData) : setTimeMinutes(newData);
-
-        const totalWeight = newData.reduce((sum, item) => sum + (item.weight || 0), 0);
-        const calculatedPercentage = (totalWeight / 100) * 100;
-        setPercentage(calculatedPercentage);
-      }
+    const handleChangeValueTable = (weight:number, slot:number) => {
+        let newData = timeSlot == 1 ? [...timeHours] : [...timeMinutes]
+        newData.find(item => item.slot === slot).weight = weight
+        const percent = newData.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+        setPercentage(percent);
+        if (timeSlot == 1) {
+          setTimeHours(newData)
+        } else {
+          setTimeMinutes(newData)
+        }
     };
 
     const handleMapEditData = async () => {
@@ -116,9 +122,15 @@ function AddWeightTemplate() {
             name: name,
             description: description,
             type: type,
-            weightSetting: weightSetting
           })
           setTimeSlot(type)
+          if (type === 1) {
+            setTimeHours(weightSetting)
+          } else {
+            setTimeMinutes(weightSetting)
+          }
+          const percent = weightSetting.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+          setPercentage(percent)
         }
         setLoading(false)
       } catch (error) {
@@ -130,20 +142,11 @@ function AddWeightTemplate() {
     const onSave = async (values: any) => {
       try {
         if (values.description === undefined) values.description = ''
-
-        const timeData = timeSlot === 1 ? timeHours : timeMinutes;
-        const { weightSetting } = values;
-        const updatedWeightSetting = timeData.map((item: any, index: number) => ({
-          slot: item.code,
-          time: item.name,
-          weight: weightSetting[index]?.weight || 0,
-        }));
-  
         const updatedValues = {
           ...values,
           description: values.description || '',
           type: timeSlot,
-          weightSetting: updatedWeightSetting,
+          weightSetting: timeSlot === 1 ? timeHours : timeMinutes,
         };
         if (valueEdit) {
           await editWeightTemplate(id, updatedValues)
@@ -152,9 +155,9 @@ function AddWeightTemplate() {
           notificationSimple("Create Weight Template Success", NOTIFICATION_SUCCESS);
         }
         router.push(BREADCRUMB_WEIGHT_TEMPLATE.url)
-      } catch (error) {
+      } catch (error:any) {
         console.log(">>> Create Weight Template Error", error)
-        notificationSimple("Create Weight Template Fail", NOTIFICATION_ERROR);
+        notificationSimple(error.message ? error.message : "Create Weight Template Fail", NOTIFICATION_ERROR);
       }
     };
     
@@ -162,8 +165,12 @@ function AddWeightTemplate() {
       console.log('>>> handle Finish Failed ', e);
     }
 
-    const handleChangeTimeType = (value: any) => {
-      setTimeSlot(value.target.value)
+    const handleChangeTimeType = (e: any) => {
+      const {value} = e.target
+      setTimeSlot(value)
+      let data = value == 1 ? timeHours : timeMinutes
+      const percent = data.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+      setPercentage(percent);
     }
 
     const renderTranslateTitleText = (text: any) => {
@@ -175,40 +182,6 @@ function AddWeightTemplate() {
       let translate = t("commons.action_type.input");
       return translate.replace("{text}", text);
     }
-
-    const columns: any = useMemo(
-      () => [
-        {
-          title: <div className='text-center'>{`${t('weight_template_page.form.time')} ${timeSlot === 1 ? t('weight_template_page.form.hour') : t('weight_template_page.form.minute')}`}</div>,
-          dataIndex: 'name',
-          key: 'name',
-          align: 'center',
-          render: (text: any) => <span>{text}</span>
-        },
-        {
-          title: (
-            <div className='text-center'>
-              {t('weight_template_page.form.weight_%')}
-              <div className='text-red'>{percentage}% / 100%</div>
-            </div>
-          ),
-          dataIndex: 'weight',
-          key: 'weight',
-          render: (text: any, record: any) => {
-            const code = record && record.code ? record.code : '';
-            const weight = record && record.weight ? record.weight : 0;
-            return (
-              <Form.Item
-                name={['weightSetting', code, 'weight']}
-                initialValue={weight}
-                getValueFromEvent={(e) => (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value))}
-              >
-                <Input type='number' min={0} onChange={(e) => handleChangeValueTable(+e.target.value, code)} />
-              </Form.Item>
-            );
-          },
-        },
-      ], [timeSlot, t, percentage])
 
     return (
       <div>
@@ -228,9 +201,9 @@ function AddWeightTemplate() {
             <FTextArea name={"description"} label={t('commons.description')} errorMessage={renderTranslateInputText(t('commons.description'))} />
             <FRadio name={"type"} value={timeSlot} defaultValue={timeSlot} label={t('weight_template_page.form.time_slot')} options={timeType} onChange={handleChangeTimeType} />
             <div className='weight-table-css w-[80%] m-auto'>
-              <Form.Item name="weightSetting">
-                <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={500} loading={loading}/>
-              </Form.Item>
+                <TableWeightTemplate dataWeight={timeSlot == 1 ? timeHours : timeMinutes} 
+                handleChangeValueTable={handleChangeValueTable} percentage={percentage} 
+                isLoading={loading} timeSlot={timeSlot}/>
             </div>
 
             <Space size="middle" className='w-full flex justify-center mt-8'>

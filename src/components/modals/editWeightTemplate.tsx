@@ -12,6 +12,7 @@ import { notificationSimple } from '@/utils/CommonUtils';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant';
 import FTextArea from '../form/FTextArea';
+import TableWeightTemplate from '../table-weight-template';
 
 export interface IEditWeightTemplateProps {
   weightTemplate: any,
@@ -32,6 +33,7 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
   const [timeHours, setTimeHours] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [weightTemplateName, setWeightTemplateName] = useState<string>("")
+  const [percentage, setPercentage] = useState<number>(0);
   const timeType = [
     {
       value: 0,
@@ -78,9 +80,15 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
           name: !preview ? `Copy of ${name}` : name,
           description: description,
           type: type,
-          weightSetting: weightSetting
         })
         setTimeSlot(type)
+        if (type === 1) {
+          setTimeHours(weightSetting)
+        } else {
+          setTimeMinutes(weightSetting)
+        }
+        const percent = weightSetting.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+        setPercentage(percent)
         setWeightTemplateName(name)
       }
       setLoading(false)
@@ -90,35 +98,26 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
     }
   }
 
-  const handleChangeValueTable = (value: number, code: number) => {
-    var newData = timeSlot == 1 ? [...timeHours] : [...timeMinutes];
-    if (code >= 0 && code < newData.length) {
-      newData[code].weight = Number(value);        
-      timeSlot == 1 ? setTimeHours(newData) : setTimeMinutes(newData);
-
-      const totalWeight = newData.reduce((sum, item) => sum + (item.weight || 0), 0);
-      const calculatedPercentage = (totalWeight / 100) * 100;
-      // setPercentage(calculatedPercentage);
+  const handleChangeValueTable = (weight:number, slot:number) => {
+    let newData = timeSlot == 1 ? [...timeHours] : [...timeMinutes]
+    newData.find(item => item.slot === slot).weight = weight
+    const percent = newData.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+    setPercentage(percent);
+    if (timeSlot == 1) {
+      setTimeHours(newData)
+    } else {
+      setTimeMinutes(newData)
     }
-  };
+};
   
   const onSave = async (values: any) => {
     try {
       if (values.description === undefined) values.description = ''
-
-      const timeData = timeSlot === 1 ? timeHours : timeMinutes;
-      const { weightSetting } = values;
-      const updatedWeightSetting = timeData.map((item: any, index: number) => ({
-        slot: item.code,
-        time: item.name,
-        weight: weightSetting[index]?.weight || 0,
-      }));
-
       const updatedValues = {
         ...values,
         description: values.description || '',
         type: timeSlot,
-        weightSetting: updatedWeightSetting,
+        weightSetting: timeSlot === 1 ? timeHours : timeMinutes,
         clonedFromWeightTemplateId: weightTemplate && weightTemplate.id ? weightTemplate.id : ""
       };
 
@@ -136,60 +135,18 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
     console.log('>>> value', value);
   }
 
-  const handleChangeTimeType = (value: any) => {
-    setTimeSlot(value.target.value)
+  const handleChangeTimeType = (e: any) => {
+    const {value} = e.target
+    setTimeSlot(value)
+    let data = value == 1 ? timeHours : timeMinutes
+    const percent = data.reduce((sum:number,item:any) => sum + (item?.weight ? item.weight : 0),0)
+    setPercentage(percent);
   }
 
   const renderTranslateInputText = (text: any) => {
     let translate = t("commons.action_type.input");
     return translate.replace("{text}", text);
   }
-
-  const columns: any = useMemo(
-    () => [
-      {
-        title: <div className='text-center'>{`${t('weight_template_page.form.time')} ${timeSlot === 1 ? t('weight_template_page.form.hour') : t('weight_template_page.form.minute')}`}</div>,
-        dataIndex: 'name',
-        key: 'name',
-        align: 'center',
-        render: (text: any) => <span>{text}</span>
-      },
-      {
-        title: (
-          <div className='text-center'>
-            {t('weight_template_page.form.weight_%')}
-            {/* <div className='text-red'>{percentage}% / 100%</div> */}
-          </div>
-        ),
-        dataIndex: 'weight',
-        key: 'weight',
-        render: (text: any, record: any) => {
-          const code = record && record.code ? record.code : '';
-          const weight = record && record.weight ? record.weight : 0;
-          return (
-            <Form.Item
-              name={['weightSetting', code, 'weight']}
-              initialValue={weight}
-              getValueFromEvent={(e) => (isNaN(e.target.value) ? e.target.value : parseFloat(e.target.value))}
-            >
-              <Input type='number' min={0} onChange={(e) => handleChangeValueTable(+e.target.value, code)} />
-            </Form.Item>
-          );
-        },
-      },
-      // {
-      //   title: <div className='text-center'>Estimate Hourly Budget</div>,
-      //   dataIndex: 'estimateBudget',
-      //   key: 'estimateBudget',
-      //   render: (text: any) => <span>{text}</span>
-      // },
-      // {
-      //   title: <div className='text-center'>Accumulative Budget</div>,
-      //   dataIndex: 'accumulativeBudget',
-      //   key: 'accumulativeBudget',
-      //   render: (text: any) => <span>{text}</span>
-      // },
-    ], [timeSlot, t])
 
   return (
     <div>
@@ -215,7 +172,9 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
           
           <div className='weight-clone-table-css'>
             <Form.Item name="weightSetting">
-              <TableGeneral columns={columns} data={timeSlot == 0 ? timeMinutes : timeHours} pagination={false} scrollY={300} loading={loading}/>
+              <TableWeightTemplate dataWeight={timeSlot == 1 ? timeHours : timeMinutes} 
+                handleChangeValueTable={handleChangeValueTable} percentage={percentage} 
+                isLoading={loading} timeSlot={timeSlot}/>
             </Form.Item>
           </div>
           {!preview && (
