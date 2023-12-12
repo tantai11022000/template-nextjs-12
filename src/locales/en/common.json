@@ -299,6 +299,10 @@
         "new_status": "New Status",
         "csv_template": "CSV Template",
         "click_to_download": "Click to Download",
-        "validate_status": "Validate Status"
+        "validate_status": "Validate Status",
+        "result_campaigns_change": "Schedule budget for {number} campaigns.",
+        "result_budget_change": "There will be {number} changes of budgets.",
+        "result_status_change": "There will be {number} changes of statuses.",
+        "back_to_campaign": "Back to Campaign"
     }
 }

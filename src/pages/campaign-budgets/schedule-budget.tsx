@@ -36,6 +36,7 @@ import moment from 'moment-timezone';
 import type { RangePickerProps } from 'antd/es/date-picker';
 import { getItem } from '@/utils/StorageUtils';
 import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
+import Link from 'next/link';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -111,6 +112,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const [isScheduleNeedEdit, setIsScheduleNeedEdit] = useState<boolean>(true)
   const [isShowEditIcon, setIsShowEditIcon] = useState<boolean>(false)
   const [selectedWeight, setSelectedWeight] = useState<any>("");
+  const [isPreview, setIsPreview] = useState<boolean>(false)
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
     current: 1,
@@ -445,8 +447,12 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         key: 'weightTemplateId',
         render: (text: any, record: any) => {
           const weight = weightTemplates.find((template: any) => template.id === text);
+          const handlePreviewTemplate = () => {
+            setIsPreview(true)
+            setOpenModalEditBudgetWeightTemplate(true)
+          }
           return (
-            <div className='flex justify-center'>{weight ? weight.name : "-"}</div>
+            <div className='flex justify-center cursor-pointer text-primary underline' onClick={handlePreviewTemplate}>{weight ? weight.name : "-"}</div>
           )
         },
       },
@@ -502,7 +508,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
                 {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
                   <Col key={campaign.id} span={8}>
                     <Checkbox value={campaign.id.toString()} className={`${campaign.isHaveSchedule ? 'upcoming' : ''}`}>
-                      <p onClick={(e) => onGoToCampaignScheduleBudget(e, campaign.id, campaign.name)}>{campaign.name}</p>
+                      <Link
+                        href={{
+                          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaign.id}`,
+                          query: { id: campaign.id, name: campaign.name}
+                        }}
+                        passHref
+                      >
+                        <a style={{color: '#079A92', textDecorationLine: 'underline'}} target='_blank'>{campaign.name}</a>
+                      </Link>
                     </Checkbox>
                   </Col>
                 )) : <Spin/>}
@@ -603,7 +617,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
       {openModalEditBudgetWeightTemplate && (
         <Modal width={1000} open={openModalEditBudgetWeightTemplate} onOk={handleOk} onCancel={handleCancel} footer={null}>
-          <EditWeightTemplate title={t('weight_template_page.set_weight_for_daily_budget')} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
+          <EditWeightTemplate preview={isPreview} title={t('weight_template_page.set_weight_for_daily_budget')} weightTemplate={weightTemplateInfo} onOk={handleOk} onCancel={handleCancel} refreshData={fetchAllWeightTemplates}/>
         </Modal>
       )}
 

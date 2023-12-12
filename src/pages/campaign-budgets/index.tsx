@@ -235,7 +235,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         console.log('error :>> ', error);
         notificationSimple(t("notification.some_thing_went_wrong"), NOTIFICATION_ERROR);
       }
-}
+  }
   
   const handleSearch= async(value: string) => {
     setKeyword(value)

@@ -72,6 +72,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
   const [totalError, setTotalError] = useState<number>(0)
   const [totalPassed, setTotalPassed] = useState<number>(0)
   const [campaignsHaveSchedule, setCampaignsHaveSchedule] = useState<any[]>([])
+  const [listCampaignId, setListCampaignId] = useState<any[]>([])
   const [openModalWarning, setOpenModalWarning] = useState<boolean>(false)
   const [statuses, setStatuses] = useState<any[]>(STATUSES)
   const [status, setStatus] = useState<number | undefined>()
@@ -119,6 +120,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         setTotalError(result.data.totalError)
         setTotalPassed(result.data.totalPassed)
         setCampaignsHaveSchedule(result.data.infoCampaignHaveSchedule)
+        setListCampaignId(result.data.listCampaignId)
         setStep(2)
       } 
     } catch (error: any) {
@@ -133,8 +135,8 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
 
   const handleFinish = async () => {
     try {
-      if (totalError <= 0) {
-        if (campaignsHaveSchedule && campaignsHaveSchedule.length) {
+      if (totalPassed > 0) {
+        if (campaignsHaveSchedule && campaignsHaveSchedule.length > 0) {
           setOpenModalWarning(true)
           return
         }
@@ -146,7 +148,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
         if (result && result.data && result.data.status == "OK") {
           notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
         }
-        router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+        setStep(3)
       } else {
         notificationSimple(t('error_messages.field_empty_or_unreadable_and_upload_again'), NOTIFICATION_WARN)
       }
@@ -172,7 +174,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
     setOpenModalWarning(false);
     notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
     setTimeout(() => {
-      router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+      setStep(3)
     }, 1000);
   };
 
@@ -220,6 +222,11 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
   const renderTranslateToastifyText = (text: any) => {
     let translate = t("toastify.success.uploaded_text")
     return translate.replace("{text}", text);
+  }
+
+  const renderTranslateResultText = (number: any, type: any) => {
+    let translate = type == 'campaign' ? t("upload_csv.result_campaigns_change") : t("upload_csv.result_status_change")
+    return translate.replace("{number}", number);
   }
 
   const columnsBudgetLog: any = useMemo(
@@ -361,6 +368,12 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
             <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={t('pagination.back')} onClick={() => setStep(1)}/>
             <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish}/>
           </div>
+        </div>
+      ) : step == 3 ? (
+        <div className='w-full flex flex-col items-center text-center mt-4'>
+          <h3>{renderTranslateResultText(listCampaignId ? listCampaignId.length : "", 'campaign')}</h3>
+          <h3>{renderTranslateResultText(totalPassed, '')}</h3>
+          <ActionButton className={'finish-button mt-4'} label={t('upload_csv.back_to_campaign')} onClick={() => router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)}/>
         </div>
       ) : null}
 

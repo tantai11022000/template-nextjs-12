@@ -299,6 +299,10 @@
         "new_status": "新しいステータス",
         "csv_template": "CSVテンプレート",
         "click_to_download": "クリックしてダウンロード",
-        "validate_status": "ステータスの検証"
+        "validate_status": "ステータスの検証",
+        "result_campaigns_change": "{number} 個のキャンペーンの予算をスケジュールする.",
+        "result_budget_change": "予算の変更は {number} 回あります.",
+        "result_status_change": "ステータス変更は100回あります.",
+        "back_to_campaign": "キャンペーンに戻る"
     }
 }

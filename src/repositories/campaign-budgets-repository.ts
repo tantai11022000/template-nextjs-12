@@ -58,9 +58,17 @@ export const exportCampaignsCSVFile = (params: any, body: any) => {
 }
 
 export const downloadCSVTemplateSchedule = () => {
-    return userClient.get(`${campaignsUrl}/download/template-schedule`);
+    return userClient.get(`${campaignsUrl}/download/template-schedule`, {
+         responseType: 'arraybuffer', headers: {
+            'Content-Disposition': 'attachment; filename="example.csv"'
+        }
+    });
 }
 
 export const downloadCSVTemplateStatus = () => {
-    return userClient.get(`${campaignsUrl}/download/template-status`);
+    return userClient.get(`${campaignsUrl}/download/template-status`, {
+        responseType: 'arraybuffer', headers: {
+           'Content-Disposition': 'attachment; filename="example.csv"'
+        }
+    });
 }
