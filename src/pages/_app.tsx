@@ -40,6 +40,8 @@ export async function getStaticProps(context: any) {
 
 function App({ Component, pageProps }: any) {
   const router = useRouter()
+  const currentAccount = getItem(CURRENT_ACCOUNT)
+  console.log(">>> currentAccount", currentAccount)
   const language = typeof window !== 'undefined' && window.localStorage.getItem('language') == 'ja_JP' ? jaJP : enUS;
   const renderWithLayout =
     Component.getLayout ||
@@ -70,8 +72,8 @@ function App({ Component, pageProps }: any) {
       if (result && result.data) {
         const activeAccounts = result.data.filter((account: any) => account.status == 1)
         store.dispatch(setAccountList({data: activeAccounts}))
-        store.dispatch(setCurrentAccount({data: activeAccounts[0].id}))
-        storeItem(CURRENT_ACCOUNT, activeAccounts[0].id)
+        store.dispatch(setCurrentAccount({data: currentAccount ? currentAccount : activeAccounts[0].id}))
+        storeItem(CURRENT_ACCOUNT, currentAccount ? currentAccount : activeAccounts[0].id)
       }
     } catch (error) {
       console.log(">>> Get All Partner Accounts Error", error)

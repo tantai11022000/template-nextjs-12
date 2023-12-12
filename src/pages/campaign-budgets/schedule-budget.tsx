@@ -34,6 +34,8 @@ import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import moment from 'moment-timezone';
 import type { RangePickerProps } from 'antd/es/date-picker';
+import { getItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -71,7 +73,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   ]
 
   const [form]:any = Form.useForm();
-  const currentAccount = useAppSelector(getCurrentAccount)
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const dispatch = useAppDispatch()
   const router = useRouter()
 
