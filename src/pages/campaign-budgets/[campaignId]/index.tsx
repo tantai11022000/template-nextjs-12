@@ -510,6 +510,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
               const result = await deleteScheduleById(params)
               if (result && result.message == "OK") {
                 notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
+                fetchScheduleBudgetLog(mode, duration)
               }
             } catch (error) {
               

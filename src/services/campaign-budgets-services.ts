@@ -41,6 +41,26 @@ export const uploadBudgetScheduleCSVFile2 = async (id: any, body: any) => {
     }
 }
 
+export const uploadStatusScheduleCSVFile = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadStatusScheduleCSVFile(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const uploadStatusScheduleCSVFile2 = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadStatusScheduleCSVFile2(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const setScheduleBudgetForCampaigns = async (body: any) => {
     try {
         const response = await campaignBudgetsRepository.setScheduleBudgetForCampaigns(body);
@@ -94,6 +114,26 @@ export const getScheduleById = async (id: any) => {
 export const exportCampaignsCSVFile = async (params: any, body: any) => {
     try {
         const response = await campaignBudgetsRepository.exportCampaignsCSVFile(params, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const downloadCSVTemplateSchedule = async () => {
+    try {
+        const response = await campaignBudgetsRepository.downloadCSVTemplateSchedule();
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const downloadCSVTemplateStatus = async () => {
+    try {
+        const response = await campaignBudgetsRepository.downloadCSVTemplateStatus();
         return handleResponse(response);
 
     } catch (error) {

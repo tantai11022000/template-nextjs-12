@@ -16,7 +16,7 @@ export default function SelectFilter (props: ISelectFilterProps) {
   const { Text } = Typography
   return (
     <div className='select-filter-container'>
-      <Text>{label}</Text>
+      <Text className='mr-6'>{label}</Text>
       <Select
         labelInValue
         optionFilterProp="label"

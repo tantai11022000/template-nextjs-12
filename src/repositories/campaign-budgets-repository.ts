@@ -21,6 +21,14 @@ export const uploadBudgetScheduleCSVFile2 = (id: any, body: any) => {
     return userClient.post(`${campaignsUrl}/upload/schedule-step-2/${id}`, body, {headers: {'Content-Type': 'multipart/form-data'}});
 }
 
+export const uploadStatusScheduleCSVFile = (id: any, body: any) => {
+    return userClient.post(`${campaignsUrl}/upload/status-schedule-step-1/${id}`, body, {headers: {'Content-Type': 'multipart/form-data'}});
+}
+
+export const uploadStatusScheduleCSVFile2 = (id: any, body: any) => {
+    return userClient.post(`${campaignsUrl}/upload/status-schedule-step-2/${id}`, body, {headers: {'Content-Type': 'multipart/form-data'}});
+}
+
 export const setScheduleBudgetForCampaigns = (body: any) => {
     return userClient.put(`${campaignsUrl}/by-schedule`, body);
 }
@@ -47,4 +55,12 @@ export const exportCampaignsCSVFile = (params: any, body: any) => {
             'Content-Disposition': 'attachment; filename="example.csv"'
         }
     });
+}
+
+export const downloadCSVTemplateSchedule = () => {
+    return userClient.get(`${campaignsUrl}/download/template-schedule`);
+}
+
+export const downloadCSVTemplateStatus = () => {
+    return userClient.get(`${campaignsUrl}/download/template-status`);
 }

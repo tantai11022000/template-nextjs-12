@@ -18,13 +18,15 @@ import { changeNextPageUrl, notificationSimple, readAsBinaryString } from '@/uti
 import ActionButton from '@/components/commons/buttons/ActionButton';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { uploadBudgetScheduleCSVFile, uploadBudgetScheduleCSVFile2 } from '@/services/campaign-budgets-services';
+import { downloadCSVTemplateSchedule, uploadBudgetScheduleCSVFile, uploadBudgetScheduleCSVFile2 } from '@/services/campaign-budgets-services';
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/utils/Constants';
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
+import { saveAs } from 'file-saver';
+import SelectFilter from '@/components/commons/filters/SelectFilter';
+
 export async function getStaticProps(context: any) {
   const { locale } = context
-
   return {
     props: {
       ...(await serverSideTranslations(locale, ['common'])),
@@ -35,51 +37,21 @@ export async function getStaticProps(context: any) {
 export interface IUpdateCampaignBudgetProps {
 }
 
-const FILES = [
+const STATUSES = [
+  {
+    id: 0,
+    value: 0,
+    label: "All"
+  },
   {
     id: 1,
-    status: "valid",
-    campaign: "Campaign A",
-    campaignId: "CA121313",
-    budget: 10000,
-    fromTime: "2023-08-25T12:10:59.000Z",
-    toTime: "2023-08-28T09:27:24.000Z"
+    value: 1,
+    label: "Passed"
   },
   {
     id: 2,
-    status: "valid",
-    campaign: "Campaign A",
-    campaignId: "CA121313",
-    budget: 10000,
-    fromTime: "2023-08-25T12:10:59.000Z",
-    toTime: "2023-08-28T09:27:24.000Z"
-  },
-  {
-    id: 3,
-    status: "invalid",
-    campaign: "Campaign A",
-    campaignId: "CA121313",
-    budget: 10000,
-    fromTime: "2023-08-25T12:10:59.000Z",
-    toTime: "2023-08-28T09:27:24.000Z"
-  },
-  {
-    id: 4,
-    status: "invalid",
-    campaign: "Campaign A",
-    campaignId: "CA121313",
-    budget: 10000,
-    fromTime: "2023-08-25T12:10:59.000Z",
-    toTime: "2023-08-28T09:27:24.000Z"
-  },
-  {
-    id: 5,
-    status: "invalid",
-    campaign: "Campaign A",
-    campaignId: "CA121313",
-    budget: 10000,
-    fromTime: "2023-08-25T12:10:59.000Z",
-    toTime: "2023-08-28T09:27:24.000Z"
+    value: 2,
+    label: "Failed"
   },
 ]
 
@@ -95,11 +67,14 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
   const [reGenerateDataAccountList, setReGenerateDataAccountList] = useState<any[]>([])
   const [step, setStep] = useState<number>(1)
   const [mappingData, setMappingData] = useState<any[]>([])
+  const [filteredData, setFilteredData] = useState<any[]>(mappingData)
   const [previewFile, setPreviewFile] = useState<any[]>([])
   const [totalError, setTotalError] = useState<number>(0)
   const [totalPassed, setTotalPassed] = useState<number>(0)
   const [campaignsHaveSchedule, setCampaignsHaveSchedule] = useState<any[]>([])
   const [openModalWarning, setOpenModalWarning] = useState<boolean>(false)
+  const [statuses, setStatuses] = useState<any[]>(STATUSES)
+  const [status, setStatus] = useState<number | undefined>()
   const [errorFiles, setErrorFiles] = useState<any>()
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
@@ -180,6 +155,18 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
     }
   }
 
+  const onDownloadCSVTemplate = async () => {
+    try {
+      const result = await downloadCSVTemplateSchedule()
+      if (result) {
+        const blob = new Blob([result], { type: 'text/csv;charset=utf-8' });
+        saveAs(blob, 'Budget-Schedule-Template.csv');
+      }
+    } catch (error) {
+      console.log(">>> Download CSV Template error", error)
+    }
+  }
+
   const handleConfirmSettingSchedule = () => {
     handleFinish()
     setOpenModalWarning(false);
@@ -191,6 +178,19 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 
   const handleCancelSettingSchedule = () => {
     setOpenModalWarning(false);
+  };
+
+  const handleSelectedStatus = (values: any) => {
+    const { value } = values
+    setStatus(value)
+
+    if (value == 0 || value == undefined) {
+      setFilteredData(mappingData);
+    } else if (value == 1) {
+      setFilteredData(mappingData.filter((row) => row.item && !row.errorFields.length));
+    } else if (value == 2) {
+      setFilteredData(mappingData.filter((row) => row.errorFields.length > 0));
+    }
   };
 
   const normFile = (e: any) => {
@@ -363,7 +363,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           )
         }
       },
-    ], [mappingData, t]
+    ], [mappingData, filteredData, t]
   )
 
   return (
@@ -384,7 +384,9 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
             >
               <FSelect required name={'partnerAccountId'} label={t('update_campaign_schedule_page.partner_account')} placeholder={renderTranslateFilterText(t('update_campaign_schedule_page.partner_account'))} options={reGenerateDataAccountList} errorMessage={renderTranslateErrorMessageText(t('update_campaign_schedule_page.partner_account'))}/>
               <FUploadFile acceptType={'.csv'} required name={'file'} label={t('update_campaign_schedule_page.schedule_file')} onUploadFile={normFile} multiple={false} errorMessage={t('error_messages.file_empty_or_unreadable')}/>
-
+              <Form.Item label={t('upload_csv.csv_template')}>
+                <Button type="link" onClick={onDownloadCSVTemplate}>{t('upload_csv.click_to_download')}</Button>
+              </Form.Item>
               <Space size="middle" className='w-full flex justify-end'>
                 <ActionButton htmlType={"submit"} className={'next-button'} iconOnRight={<RightOutlined />} label={t('pagination.next')}/>
               </Space>
@@ -396,11 +398,14 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           <div className='panel-heading flex items-center justify-between'>
             <h2>{t('update_campaign_schedule_page.update_campaign_budget_schedule')} - {t('update_campaign_schedule_page.validate_and_live_edit')}</h2>
           </div>
-          <div className='w-full text-center mt-4'>
-            <h3 className='w-full flex items-center justify-center'>{t('upload_csv.rows_passed')}: <h3 className='text-green ml-1'>{totalPassed}</h3></h3>
-            <h3 className='w-full flex items-center justify-center'>{t('upload_csv.rows_failed')}: <h3 className='text-red ml-1'>{totalError}</h3></h3>
+          <div className='w-full flex item justify-between mt-4'>
+            <div>
+              <h3 className='w-full flex items-center'>{t('upload_csv.rows_passed')}: <h3 className='text-green ml-1'>{totalPassed}</h3></h3>
+              <h3 className='w-full flex items-center'>{t('upload_csv.rows_failed')}: <h3 className='text-red ml-1'>{totalError}</h3></h3>
+            </div>
+            <SelectFilter label={t('upload_csv.validate_status')} placeholder={renderTranslateFilterText(t('commons.status'))} onChange={handleSelectedStatus} options={statuses} />
           </div>
-          <TableGeneral loading={loading} columns={columnsBudgetLog} data={mappingData ? mappingData  : []} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
+          <TableGeneral loading={loading} columns={columnsBudgetLog} data={status == 0 || status == undefined ? mappingData : filteredData} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
           <div className='w-full flex items-center justify-between'>
             <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={t('pagination.back')} onClick={() => setStep(1)}/>
             <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish}/>

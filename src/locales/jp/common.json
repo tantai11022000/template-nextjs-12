@@ -295,6 +295,10 @@
         "trend": "トレンド",
         "weight_template_id": "ウェイトテンプレートID",
         "rows_passed": "渡された行数",
-        "rows_failed": "行が失敗しました"
+        "rows_failed": "行が失敗しました",
+        "new_status": "新しいステータス",
+        "csv_template": "CSVテンプレート",
+        "click_to_download": "クリックしてダウンロード",
+        "validate_status": "ステータスの検証"
     }
 }

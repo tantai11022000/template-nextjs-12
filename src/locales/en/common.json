@@ -295,6 +295,10 @@
         "trend": "Trend",
         "weight_template_id": "Weight Template ID",
         "rows_passed": "Rows passed",
-        "rows_failed": "Rows failed"
+        "rows_failed": "Rows failed",
+        "new_status": "New Status",
+        "csv_template": "CSV Template",
+        "click_to_download": "Click to Download",
+        "validate_status": "Validate Status"
     }
 }
