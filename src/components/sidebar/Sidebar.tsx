@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Spin } from 'antd';
 import { MenuProps } from 'antd';
 import { useAppSelector } from '@/store/hook';
 import { getCollapseMenu } from '@/store/globals/globalsSlice';
@@ -42,6 +42,7 @@ export default function SideBar (props: ISideBarProps) {
   const { menu, setMenu } = props
   const isCollapseMenu = useAppSelector(getCollapseMenu)
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const items: MenuItem[] = [
     getItems(t("sidebar.campaign_budgets"), 'campaign-budgets', 'campaign-budgets', BREADCRUMB_CAMPAIGN_BUDGET.url , <PieChartOutlined />),
@@ -49,6 +50,11 @@ export default function SideBar (props: ISideBarProps) {
     getItems(t('sidebar.accounts'), 'accounts', 'accounts', BREADCRUMB_ACCOUNT.url, <TeamOutlined />),
     getItems(t('sidebar.weight_template'), 'weight-template', 'weight-template', BREADCRUMB_WEIGHT_TEMPLATE.url, <GoldOutlined />),
   ];
+
+  useEffect(() => {
+    setLoading(false)
+  }, [])
+  
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,18 +82,20 @@ export default function SideBar (props: ISideBarProps) {
 
   return (
     <div className='sidebar-container'>
-      <Sider width={250} collapsed={isCollapseMenu ? collapsed : !collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" selectedKeys={[menu]} mode="inline">
-          {items && items.map((item: any) => (
-            <Menu.Item key={item.key} icon={item.icon} onClick={() => handleClickMenu(item.value)}>
-              <ActiveMenuLink href={item.url}>
-                {item.label}
-              </ActiveMenuLink>
-            </Menu.Item>
-          ))}
-        </Menu>
-      </Sider>
+      {loading ? <Spin/> : (
+        <Sider width={250} collapsed={isCollapseMenu ? collapsed : !collapsed} onCollapse={(value) => setCollapsed(value)}>
+          <div className="demo-logo-vertical" />
+          <Menu theme="dark" selectedKeys={[menu]} mode="inline">
+            {items && items.map((item: any) => (
+              <Menu.Item key={item.key} icon={item.icon} onClick={() => handleClickMenu(item.value)}>
+                <ActiveMenuLink href={item.url}>
+                  {item.label}
+                </ActiveMenuLink>
+              </Menu.Item>
+            ))}
+          </Menu>
+        </Sider>
+      )}
     </div>
   );
 }

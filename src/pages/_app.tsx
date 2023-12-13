@@ -11,7 +11,7 @@ import '../components/commons/index.scss'
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux';
 import store from '@/store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getAllPartnerAccounts } from '@/services/accounts-service'
 import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice'
 import { ToastContainer } from 'react-toastify';
@@ -19,14 +19,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { StyleProvider } from '@ant-design/cssinjs';
 import { appWithTranslation } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, Spin } from 'antd';
 import { getItem, storeItem } from '@/utils/StorageUtils'
 import { CURRENT_ACCOUNT, LANGUAGE_CODE, LANGUAGE_KEY } from '@/utils/StorageKeys'
 import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
 import { useRouter } from 'next/router'
 import jaJP from 'antd/locale/ja_JP';
 import enUS from 'antd/locale/en_US';
-
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -40,6 +39,7 @@ export async function getStaticProps(context: any) {
 
 function App({ Component, pageProps }: any) {
   const router = useRouter()
+  const [loading, setLoading] = useState<boolean>(true)
   const currentAccount = getItem(CURRENT_ACCOUNT)
   const language = typeof window !== 'undefined' && window.localStorage.getItem('language') == 'ja_JP' ? jaJP : enUS;
   const renderWithLayout =
@@ -61,6 +61,13 @@ function App({ Component, pageProps }: any) {
     getAllAccountList()
     setDefaultLocale();
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000);
+  }, [])
+  
   
   const getAllAccountList = async () => {
     try {
@@ -88,7 +95,7 @@ function App({ Component, pageProps }: any) {
               fontFamily: '"M PLUS Rounded 1c", "Droid Sans", Tahoma, Arial, sans-serif',
             },
           }}>
-            {renderWithLayout(<Component {...pageProps} key={router.asPath}/>)}
+            {loading ? <Spin/> : <>{renderWithLayout(<Component {...pageProps} key={router.asPath}/>)}</>}
         </ConfigProvider>
        </StyleProvider>
       <ToastContainer />

@@ -12,7 +12,8 @@ export enum CAMPAIGN_STATUS {
     ENABLE = 1,
     PAUSED = 2,
     ARCHIVED = 3,
-    OTHER = 4,
+    ENDED = 4,
+    OTHER = 5
 }
 
 export enum SCHEDULE_STATUS {

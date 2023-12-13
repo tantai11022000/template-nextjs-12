@@ -125,7 +125,7 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
       } 
     } catch (error: any) {
       console.log(">>> Upload CSV File Error", error)
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 

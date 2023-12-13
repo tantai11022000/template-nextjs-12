@@ -49,8 +49,12 @@ export const changeBudgetCampaign = (body: any) => {
     return userClient.put(`${campaignsUrl}/update-budget`, body);
 }
 
-export const deleteScheduleById = (params: any) => {
-    return userClient.delete(`${campaignsUrl}/${params.partnerAccountId}/${params.scheduleId}`);
+export const deleteBudgetScheduleById = (params: any) => {
+    return userClient.delete(`${campaignsUrl}/budget-schedule/${params.partnerAccountId}/${params.scheduleId}`);
+}
+
+export const deleteStatusScheduleById = (params: any) => {
+    return userClient.delete(`${campaignsUrl}/status-schedule/${params.partnerAccountId}/${params.scheduleId}`);
 }
 
 export const getScheduleById = (id: any) => {

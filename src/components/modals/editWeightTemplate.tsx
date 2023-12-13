@@ -122,12 +122,12 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
       };
 
       await createWeightTemplate(updatedValues)
-      notificationSimple("Create Weight Template Success", NOTIFICATION_SUCCESS);
+      notificationSimple(renderTranslateToastifyText(t('weight_template_page.weight_template')), NOTIFICATION_SUCCESS)
       refreshData()
       onOk()
     } catch (error: any) {
       console.log(">>> Create Weight Template Error", error)
-      notificationSimple(error.message, NOTIFICATION_ERROR);
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR);
     }
   };
 
@@ -145,6 +145,11 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
 
   const renderTranslateInputText = (text: any) => {
     let translate = t("commons.action_type.input");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.created_text")
     return translate.replace("{text}", text);
   }
 

@@ -152,12 +152,12 @@ function AddWeightTemplate() {
           await editWeightTemplate(id, updatedValues)
         } else {
           await createWeightTemplate(updatedValues)
-          notificationSimple("Create Weight Template Success", NOTIFICATION_SUCCESS);
+          notificationSimple(renderTranslateToastifyText(t('weight_template_page.weight_template')), NOTIFICATION_SUCCESS)
         }
         router.push(BREADCRUMB_WEIGHT_TEMPLATE.url)
       } catch (error:any) {
         console.log(">>> Create Weight Template Error", error)
-        notificationSimple(error.message ? error.message : "Create Weight Template Fail", NOTIFICATION_ERROR);
+        notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR);
       }
     };
     
@@ -180,6 +180,11 @@ function AddWeightTemplate() {
 
     const renderTranslateInputText = (text: any) => {
       let translate = t("commons.action_type.input");
+      return translate.replace("{text}", text);
+    }
+
+    const renderTranslateToastifyText = (text: any) => {
+      let translate = t("toastify.success.created_text")
       return translate.replace("{text}", text);
     }
 

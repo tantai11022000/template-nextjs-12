@@ -8,12 +8,13 @@ import { useTranslation } from 'next-i18next';
 interface IRangeDatePickerProps {
   onRangeChange: any,
   duration: any,
-  showTime?: boolean
+  showTime?: boolean,
+  renderExtraFooter?: any
 }
 
 const RangeDatePicker = (props: IRangeDatePickerProps) => {
   const { t } = useTranslation()
-  const { onRangeChange, duration, showTime } = props
+  const { onRangeChange, duration, showTime, renderExtraFooter } = props
   const { RangePicker } = DatePicker;
 
   const rangePresets: TimeRangePickerProps['presets'] = [
@@ -34,6 +35,7 @@ const RangeDatePicker = (props: IRangeDatePickerProps) => {
     <div className='range-date-picker-container'>
       <Space direction="vertical" size={12}>
         <RangePicker
+          renderExtraFooter={renderExtraFooter}
           showTime={showTime ? true : false} 
           format={showTime ? "YYYY/MM/DD HH:mm" : "YYYY/MM/DD"} 
           defaultValue={[dayjs(duration && duration.startDate ? moment(duration.startDate).format("YYYY/MM/DD") : ""), dayjs(duration && duration.endDate ? moment(duration.endDate).format("YYYY/MM/DD") : "")]} 

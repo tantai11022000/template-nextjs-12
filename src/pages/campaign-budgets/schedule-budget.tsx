@@ -15,14 +15,13 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import AddWeightTemplate from '../weight-template/[...type]';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { setBreadcrumb } from '@/store/breadcrumb/breadcrumbSlice';
-import { changeNextPageUrl, notificationSimple } from '@/utils/CommonUtils';
+import { changeNextPageUrl, notificationSimple, parseDate } from '@/utils/CommonUtils';
 import ActionButton from '@/components/commons/buttons/ActionButton';
 
 import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import FSelect from '@/components/form/FSelect';
 import FRadio from '@/components/form/FRadio';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
-import type { Dayjs } from 'dayjs';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
@@ -345,7 +344,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
       router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
     } catch (error: any) {
       console.log(">>> Set Schedule Budget For Campaigns Error", error)
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 
@@ -358,7 +357,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           mode: mode,
           adjust: adjust,
           value: adjust != 2 ? Math.abs(value) : -Math.abs(value),
-          schedule: dayjs(schedule),
+          schedule: parseDate(schedule),
           weightTemplateId: adtranWeightTemplateId ? adtranWeightTemplateId : ""
         })
         setSelectMode(mode)

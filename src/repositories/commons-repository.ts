@@ -11,3 +11,7 @@ export const getPortfolio = (id: any) => {
     return userClient.get(`${commonsUrl}/portfolio/${id}`);
 }
 
+export const getCampaignStatus = () => {
+    return userClient.get(`${commonsUrl}/campaign-status`);
+}
+

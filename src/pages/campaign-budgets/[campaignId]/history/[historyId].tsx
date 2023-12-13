@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
-import { Space, Tag, Typography } from 'antd';
+import { Button, Space, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
 import moment from 'moment';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
@@ -69,6 +69,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
     startDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 5),
     endDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
   });
+  const [showTimePanel, setShowTimePanel] = useState<boolean>(false)
 
   useEffect(() => {
     init()
@@ -91,8 +92,8 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         page: current,
         pageSize,
         total,
-        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD HH:mm") : "",
-        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD HH:mm") : "",
+        from: duration && duration.startDate ? moment(duration.startDate).format(showTimePanel ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD") : "",
+        to: duration && duration.endDate ? moment(duration.endDate).format(showTimePanel ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD") : "",
       }
       const result = await getCampaignPerformanceHistoryLog(campaignId, params)
       if (result && result.data) {
@@ -208,8 +209,6 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
 
   const onRangeChange = (dates: null | (Dayjs | null)[], dateStrings: string[]) => {
     if (dates) {
-      console.log('From: ', dates[0], ', to: ', dates[1]);
-      console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
       const duration = {
         startDate: dateStrings[0],
         endDate: dateStrings[1]
@@ -226,6 +225,18 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
     return translate.replace("{text}", text);
   }
 
+  const renderExtraFooter = () => {
+    const handleShowTimePannel = () => {
+      if (showTimePanel) setShowTimePanel(false)
+      else setShowTimePanel(true)
+    }
+    return (
+      <Button onClick={handleShowTimePannel}>
+        {showTimePanel ? "Close Time" : "Show Time"}
+      </Button>
+    );
+  };
+
   return (
     <div className='text-black'>
       <div className='panel-heading'>
@@ -234,7 +245,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         <div className='flex items-center justify-between mt-5'>
         <h3>Budget Update on 17 23rd-Aug-2023</h3>
         <Space>
-          <RangeDatePicker showTime duration={duration} onRangeChange={onRangeChange}/>
+          <RangeDatePicker renderExtraFooter={renderExtraFooter} showTime={showTimePanel ? true : false} duration={duration} onRangeChange={onRangeChange}/>
           <SelectFilter placeholder={"Export"} onChange={handleChange} options={exportType}/>
         </Space>
         </div>

@@ -23,7 +23,7 @@ import ActionButton from '@/components/commons/buttons/ActionButton';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
-import { getPortfolio } from '@/services/commons-service';
+import { getCampaignStatus, getPortfolio } from '@/services/commons-service';
 import FileSaver from 'file-saver';
 import { getItem } from '@/utils/StorageUtils';
 import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
@@ -113,7 +113,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
 
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<any>('');
-  const [statuses, setStatuses] = useState<any[]>(STATUSES)
+  const [statuses, setStatuses] = useState<any[]>([])
   const [bulkAction, setBulkAction] = useState<any[]>(BULK_ACTION)
   const [selectedRowKeys, setSelectedRowKeys] = useState<any>()
   const [selectedRowsWithCampaignName, setSelectedRowsWithCampaignName] = useState<any>()
@@ -146,6 +146,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
     }))
     setMappingPortfolio(newData)
   }, [portfolio])
+
+  useEffect(() => {
+    fetchCampaignStatus()
+  }, [])
 
   useEffect(() => {
     // mapFirstQuery()
@@ -203,7 +207,22 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         setPortfolio(result.data)
       }
     } catch (error) {
-      console.log(">>> fetch Portfolio Error", error)
+      console.log(">>> Fetch Portfolio Error", error)
+    }
+  }
+
+  const fetchCampaignStatus = async () => {
+    try {
+      const result = await getCampaignStatus()
+      if (result && result.data) {
+        const newData = result.data.map((data: any) => ({
+          value: data.code,
+          label: data.name
+        }))
+        setStatuses(newData)
+      }
+    } catch (error) {
+      console.log(">>> Fetch Campaign Status Error", error)
     }
   }
 
@@ -403,6 +422,9 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
             } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
               status = t('commons.status_enum.archived')
               type = 'processing'
+            } else if (statusData == CAMPAIGN_STATUS.ENDED) {
+              status = t('commons.status_enum.ended')
+              type = 'error'
             } else if (statusData == CAMPAIGN_STATUS.OTHER) {
               status = t('commons.status_enum.other')
               type = 'default'
@@ -470,7 +492,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
               }
             } catch (error: any) {
               console.log(">>> Change Budget Error", error)
-              notificationSimple(error.message, NOTIFICATION_ERROR)
+              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
             }
           };
 

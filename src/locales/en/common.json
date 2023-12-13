@@ -39,6 +39,7 @@
             "enable": "Enable",
             "archived": "Archived",
             "other": "Other",
+            "ended": "Ended",
             
             "active": "Active",
             "inactive": "Inactive",
@@ -96,7 +97,7 @@
 
         },
         "error": {
-
+            "default_error_message": "An error occurred. Please try again later."
         }
     },
 

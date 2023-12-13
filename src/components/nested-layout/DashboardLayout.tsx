@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Select } from 'antd';
+import {  Select, Spin } from 'antd';
 import { Layout } from 'antd';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
@@ -23,6 +23,7 @@ const DashboardLayout = (props: any) => {
   const accountList = useAppSelector(getAccountList);
   const currentAccount = getItem(CURRENT_ACCOUNT)
   const [currentAcc, setCurrentAcc] = useState<any>(currentAccount)
+  const [loading, setLoading] = useState<boolean>(true)
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [menu, setMenu] = useState<string>("campaign-budgets")
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
@@ -52,6 +53,10 @@ const DashboardLayout = (props: any) => {
     }
     setMenu(handleMenuName(router.pathname))
   }, [router.pathname])
+
+  useEffect(() => {
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     setCurrentAcc(currentAccount)
@@ -112,13 +117,15 @@ const DashboardLayout = (props: any) => {
                 </div>
           </Layout>
           
-          <div className='m-6 bg-white'>
-            <div className='p-4 panel-container'>
-              {React.Children.map(children, (child) => {
-                return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
-              })}
+          {loading ? <Spin/> : (
+            <div className='m-6 bg-white'>
+              <div className='p-4 panel-container'>
+                {React.Children.map(children, (child) => {
+                  return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <Footer style={{ textAlign: 'left' }}>© 2023 ADTRAN</Footer>
       </Layout>

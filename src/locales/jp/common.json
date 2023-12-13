@@ -39,6 +39,7 @@
             "enable": "有効にする",
             "archived": "アーカイブ済み",
             "other": "他の",
+            "ended": "終了しました",
 
             "active": "アクティブ",
             "inactive": "非活性",
@@ -95,7 +96,7 @@
             "validation": "検証が成功しました."
         },
         "error": {
-
+            "default_error_message": "エラーが発生しました。しばらくしてから再度実行してください."
         }
     },
 

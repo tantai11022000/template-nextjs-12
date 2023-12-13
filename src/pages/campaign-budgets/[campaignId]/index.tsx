@@ -31,9 +31,9 @@ import { useTranslation } from 'next-i18next';
 import type { Dayjs } from 'dayjs';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { deleteScheduleById, getScheduleBudgetLog, getScheduleStatusLog } from '@/services/campaign-budgets-services';
+import { deleteBudgetScheduleById, deleteStatusScheduleById, getScheduleBudgetLog, getScheduleStatusLog } from '@/services/campaign-budgets-services';
 import { CAMPAIGN_STATUS, SCHEDULE_STATUS } from '@/enums/status';
-import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
+import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { ADJUST_CODE } from '@/enums/adjust';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
@@ -371,7 +371,6 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         dataIndex: 'action',
         key: 'action',
         render: (_: any, record: any) => {
-          const statusData = record.status
           const { status, id, detailedBySettingId, note, scheduledTime } = record
           const { mode, adtranWeightTemplateId } = record && record.detailedBySetting
           const today = new Date();
@@ -382,7 +381,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
           }
           const renderActionType = () => {
             let action: any = ''
-            if (statusData == SCHEDULE_STATUS.UPCOMING) {
+            if (status == SCHEDULE_STATUS.UPCOMING) {
               if (mode == SETTING_BUDGET_MODE.DAILY) {
                 if (moment.tz(today, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD") != moment.tz(scheduledTime, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD")) {
                   action = (
@@ -430,7 +429,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                   </Space>
                 )
               }
-            } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
+            } else if (status == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
               if (mode == SETTING_BUDGET_MODE.DAILY) {
                 action = (
                   <Space size="middle" className='flex justify-center'>
@@ -451,11 +450,11 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                   </Space>
                 )
               }
-            } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
+            } else if (status == SCHEDULE_STATUS.FAILED_EXECUTED) {
               action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined className='text-lg'/></Tooltip>
-            } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
+            } else if (status == SCHEDULE_STATUS.PROCESSING) {
               action = ''
-            } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
+            } else if (status == SCHEDULE_STATUS.IN_QUEUE) {
               action = ''
             }
             return action
@@ -467,13 +466,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                 partnerAccountId: currentAccount,
                 scheduleId: id
               }
-              const result = await deleteScheduleById(params)
+              const result = await deleteBudgetScheduleById(params)
               if (result && result.message == "OK") {
                 notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
                 fetchScheduleBudgetLog(mode, duration)
               }
-            } catch (error) {
-              
+            } catch (error: any) {
+              console.log(">>> Delete Budget Schedule Error", error)
+              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
             }
           }
           return (
@@ -529,21 +529,50 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         }
       },
       {
+        title: <div className='text-center'>{t('commons.status')}</div>,
+        dataIndex: 'status',
+        key: 'status',
+        render: (_: any, record: any) => {
+          const statusData = record.status
+          const renderStatus = () => {
+            let status: any = ''
+            let type = ''
+            if (statusData == SCHEDULE_STATUS.UPCOMING) {
+              status = t('commons.status_enum.upcoming')
+              type = 'warning'
+            } else if (statusData == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
+              status = <Tooltip placement="top" title={t('commons.status_enum.success')} arrow={true}><CheckCircleOutlined className='text-lg'/></Tooltip>
+              type = 'success'
+            } else if (statusData == SCHEDULE_STATUS.FAILED_EXECUTED) {
+              status = <Tooltip placement="top" title={t('commons.status_enum.fail')} arrow={true}><InfoCircleOutlined className='text-lg'/></Tooltip>
+              type = 'error'
+            } else if (statusData == SCHEDULE_STATUS.PROCESSING) {
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_process')} arrow={true}><LoadingOutlined className='text-lg'/></Tooltip>
+              type = 'processing'
+            } else if (statusData == SCHEDULE_STATUS.IN_QUEUE) {
+              status = <Tooltip placement="top" title={t('commons.status_enum.in_queue')} arrow={true}><UnorderedListOutlined className='text-lg' /></Tooltip>
+              type = 'default'
+            }
+            return (
+              <>
+                {typeof status == 'string' ? <Tag className='text-center uppercase' color={type}>{status}</Tag> : <>{status}</>}
+              </>
+            )
+          }
+          return (
+              <div className='flex justify-center uppercase'>
+                {renderStatus()}
+              </div>
+          );
+        },
+      },
+      {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
         dataIndex: 'updatedDate',
         key: 'updatedDate',
         render: (_: any, record: any) => {
           const schedule = record.scheduledTime ? record.scheduledTime : ""
           return <p className='text-center'>{schedule ? moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
-        }
-      },
-      {
-        title: <div className='text-center'>{t('commons.setting_type')}</div>,
-        dataIndex: 'mode',
-        key: 'mode',
-        render: (_: any, record: any) => {
-          const mode = record.detailedBySetting && record.detailedBySetting.mode ? record.detailedBySetting.mode : ""
-          return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
         }
       },
       {
@@ -561,14 +590,49 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         dataIndex: 'log',
         key: 'log',
         render: (_: any, record: any) => {
+          const { status, id, note, scheduledTime } = record
+
+          const renderActionType = () => {
+            let action: any = ''
+            if (status == SCHEDULE_STATUS.UPCOMING) {
+              action = (
+                <Space size="middle" className='flex justify-center'>
+                  <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
+                    <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteStatus(id)}/>
+                  </Tooltip>
+                </Space>
+              )
+            } else if (status == SCHEDULE_STATUS.SUCCESSFULLY_EXECUTED) {
+              action = ''
+            } else if (status == SCHEDULE_STATUS.FAILED_EXECUTED) {
+              action = <Tooltip placement="top" title={note ? note : t('commons.action_type.log')} arrow={true}><FileTextOutlined className='text-lg'/></Tooltip>
+            } else if (status == SCHEDULE_STATUS.PROCESSING) {
+              action = ''
+            } else if (status == SCHEDULE_STATUS.IN_QUEUE) {
+              action = ''
+            }
+            return action
+          }
+          
+          const onDeleteStatus = async (id: any) => {
+            try {
+              const params = {
+                partnerAccountId: currentAccount,
+                scheduleId: id
+              }
+              const result = await deleteStatusScheduleById(params)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.status')), NOTIFICATION_SUCCESS)
+                fetchScheduleBudgetLog(mode, duration)
+              }
+            } catch (error: any) {
+              console.log(">>> Delete Status Schedule Error", error)
+              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
+            }
+          }
           return (
             <div className='flex justify-center'>
-              <Space size="middle" className='flex justify-center'>
-                  <EditOutlined className='text-lg cursor-pointer' />
-                  <DeleteOutlined className='text-lg cursor-pointer'/>
-                  <FundOutlined className='text-lg cursor-pointer'/>
-                  <GoldOutlined className='text-lg cursor-pointer' />
-                </Space>
+              {renderActionType()}
             </div>
           )
         },

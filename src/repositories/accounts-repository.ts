@@ -26,3 +26,7 @@ export const getAccountInfo = (id: any) => {
 export const updateAccountStatus = (id: any, body: any) => {
     return userClient.put(`${accountUrl}/status/${id}`, body);
 }
+
+export const deleteAccountById = (id: any) => {
+    return userClient.delete(`${accountUrl}/${id}`);
+}

@@ -1,5 +1,15 @@
 import qs from 'query-string';
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault(process.env.NEXT_PUBLIC_TIMEZONE);
+
+export const parseDate = (date: any) => {
+  return dayjs(date).tz();
+};
 
 export const getStoredLanguage = () => {
   if (typeof window !== 'undefined') {

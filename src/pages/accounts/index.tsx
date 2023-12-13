@@ -3,7 +3,7 @@ import { Dropdown, Input, Space, Tag } from 'antd';
 import TableGeneral from '@/components/table';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
-import { getAllPartnerAccounts, updateAccountStatus } from '@/services/accounts-service';
+import { deleteAccountById, getAllPartnerAccounts, updateAccountStatus } from '@/services/accounts-service';
 import { BREADCRUMB_ACCOUNT } from '@/Constant/index';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import RootLayout from '@/components/layout';
@@ -115,7 +115,7 @@ export default function Accounts (props: IAccountsProps) {
       }
     } catch (error: any) {
       console.log(">>> Update Account Status Error", error)
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   };
 
@@ -176,11 +176,29 @@ export default function Accounts (props: IAccountsProps) {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
+          const id = record.id
+
+          const onDeleteAccount = async (id: any) => {
+            try {
+              const params = {
+                partnerAccountId: currentAccount,
+                scheduleId: id
+              }
+              const result = await deleteAccountById(id)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
+                getAllAccounts(keyword)
+              }
+            } catch (error) {
+              
+            }
+          }
+
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
-                {/* <DeleteOutlined className='text-lg cursor-pointer'/> */}
+                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${id}`)}/>
+                <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteAccount(id)}/>
               </Space>
             </div>
           )

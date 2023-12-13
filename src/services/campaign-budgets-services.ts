@@ -111,9 +111,19 @@ export const changeBudgetCampaign = async (body: any) => {
     }
 }
 
-export const deleteScheduleById = async (params: any) => {
+export const deleteBudgetScheduleById = async (params: any) => {
     try {
-        const response = await campaignBudgetsRepository.deleteScheduleById(params);
+        const response = await campaignBudgetsRepository.deleteBudgetScheduleById(params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const deleteStatusScheduleById = async (params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.deleteStatusScheduleById(params);
         return handleResponse(response);
 
     } catch (error) {

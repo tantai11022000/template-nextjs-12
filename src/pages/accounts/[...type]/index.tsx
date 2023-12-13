@@ -164,7 +164,7 @@ export default function AddAccount (props: IAddAccountProps) {
     } catch (error: any) {
       console.log(">>>> Create Account Error", error)
       setLoading({...loading, isCreate: false})
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 
@@ -182,7 +182,7 @@ export default function AddAccount (props: IAddAccountProps) {
       notificationSimple(t('toastify.success.validation'), NOTIFICATION_SUCCESS)
     } catch (error: any) {
       setLoading({...loading, isValid: false})
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 
