@@ -26,6 +26,7 @@ import { i18n } from '../../next-i18next.config'; // Adjust the path accordingly
 import { useRouter } from 'next/router'
 import jaJP from 'antd/locale/ja_JP';
 import enUS from 'antd/locale/en_US';
+import Head from 'next/head'
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -87,6 +88,10 @@ function App({ Component, pageProps }: any) {
   }
 
   return (
+    <>
+    <Head>
+        <title>AdTran - Integrated Digital Marketing Reporting Solution</title>
+    </Head>
     <Provider store={store} >
       <StyleProvider hashPriority="high">
         <ConfigProvider locale={language}
@@ -100,6 +105,7 @@ function App({ Component, pageProps }: any) {
        </StyleProvider>
       <ToastContainer />
     </Provider>
+    </>
   )
 }
 

@@ -174,3 +174,12 @@ export const trimFieldValues = (values: any) => {
     }
     return trimmedValues;
 };
+
+export const formatNumber = (number:number, fixed: number = 2) => {
+  const numberFormatted = number.toFixed(fixed).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+  if (numberFormatted.split(".")[1] == '00') {
+    return numberFormatted.split(".")[0]
+  } else {
+    return numberFormatted
+  }
+}

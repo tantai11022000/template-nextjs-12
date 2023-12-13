@@ -6,7 +6,7 @@ import TableGeneral from '@/components/table';
 import { changeBudgetCampaign, exportCampaignsCSVFile, getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { Modal } from 'antd';
 import { useRouter } from 'next/router';
-import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
+import { changeNextPageUrl, formatNumber, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
 import store from '@/store';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import { getCurrentAccount, getIsSyncData, setSyncData } from '@/store/account/accountSlice';
@@ -517,7 +517,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         dataIndex: 'imp',
         key: 'imp',
         render: (_: any, record: any) => {
-          const imp = record.metrics && record.metrics.impressions ? record.metrics.impressions : "-"
+          const imp = record.metrics && record.metrics.impressions ? formatNumber(record.metrics.impressions) : "-"
           return <p className='text-end'>{imp}</p>
         }
       },
@@ -526,7 +526,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         dataIndex: 'click',
         key: 'click',
         render: (_: any, record: any) => {
-          const click = record.metrics && record.metrics.clicks ? record.metrics.clicks : "-"
+          const click = record.metrics && record.metrics.clicks ? formatNumber(record.metrics.clicks) : "-"
           return <p className='text-end'>{click}</p>
         }
       },
@@ -535,7 +535,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         dataIndex: 'sale',
         key: 'sale',
         render: (_: any, record: any) => {
-          const sale = record.metrics && record.metrics.sales ? record.metrics.sales : "-"
+          const sale = record.metrics && record.metrics.sales ? formatNumber(record.metrics.sales) : "-"
           return <p className='text-end'>{sale}</p>
         }
       },
@@ -546,7 +546,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         render: (_: any, record: any) => {
           const sale = record.metrics && record.metrics.sales ? record.metrics.sales : 0
           const cost = record.metrics && record.metrics.cost ? record.metrics.cost : 0
-          const roas = sale && cost ? (sale / cost).toFixed(2) : "-"
+          const roas = sale && cost ? formatNumber((sale / cost)) : "-"
           return <p className='text-end'>{roas}</p>
         }
       },

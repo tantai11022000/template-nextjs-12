@@ -352,8 +352,13 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
         dataIndex: 'mode',
         key: 'mode',
         render: (_: any, record: any) => {
-          const mode = record.detailedBySetting && record.detailedBySetting.mode ? record.detailedBySetting.mode : ""
-          return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
+          const mode = record.detailedBySetting && !isNaN(record.detailedBySetting.mode) ? record.detailedBySetting.mode : ""
+          const adjust = record.detailedBySetting && !isNaN(record.detailedBySetting.adjust) ? record.detailedBySetting.adjust : ""
+          return (
+            <Tooltip placement="top" title={`${SETTING_BUDGET_MODE[mode]} - ${ADJUST_CODE[adjust]}`} arrow={true}>
+              <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
+            </Tooltip>
+          )
         }
       },
       {
