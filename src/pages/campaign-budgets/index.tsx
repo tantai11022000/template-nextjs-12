@@ -343,7 +343,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       const campaignNames = selectedRows.map((row: any) => row.name);
       setSelectedRowsWithCampaignName(campaignNames)
 
-      const campaignIsHaveSchedule = selectedRows.map((row: any) => row.isHaveSchedule ? true : false);
+      const campaignIsHaveSchedule = selectedRows.map((row: any) => row.adtranAmazonCampaignBudgetSchedule == null ? false : true);
       setSelectedRowsWithIsHaveSchedule(campaignIsHaveSchedule)
     },
     getCheckboxProps: (record: any) => ({

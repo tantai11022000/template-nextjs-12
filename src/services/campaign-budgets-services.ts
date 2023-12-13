@@ -71,9 +71,29 @@ export const setScheduleBudgetForCampaigns = async (body: any) => {
     }
 }
 
+export const getScheduleLog = async (paths: any, params: any, type: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleLog(paths, params, type);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const getScheduleBudgetLog = async (paths: any, params: any) => {
     try {
         const response = await campaignBudgetsRepository.getScheduleBudgetLog(paths, params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getScheduleStatusLog = async (paths: any, params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleStatusLog(paths, params);
         return handleResponse(response);
 
     } catch (error) {

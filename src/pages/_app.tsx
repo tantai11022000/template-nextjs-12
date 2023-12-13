@@ -41,7 +41,6 @@ export async function getStaticProps(context: any) {
 function App({ Component, pageProps }: any) {
   const router = useRouter()
   const currentAccount = getItem(CURRENT_ACCOUNT)
-  console.log(">>> currentAccount", currentAccount)
   const language = typeof window !== 'undefined' && window.localStorage.getItem('language') == 'ja_JP' ? jaJP : enUS;
   const renderWithLayout =
     Component.getLayout ||

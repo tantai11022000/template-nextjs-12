@@ -31,15 +31,14 @@ import { useTranslation } from 'next-i18next';
 import type { Dayjs } from 'dayjs';
 import DateTimePicker from '@/components/dateTime/DateTimePicker';
 import { getCurrentAccount } from '@/store/account/accountSlice';
-import { deleteScheduleById, getScheduleBudgetLog } from '@/services/campaign-budgets-services';
-import { SCHEDULE_STATUS } from '@/enums/status';
+import { deleteScheduleById, getScheduleBudgetLog, getScheduleStatusLog } from '@/services/campaign-budgets-services';
+import { CAMPAIGN_STATUS, SCHEDULE_STATUS } from '@/enums/status';
 import { NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { SETTING_BUDGET_MODE } from '@/enums/mode';
 import { ADJUST_CODE } from '@/enums/adjust';
 import EditWeightTemplate from '@/components/modals/editWeightTemplate';
 import { getItem } from '@/utils/StorageUtils';
 import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
-
 
 export const getStaticPaths = async () => {
   return {
@@ -61,63 +60,14 @@ export async function getStaticProps(context: any) {
 export interface ICampaignDetailProps {
 }
 
-const BUDGET_UPDATE_LOG = [
-  {
-    id: 1,
-    before: null,
-    after: 15000,
-    status: "active",
-    updateTime: "2023-08-28T09:27:24.000Z",
-    settingType: "One-time",
-    userUpdate: "Bao"
-  },
-  {
-    id: 2,
-    before: null,
-    after: 10000,
-    status: "upcoming",
-    updateTime: "2023-08-28T02:30:42.000Z",
-    settingType: "One-time",
-    userUpdate: "Tai"
-  },
-  {
-    id: 3,
-    before: 10000,
-    after: 15000,
-    status: "active",
-    updateTime: "2023-08-25T12:10:59.000Z",
-    settingType: "Daily with Weight",
-    userUpdate: "Bao"
-  },
-  {
-    id: 4,
-    before: 10000,
-    after: 15000,
-    status: "inactive",
-    updateTime: "2023-08-25T11:04:54.000Z",
-    settingType: "One-time",
-    userUpdate: "Tai"
-  },
-]
-
-const UPDATE_BUDGET = [
-  {
-    value: 1,
-    label: 'One Time'
-  },
-  {
-    value: 2,
-    label: 'Daily With Weight'
-  },
-]
-
 export default function CampaignDetail (props: ICampaignDetailProps) {
   const { t } = useTranslation()
   const router = useRouter()
   const currentAccount = getItem(CURRENT_ACCOUNT)
   const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
-  const campaignName = router && router.query && router.query.name ? router.query.name : ""
+  const campaignNameFromQuery = router && router.query && router.query.name ? router.query.name : ""
   const dispatch = useAppDispatch()
+  const [campaignName, setCampaignName] = useState<any>(campaignNameFromQuery)
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [statusLog, setStatusLog] = useState<any[]>([])
   const [openModalPreviewWeightTemplate, setOpenModalPreviewWeightTemplate] = useState<boolean>(false);
@@ -125,35 +75,11 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     id: "",
     name: ""
   })
-  const [filterModeOptions, setFilterModeOptions] = useState<any[]>([
-    {
-      value: 'all',
-      label: 'All'
-    },
-    {
-      value: 'one-time',
-      label: t('commons.weight_type.one_time')
-    },
-    {
-      value: 'daily',
-      label: t('commons.weight_type.daily_with_weight')
-    },
-  ])
+  const [tabs, setTabs] = useState<any[]>([])
+  const [currentTab, setCurrentTab] = useState<number>(1)
+  const [filterModeOptions, setFilterModeOptions] = useState<any[]>([])
   const [mode, setMode] = useState<string>('')
-  const [filterOptions, setFilterOptions] = useState<any[]>([
-    {
-      value: 1,
-      label: t('update_log_page.update_status_schedule')
-    },
-    {
-      value: 2,
-      label: t('update_log_page.update_budget_schedule')
-    },
-    {
-      value: 3,
-      label: t('update_log_page.export')
-    },
-  ])
+  const [filterOptions, setFilterOptions] = useState<any[]>([])
 
   const date = new Date();
   const [duration, setDuration] = useState<any>({
@@ -162,32 +88,55 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   });
   
   const [loading, setLoading] = useState<boolean>(false)
-  const [turnOn, setTurnOn] = useState<boolean>(false)
-  const [pagination, setPagination] = useState<any>({
-    budgetLog: {
+  const [paginationBudgetLog, setPaginationBudgetLog] = useState<any>({
       pageSize: 30,
       current: 1,
       total: 0,
-    },
-    statusLog: {
-      pageSize: 2,
+  })
+  const [paginationStatusLog, setPaginationStatusLog] = useState<any>({
+      pageSize: 10,
       current: 1,
       total: 0,
-    }
   })
-  useEffect(() => {
-    if (currentAccount) fetchScheduleBudgetLog(mode, duration)
-  }, [currentAccount, pagination.budgetLog.pageSize, pagination.budgetLog.current])
 
   useEffect(() => {
-    if (!campaignId) return
+    if (campaignNameFromQuery) setCampaignName(campaignNameFromQuery)
+  }, [router.query])
+  
+  useEffect(() => {
+    setTabs([
+      { id: 1, label: t('update_log_page.budget_update_log') },
+      { id: 2, label: t('update_log_page.status_update') }
+    ])
+    setFilterModeOptions([
+      { value: 'all', label: t('commons.all') },
+      { value: 'one-time', label: t('commons.weight_type.one_time') },
+      { value: 'daily', label: t('commons.weight_type.daily_with_weight') }
+    ])
+    setFilterOptions([
+      { value: 1, label: t('update_log_page.update_status_schedule') },
+      { value: 2, label: t('update_log_page.update_budget_schedule') },
+      { value: 3, label: t('update_log_page.export') }
+    ])
+  }, [t])
+  
+
+  useEffect(() => {
+    if (currentAccount) {
+      if (currentTab == 1) fetchScheduleBudgetLog(mode, duration)
+      else if (currentTab == 2) fetchScheduleStatusLog(mode, duration)
+    }
+  }, [currentAccount, currentTab, paginationBudgetLog?.pageSize, paginationBudgetLog?.current, paginationStatusLog?.pageSize, paginationStatusLog?.current])
+
+  useEffect(() => {
+    if (!campaignName) return
     dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: campaignName , url: ''}]}))
-  },[campaignId])
+  },[campaignName])
   
   const fetchScheduleBudgetLog = async (mode: string, duration: any) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = pagination.budgetLog
+      const {pageSize, current, total} = paginationBudgetLog
       const paths = {
         campaignId,
         partnerAccountId: currentAccount
@@ -203,13 +152,10 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       const result = await getScheduleBudgetLog(paths, params)
       if (result && result.data) {
         setBudgetLog(result.data)
-        setPagination({
-          ...pagination,
-          budgetLog: {
-            ...pagination.budgetLog,
-            pageSize: result.pagination.pageSize,
-            total: result.pagination.total,
-          },
+        setPaginationBudgetLog({
+          ...paginationBudgetLog,
+          pageSize: result.pagination.pageSize,
+          total: result.pagination.total,
         });
       }
       setLoading(false)
@@ -219,39 +165,52 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     }
   }
 
-  const getStatusLog = async () => {
+  const fetchScheduleStatusLog = async (mode: string, duration: any) => {
     setLoading(true)
     try {
-      setTimeout(() => {
-        setStatusLog(BUDGET_UPDATE_LOG)
-        setLoading(false)
-      }, 1000);
+      const {pageSize, current, total} = paginationStatusLog
+      const paths = {
+        campaignId,
+        partnerAccountId: currentAccount
+      }
+      const params = {
+        page: current,
+        pageSize,
+        total,
+        mode,
+        from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD") : "",
+        to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD") : "",
+      }
+      const result = await getScheduleStatusLog(paths, params)
+      if (result && result.data) {
+        setStatusLog(result.data)
+        setPaginationStatusLog({
+          ...paginationStatusLog,
+          pageSize: result.pagination.pageSize,
+          total: result.pagination.total,
+        });
+      }
+      setLoading(false)
     } catch (error) {
       setLoading(false)
-      console.log(">>> Get Budget Log Error", error)
+      console.log(">>> Get Status Log Error", error)
     }
   }
 
   const handleOnChangeTable = (pagination: any, type: string) => {
     if (type === "BUDGET") {
-      setPagination({
-        ...pagination,
-        budgetLog: {
-          ...pagination.budgetLog,
-          total: pagination.total,
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-        },
+      setPaginationBudgetLog({
+        ...paginationBudgetLog,
+        pageSize: pagination.pageSize,
+        total: pagination.total,
+        current: pagination.current,
       });
     } else if (type === "STATUS") {
-      setPagination({
-        ...pagination,
-        statusLog: {
-          ...pagination.statusLog,
-          total: pagination.total,
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-        },
+      setPaginationStatusLog({
+        ...paginationStatusLog,
+        pageSize: pagination.pageSize,
+        total: pagination.total,
+        current: pagination.current,
       });
     }
   };
@@ -260,6 +219,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
     const { value } = values
     setMode(value)
     fetchScheduleBudgetLog(value, duration)
+    fetchScheduleStatusLog(value, duration)
   };
 
   const handleChangeUpdateFilter = (value: any) => {
@@ -529,72 +489,72 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const columnsStatusLog: any = useMemo(
     () => [
       {
-        title: <div className='text-center'>{t('commons.action')}</div>,
-        dataIndex: 'action',
-        key: 'action',
-        render: (_: any, record: any) => {
-          let { status } = record
-
-          const handleChangeStatus = (value: any) => {
-            console.log(`Status is ${value}`);
-            if (value == false) {
-              setTurnOn(false)
-            } else if (value == true) {
-              setTurnOn(true)
-            }
-          };
-
-          return (
-              <div className='flex justify-center'>
-                <Switch checked={turnOn ? true : false} onChange={handleChangeStatus}/>
-              </div>
-          )
+        title: <div className='text-center'>{t('commons.before')}</div>,
+        dataIndex: 'oldStatus',
+        key: 'oldStatus',
+        render: (text: any, record: any) => {
+          const oldStatus = text ? text : 'NA'
+          return <p className='text-center'>{oldStatus}</p>
         }
       },
       {
-        title: <div className='text-center'>{t('commons.status')}</div>,
-        dataIndex: 'status',
-        key: 'status',
-        render: (text: any) => {
+        title: <div className='text-center'>{t('commons.after')}</div>,
+        dataIndex: 'newStatus',
+        key: 'newStatus',
+        render: (_: any, record: any) => {
+          const statusData = record.newStatus
           const renderStatus = () => {
             let status = ''
             let type = ''
-            if (text == "active") {
-              status = t('commons.status_enum.active')
+            if (statusData == CAMPAIGN_STATUS.ENABLE) {
+              status = t('commons.status_enum.enable')
               type = 'success'
-            } else if (text == 'inactive') {
-              status = t('commons.status_enum.inactive')
-              type = 'error'
-            } else if (text == 'upcoming') {
-              status = t('commons.status_enum.upcoming')
+            } else if (statusData == CAMPAIGN_STATUS.PAUSED) {
+              status = t('commons.status_enum.paused')
+              type = 'warning'
+            } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
+              status = t('commons.status_enum.archived')
               type = 'processing'
+            } else if (statusData == CAMPAIGN_STATUS.OTHER) {
+              status = t('commons.status_enum.other')
+              type = 'default'
             }
-            return <Tag color={type} className='uppercase'>{status}</Tag>
+            return <Tag className='text-center uppercase' color={type}>{status}</Tag>
           }
           return (
-              <div className='flex justify-center uppercase'>
+            <div className='flex justify-center'>
                 {renderStatus()}
-              </div>
+            </div>
           );
-        },
+        }
       },
       {
         title: <div className='text-center'>{t('commons.update_time')}</div>,
-        dataIndex: 'updateTime',
-        key: 'updateTime',
-        render: (text: any) => <p className='text-center'>{text ? moment(text).format("YYYY-MM-DD / hh:mm:ss") : ""}</p>,
+        dataIndex: 'updatedDate',
+        key: 'updatedDate',
+        render: (_: any, record: any) => {
+          const schedule = record.scheduledTime ? record.scheduledTime : ""
+          return <p className='text-center'>{schedule ? moment.tz(schedule, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format("YYYY-MM-DD | HH:mm:ss") : ""}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.setting_type')}</div>,
-        dataIndex: 'settingType',
-        key: 'settingType',
-        render: (text: any) => <p>{text == "One-time" ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>,
+        dataIndex: 'mode',
+        key: 'mode',
+        render: (_: any, record: any) => {
+          const mode = record.detailedBySetting && record.detailedBySetting.mode ? record.detailedBySetting.mode : ""
+          return <p className='text-center'>{mode != 3 ? t('commons.weight_type.one_time') : t('commons.weight_type.daily_with_weight')}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.updated_by')}</div>,
-        dataIndex: 'userUpdate',
-        key: 'userUpdate',
-        render: (text: any) => <p>{text}</p>,
+        dataIndex: 'updatedBy',
+        key: 'updatedBy',
+        render: (_: any, record: any) => {
+          const firstName = record && record.modifier && record.modifier.firstName ? record.modifier.firstName : ""
+          const lastName = record && record.modifier && record.modifier.lastName ? record.modifier.lastName : ""
+          return <p className='text-center'>{firstName + ' ' + lastName}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('commons.log')}</div>,
@@ -626,30 +586,38 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       }
       setDuration(duration)
       fetchScheduleBudgetLog(mode, duration)
+      fetchScheduleStatusLog(mode, duration)
     } else {
       console.log('Clear');
     }
   };
 
+  const onChangeTab = (id: number) => {
+    setCurrentTab(id)
+  }
+
   return (
     <div>
       <div>
-        <div className='panel-heading flex items-center justify-between max-lg:flex-col max-lg:items-start'>
-          <h2 className='max-lg:mb-2'>{t('update_log_page.budget_update_log')}</h2>
+        <div className='panel-heading flex items-center justify-between max-lg:flex-col max-lg:items-center'>
+          <div className='tabs-container'>
+            {tabs.map((tab: any) => (
+              <div key={tab.id} className="tabs" onClick={() => onChangeTab(tab.id)}>
+                <h2  className={`tab-item max-lg:mb-2 ${currentTab === tab.id ? "active remove-text-transform" : "remove-text-transform"}`}>{tab.label}</h2>
+                <div className="line"></div>
+              </div>
+              ))}
+          </div>
           <Space className='max-sm:flex-col max-sm:items-start'>
             <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
-            <SelectFilter placeholder={filterModeOptions[0].label} onChange={handleChangeModeFilter} options={filterModeOptions}/>
+            <SelectFilter placeholder={filterModeOptions && filterModeOptions.length > 0 ? filterModeOptions[0].label : ""} onChange={handleChangeModeFilter} options={filterModeOptions}/>
             {/* <SelectFilter placeholder={t('update_log_page.update_budget')} onChange={handleChangeUpdateFilter} options={filterOptions}/> */}
           </Space>
         </div>
-        <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog} pagination={pagination.budgetLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "BUDGET")} />
-      </div>
-      <div className='mt-6'>
-        <div className='panel-heading flex items-center justify-between'>
-          <h2>{t('update_log_page.status_update')}</h2>
-          <RangeDatePicker duration={duration} onRangeChange={onRangeChange}/>
-        </div>
-        <TableGeneral loading={loading} columns={columnsStatusLog} data={statusLog} pagination={pagination.statusLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "STATUS")} />
+        {currentTab == 1 
+          ? <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetLog} pagination={paginationBudgetLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "BUDGET")} />
+          : <TableGeneral loading={loading} columns={columnsStatusLog} data={statusLog} pagination={paginationStatusLog} handleOnChangeTable={(pagination: any) => handleOnChangeTable(pagination, "STATUS")} />
+        } 
       </div>
 
       {openModalPreviewWeightTemplate && (
