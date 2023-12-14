@@ -24,6 +24,8 @@ import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS, NOTIFICATION_WARN } from '@/u
 import ConfirmSetupBudgetSchedule from '@/components/modals/confirmSetupBudgetSchedule';
 import { saveAs } from 'file-saver';
 import SelectFilter from '@/components/commons/filters/SelectFilter';
+import { getItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -83,12 +85,17 @@ export default function UpdateCampaignStatus (props: IUpdateCampaignStatusProps)
     total: 0,
   })
 
+  const currentAccount = getItem(CURRENT_ACCOUNT)
+
   useEffect(() => {
     const newData = accountList.map((account:any) => ({
       value: account.id,
       label: account.name
     }))
     setReGenerateDataAccountList(newData)
+    form.setFieldsValue({
+      partnerAccountId: currentAccount ? +currentAccount : ""
+    })
   }, [accountList])
 
   useEffect(() => {

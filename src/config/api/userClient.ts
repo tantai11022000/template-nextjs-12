@@ -18,10 +18,10 @@ userClient.interceptors.request.use(
         const obj = token ? JSON.parse(token) : ""
         const accessToken = obj && obj.accessToken ? obj.accessToken : null
         
-        if (!accessToken) {
-          window.location.href = `${process.env.NEXT_PUBLIC_MAIN_URL}/#/user/login`
-          return Promise.reject("Not authorizaton");
-        }
+        // if (!accessToken) {
+        //   window.location.href = `${process.env.NEXT_PUBLIC_MAIN_URL}/#/user/login`
+        //   return Promise.reject("Not authorizaton");
+        // }
 
         if (request && request.headers) {
             request.headers['Authorization'] = 'Bearer ' + accessToken;
@@ -44,10 +44,10 @@ userClient.interceptors.response.use(
           return userClient(originalConfig);
         }
 
-        if (error.response.status === 403) {
-          window.location.href = `${process.env.NEXT_PUBLIC_MAIN_URL}/#/user/login`
-          return Promise.reject("Forbidden");
-        }
+        // if (error.response.status === 403) {
+        //   window.location.href = `${process.env.NEXT_PUBLIC_MAIN_URL}/#/user/login`
+        //   return Promise.reject("Forbidden");
+        // }
 
         return Promise.reject(error.response && error.response.data ? error.response.data : error);
     }

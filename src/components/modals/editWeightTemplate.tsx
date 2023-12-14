@@ -7,7 +7,7 @@ import { useTranslation } from 'next-i18next';
 import ActionButton from '../commons/buttons/ActionButton';
 import { useRouter } from 'next/router';
 import { getDaily30MinsSlot } from '@/services/commons-service';
-import { createWeightTemplate, getWeightTemplateDetail } from '@/services/weight-template';
+import { createWeightTemplate, getTemplateDuplicateName, getWeightTemplateDetail } from '@/services/weight-template';
 import { notificationSimple } from '@/utils/CommonUtils';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
 import { BREADCRUMB_WEIGHT_TEMPLATE } from '@/Constant';
@@ -76,8 +76,11 @@ export default function EditWeightTemplate (props: IEditWeightTemplateProps) {
       const result = await getWeightTemplateDetail(weightTemplate.id)
       if (result && result.data) {
         const { name, description, type, weightSetting } = result.data
+        if (!preview) {
+          var listDuplicateName = await getTemplateDuplicateName(name)
+        }
         form.setFieldsValue({
-          name: !preview ? `Copy of ${name}` : name,
+          name: !preview ? `Copy of ${name} (${listDuplicateName.data.length})` : name,
           description: description,
           type: type,
         })

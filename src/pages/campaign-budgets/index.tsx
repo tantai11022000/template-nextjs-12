@@ -144,6 +144,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       value: data.portfolioId,
       label: data.name
     }))
+    newData.unshift({
+      value: null,
+      label: "All"
+    })
     setMappingPortfolio(newData)
   }, [portfolio])
 
@@ -219,6 +223,10 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
           value: data.code,
           label: data.name
         }))
+        newData.unshift({
+          value: null,
+          label: "All"
+        })
         setStatuses(newData)
       }
     } catch (error) {
