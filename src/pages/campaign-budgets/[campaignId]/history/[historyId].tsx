@@ -3,7 +3,7 @@ import RootLayout from '@/components/layout';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import { Button, Space, Tag, Typography } from 'antd';
 import TableGeneral from '@/components/table';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import RangeDatePicker from '@/components/dateTime/RangeDatePicker';
 import { BREADCRUMB_CAMPAIGN_BUDGET } from '@/Constant/index';
 import { useAppDispatch } from '@/store/hook';
@@ -57,7 +57,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   const historyId = router && router.query && router.query.historyId ? router.query.historyId : ""
   const [loading, setLoading] = useState<boolean>(false)
   const [budgetHistory, setBudgetHistory] = useState<any[]>([])
-  const [exportType, setExportType] = useState<any[]>(EXPORT_TYPE)
+  const [exportType, setExportType] = useState<any[]>([])
   const [pagination, setPagination] = useState<any>({
     pageSize: 30,
     current: 1,
@@ -72,8 +72,16 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   const [showTimePanel, setShowTimePanel] = useState<boolean>(false)
 
   useEffect(() => {
-    init()
-  }, [])
+    setExportType([
+      { value: 'csv', label: t('commons.csv') },
+      { value: 'excel', label: t('commons.excel') }
+    ])
+  }, [t])
+  
+
+  useEffect(() => {
+    getBudgetHistory(duration)
+  }, [pagination.pageSize, pagination.current])
 
   useEffect(() => {
     if (!historyId || !campaignId) return
@@ -87,11 +95,10 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
   const getBudgetHistory = async (duration: any) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = pagination
+      const { pageSize, current } = pagination
       var params = {
         page: current,
         pageSize,
-        total,
         from: duration && duration.startDate ? moment(duration.startDate).format(showTimePanel ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD") : "",
         to: duration && duration.endDate ? moment(duration.endDate).format(showTimePanel ? "YYYY-MM-DD HH:mm" : "YYYY-MM-DD") : "",
       }
@@ -124,7 +131,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         key: 'updateTime',
         render: (_: any, record: any) => {
           const time = record.date ? record.date : "-"
-          return <p className='text-center'>{moment(time).format("YYYY-MM-DD | HH:mm:ss")}</p>
+          return <p className='text-center'>{moment.tz(time, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format(showTimePanel ? "YYYY/MM/DD HH:mm" : "YYYY/MM/DD")}</p>
         },
       },
       {
@@ -176,32 +183,36 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         title: <div className='text-center'>{t('metrics.cpm')}</div>,
         dataIndex: 'cpm',
         key: 'cpm',
-        render: (text: any) => <p className='text-end'>{text || "-"}</p>
+        render: (text: any, record: any) => {
+          const cpm = record.metrics && record.metrics.cpm ? Number(record.metrics.cpm) : 0
+          return  <p className='text-end'>{cpm ? cpm % 1 != 0 ? `￥${Number(cpm).toFixed(2)}` : `￥${Number(cpm)}` : "-"}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.sale')}</div>,
         dataIndex: 'sale',
         key: 'sale',
-        render: (_: any, record: any) => {
-          const sale = record.metrics && record.metrics.sales ? record.metrics.sales : "-"
-          return <p className='text-end'>{sale}</p>
+        render: (text: any, record: any) => {
+          const sales = record.metrics && record.metrics.sales ? Number(record.metrics.sales) : 0
+          return  <p className='text-end'>{sales ? sales % 1 != 0 ? `￥${Number(sales).toFixed(2)}` : `￥${Number(sales)}` : "-"}</p>
         }
       },
       {
         title: <div className='text-center'>{t('metrics.cv')}</div>,
         dataIndex: 'cv',
         key: 'cv',
-        render: (text: any) => <p className='text-end'>{text || "-"}</p>,
-
-        // sorter: (a: any, b: any) => a.cv - b.cv
+        render: (text: any, record: any) => {
+          const cv = record.metrics && record.metrics.cv ? Number(record.metrics.cv) : 0
+          return  <p className='text-end'>{cv ? cv % 1 != 0 ? `￥${Number(cv).toFixed(2)}` : `￥${Number(cv)}` : "-"}</p>
+        }
       },
       {
         title: <div className='text-center'>{t('metrics.cost')}</div>,
         dataIndex: 'cost',
         key: 'cost',
-        render: (_: any, record: any) => {
-          const cost = record.metrics && record.metrics.cost ? record.metrics.cost : "-"
-          return <p className='text-end'>{cost}</p>
+        render: (text: any, record: any) => {
+          const cost = record.metrics && record.metrics.cost ? Number(record.metrics.cost) : 0
+          return  <p className='text-end'>{cost ? cost % 1 != 0 ? `￥${Number(cost).toFixed(2)}` : `￥${Number(cost)}` : "-"}</p>
         }
       },
     ], [budgetHistory, t]
@@ -232,7 +243,7 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
     }
     return (
       <Button onClick={handleShowTimePannel}>
-        {showTimePanel ? "Close Time" : "Show Time"}
+        {showTimePanel ? t('commons.close_time_panel') : t('commons.open_time_panel')}
       </Button>
     );
   };
@@ -243,10 +254,12 @@ export default function BudgetHistory (props: IBudgetHistoryProps) {
         <h2>{renderTranslateTitleText(campaignName ? campaignName : "")}</h2>
       </div>
         <div className='flex items-center justify-between mt-5'>
-        <h3>Budget Update on 17 23rd-Aug-2023</h3>
+        <h3>
+          {t('campaign_performance_history_log_page.budget_update')} {duration && duration.startDate ? moment.tz(duration.startDate, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format(showTimePanel ? "YYYY/MM/DD HH:mm" : "YYYY/MM/DD") : ""} - {duration && duration.endDate ? moment.tz(duration.endDate, `${process.env.NEXT_PUBLIC_TIMEZONE}`).format(showTimePanel ? "YYYY/MM/DD HH:mm" : "YYYY/MM/DD") : ""}
+        </h3>
         <Space>
           <RangeDatePicker renderExtraFooter={renderExtraFooter} showTime={showTimePanel ? true : false} duration={duration} onRangeChange={onRangeChange}/>
-          <SelectFilter placeholder={"Export"} onChange={handleChange} options={exportType}/>
+          <SelectFilter placeholder={t('commons.action_type.export')} onChange={handleChange} options={exportType}/>
         </Space>
         </div>
         <TableGeneral loading={loading} columns={columnsBudgetLog} data={budgetHistory} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>

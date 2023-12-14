@@ -53,61 +53,29 @@ export interface IScheduleBudgetProps {
 
 export default function ScheduleBudget (props: IScheduleBudgetProps) {
   const { t } = useTranslation()
-  const MODES = [
-    {
-      value: 0,
-      label: t('schedule_budget_for_campaign.exact')
-    },
-    {
-      value: 1,
-      label: "%"
-    },
-    {
-      value: 2,
-      label: t('schedule_budget_for_campaign.fixed')
-    },
-    {
-      value: 3,
-      label: t('schedule_budget_for_campaign.daily')
-    },
-  ]
-
   const [form]:any = Form.useForm();
   const currentAccount = getItem(CURRENT_ACCOUNT)
   const dispatch = useAppDispatch()
   const router = useRouter()
-
-  const scheduleId: any = router && router.query && router.query.scheduleId ? router.query.scheduleId : '';
-
-  const campaignIDsQuery: any = router && router.query && router.query.campaignIds && router.query.campaignIds.length ? router.query.campaignIds : [];
-  const campaignIDsFromQuery = Array.isArray(campaignIDsQuery) ? campaignIDsQuery : [campaignIDsQuery];
   
-  const campaignNamesQuery: any = router && router.query && router.query.campaignNames && router.query.campaignNames.length ? router.query.campaignNames : [];
-  const campaignNamesFromQuery = Array.isArray(campaignNamesQuery) ? campaignNamesQuery : [campaignNamesQuery];
-
-  const isHaveScheduleQuery: any = router && router.query && router.query.isHaveSchedule && router.query.isHaveSchedule.length ? router.query.isHaveSchedule : [];
-  const isHaveScheduleFromQuery = Array.isArray(isHaveScheduleQuery) ? isHaveScheduleQuery.map(value => value === 'true') : [isHaveScheduleQuery === 'true'];
-  
-  const campaignIDs = Array.isArray(campaignIDsQuery) ? campaignIDsQuery : [campaignIDsQuery];
-
-  const [campaignId, setCampaignId] = useState(campaignIDsFromQuery)
-  const [campaignName, setCampaignName] = useState(campaignNamesFromQuery)
-  const [campaignHaveSchedule, setCampaignHaveSchedule] = useState(isHaveScheduleFromQuery)
-  
-  const isWeight = router && router.query && router.query.isWeight ? true : false
-  const valueEdit = router && router.query && router.query.isEdit ? true : false
-  const [campaignIds, setCampaignIds] = useState<any[]>(campaignIDs);
+  const params =  new URLSearchParams(window.location.search)
+  const campaignsInfo: any = params.get("campaigns")
+  const decodeCampaignsInfo = decodeURIComponent(escape(window.atob(campaignsInfo)))
+  const parseCampaignsInfo = JSON.parse(decodeCampaignsInfo)
+  const [scheduleId, setScheduleId] = useState<any>(parseCampaignsInfo && parseCampaignsInfo.scheduleId ? parseCampaignsInfo.scheduleId : '')
+  const [isEdit, setIsEdit] = useState<boolean>(parseCampaignsInfo && parseCampaignsInfo.isEdit ? true : false)
+  const [isWeight, setIsWeight] = useState<boolean>(parseCampaignsInfo && parseCampaignsInfo.isWeight ? true : false)
+  const [campaignIds, setCampaignIds] = useState<any[]>(parseCampaignsInfo && parseCampaignsInfo.campaignIds ? parseCampaignsInfo.campaignIds : []);
   const [selectMode, setSelectMode] = useState<number>(isWeight ? 3 : 0)
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<any>(false);
   const [campaignBudgets, setCampaignBudgets] = useState<any[]>([])
   const [weightTemplates, setWeightTemplates] = useState<any>([]);
   const [mappingWeightTemplates, setMappingWeightTemplates] = useState<any[]>([])
-  const [modes, setModes] = useState<any[]>(MODES)
+  const [modes, setModes] = useState<any[]>([])
   const [showMore, setShowMore] = useState<boolean>(false);
   const [displayedCampaigns, setDisplayedCampaigns] = useState<any[]>([]);
   const [openModalEditBudgetWeightTemplate, setOpenModalEditBudgetWeightTemplate] = useState<boolean>(false);
   const [openModalWarning, setOpenModalWarning] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false)
   const [isScheduleNeedEdit, setIsScheduleNeedEdit] = useState<boolean>(true)
   const [isShowEditIcon, setIsShowEditIcon] = useState<boolean>(false)
   const [selectedWeight, setSelectedWeight] = useState<any>("");
@@ -124,28 +92,20 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   })
 
   useEffect(() => {
-    setIsEdit(valueEdit)
-    if (valueEdit) {
-      handleMapEditData()
-    }
-  },[router])
-
-  useEffect(() => {
-    const newData = campaignId.map((id: any, index: any) => ({
+    const newData = parseCampaignsInfo.campaignIds.map((id: any, index: any) => ({
       id,
-      name: campaignName[index],
-      isHaveSchedule: campaignHaveSchedule[index],
+      name: parseCampaignsInfo.campaignNames[index],
+      isHaveSchedule: parseCampaignsInfo.isHaveSchedule[index],
     }));
     setCampaignBudgets(newData)
-    setDisplayedCampaigns(newData.slice(0, 10))
-  }, [router.query.campaignIds, router.query.campaignNames, router.query.isHaveSchedule])
-
-  useEffect(() => {
-    setCampaignId(campaignIDsFromQuery)
-    setCampaignName(campaignNamesFromQuery)
-    setCampaignHaveSchedule(campaignHaveSchedule)
-  }, [router.query.campaignIds, router.query.campaignNames, router.query.isHaveSchedule])
+    setDisplayedCampaigns(newData.slice(0, 10)) 
+  }, [])
   
+  useEffect(() => {
+    if (isEdit) {
+      handleMapEditData()
+    }
+  },[isEdit])
 
   useEffect(() => {
     if (currentAccount) init();
@@ -160,7 +120,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }, [campaignBudgets]);
 
   useEffect(() => {
-    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, {label: t('breadcrumb.schedule_budget') , url: ''}]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.campaign_budgets') , url: '/campaign-budgets'}, isEdit ? {label: parseCampaignsInfo.campaignNames[0] , url: ''} : {label: t('breadcrumb.schedule_budget') , url: ''}]}))
   },[])
 
   useEffect(() => {
@@ -170,6 +130,16 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     }))
     setMappingWeightTemplates(newData)
   }, [weightTemplates])
+
+  useEffect(() => {
+    setModes([
+      { value: 0, label: t('schedule_budget_for_campaign.exact') },
+      { value: 1, label: "%" },
+      { value: 2, label: t('schedule_budget_for_campaign.fixed') },
+      { value: 3, label: t('schedule_budget_for_campaign.daily') }
+    ])
+  }, [t])
+  
 
   const init = () => {
     fetchAllWeightTemplates()
@@ -249,10 +219,26 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     setOpenModalEditBudgetWeightTemplate(false);
   };
 
-  const handleConfirmSettingSchedule = () => {
-    onSaveSchedule()
-    setOpenModalWarning(false);
-    router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+  const handleConfirmSettingSchedule = async () => {
+    setLoading(true)
+    try {
+      const body = {
+        budgets: budgets,
+        partnerAccountId: currentAccount,
+        campaignIds
+      }
+      const result = await setScheduleBudgetForCampaigns(body)
+      if (result && result.message == "OK") {
+        notificationSimple(renderTranslateToastifyText(t('schedule_budget_for_campaign.title')), NOTIFICATION_SUCCESS)
+        router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+        setLoading(false)
+        setOpenModalWarning(false);
+      }
+    } catch (error: any) {
+      console.log(">>> Set Schedule Budget For Campaigns Error", error)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
+      setLoading(false)
+    }
   };
 
   const handleCancelSettingSchedule = () => {
@@ -266,7 +252,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const onSaveModeForm = (fieldsValue: any) => {
-    if (isScheduleNeedEdit && valueEdit) {
+    if (isScheduleNeedEdit && isEdit) {
       fieldsValue.settingScheduleId = Number(scheduleId);
       setIsScheduleNeedEdit(false); 
     }
@@ -323,6 +309,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const onSaveSchedule = async () => {
+    setLoading(true)
     try {
       if (campaignIds.length == 0) {
         notificationSimple(t('schedule_budget_for_campaign.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
@@ -331,6 +318,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
       if (hasUpcomingSchedule()) {
         setOpenModalWarning(true);
+        setLoading(false)
         return;
       }
 
@@ -340,11 +328,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
         campaignIds
       }
       const result = await setScheduleBudgetForCampaigns(body)
-      if (result && result.message == "OK") notificationSimple(renderTranslateToastifyText(t('schedule_budget_for_campaign.title')), NOTIFICATION_SUCCESS)
-      router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+      if (result && result.message == "OK") {
+        notificationSimple(renderTranslateToastifyText(t('schedule_budget_for_campaign.title')), NOTIFICATION_SUCCESS)
+        router.push(BREADCRUMB_CAMPAIGN_BUDGET.url)
+      }
+      setLoading(false)
     } catch (error: any) {
       console.log(">>> Set Schedule Budget For Campaigns Error", error)
       notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
+      setLoading(false)
     }
   }
 
@@ -368,7 +360,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
   }
 
   const hasUpcomingSchedule = () => {
-    return campaignBudgets.some((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule);
+    return campaignBudgets.some((campaign: any) => campaignIds.includes(campaign.id) && campaign.isHaveSchedule);
   };
 
   const onGoToCampaignScheduleBudget = (event: any, id: any, name: any) => {
@@ -451,7 +443,9 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
             setOpenModalEditBudgetWeightTemplate(true)
           }
           return (
-            <div className='flex justify-center cursor-pointer text-primary underline' onClick={handlePreviewTemplate}>{weight ? weight.name : "-"}</div>
+            <div className='flex justify-center'>
+              {weight ? <div className='cursor-pointer text-primary underline' onClick={handlePreviewTemplate}>{weight.name}</div> : "-"}
+            </div>
           )
         },
       },
@@ -506,15 +500,15 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
               <Row>
                 {displayedCampaigns && displayedCampaigns.length ? displayedCampaigns.map((campaign: any) => (
                   <Col key={campaign.id} span={8}>
-                    <Checkbox value={campaign.id.toString()} className={`${campaign.isHaveSchedule ? 'upcoming' : ''}`}>
+                    <Checkbox value={campaign.id}>
                       <Link
                         href={{
                           pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${campaign.id}`,
-                          query: { id: campaign.id, name: campaign.name}
+                          query: {campaign: JSON.stringify(campaign)}
                         }}
                         passHref
                       >
-                        <a style={{color: '#079A92', textDecorationLine: 'underline'}} target='_blank'>{campaign.name}</a>
+                        <a style={{color: `${campaign.isHaveSchedule ? "red": "black"}`}} target='_blank'>{campaign.name}</a>
                       </Link>
                     </Checkbox>
                   </Col>
@@ -598,7 +592,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
               <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
                 <div className='flex justify-center mt-6'>
-                  <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.add')}/>
+                  <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.add')} disabled={loading}/>
                 </div>
               </Form.Item>
             </Form>
@@ -606,11 +600,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
           </div>
       </div>
       <div>
-        <TableGeneral loading={loading} columns={columns} data={budgets} pagination={false} handleOnChangeTable={handleOnChangeTable}/>
+        <TableGeneral columns={columns} data={budgets} pagination={false} handleOnChangeTable={handleOnChangeTable}/>
       </div>
       <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
         <div className='flex justify-center mt-6'>
-          <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')} onClick={onSaveSchedule}/>
+          {loading ? <Spin/> : <ActionButton htmlType={"submit"} className={'finish-button'} label={t('commons.action_type.save')} onClick={onSaveSchedule}/>}
         </div>
       </Form.Item>
 
@@ -622,7 +616,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
       {openModalWarning && (
         <Modal open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
-          <ConfirmSetupBudgetSchedule title={'Existing Budget Schedule Warning'} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id.toString()) && campaign.isHaveSchedule)}/>
+          <ConfirmSetupBudgetSchedule loading={loading} title={t('schedule_budget_for_campaign.modal.existing_budget_schedule_warning')} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id) && campaign.isHaveSchedule)}/>
         </Modal>
       )}
 

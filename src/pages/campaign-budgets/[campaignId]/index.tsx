@@ -64,10 +64,14 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const { t } = useTranslation()
   const router = useRouter()
   const currentAccount = getItem(CURRENT_ACCOUNT)
-  const campaignId = router && router.query && router.query.campaignId ? router.query.campaignId : ""
-  const campaignNameFromQuery = router && router.query && router.query.name ? router.query.name : ""
+
+  const params =  new URLSearchParams(window.location.search)
+  const campaign: any = params.get("campaign")
+  const parseCampaign = JSON.parse(campaign)
+
   const dispatch = useAppDispatch()
-  const [campaignName, setCampaignName] = useState<any>(campaignNameFromQuery)
+  const [campaignId, setCampaignId] = useState<any>(parseCampaign && parseCampaign.id ? parseCampaign.id : "")
+  const [campaignName, setCampaignName] = useState<any>(parseCampaign && parseCampaign.name ? parseCampaign.name : "")
   const [budgetLog, setBudgetLog] = useState<any[]>([])
   const [statusLog, setStatusLog] = useState<any[]>([])
   const [openModalPreviewWeightTemplate, setOpenModalPreviewWeightTemplate] = useState<boolean>(false);
@@ -98,10 +102,6 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       current: 1,
       total: 0,
   })
-
-  useEffect(() => {
-    if (campaignNameFromQuery) setCampaignName(campaignNameFromQuery)
-  }, [router.query])
   
   useEffect(() => {
     setTabs([
@@ -136,7 +136,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
   const fetchScheduleBudgetLog = async (mode: string, duration: any) => {
     setLoading(true)
     try {
-      const {pageSize, current, total} = paginationBudgetLog
+      const {pageSize, current} = paginationBudgetLog
       const paths = {
         campaignId,
         partnerAccountId: currentAccount
@@ -144,7 +144,6 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
       const params = {
         page: current,
         pageSize,
-        total,
         mode,
         from: duration && duration.startDate ? moment(duration.startDate).format("YYYY-MM-DD") : "",
         to: duration && duration.endDate ? moment(duration.endDate).format("YYYY-MM-DD") : "",
@@ -384,6 +383,42 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             setWeightTemplateInfo({...weightTemplateInfo, id: adtranWeightTemplateId})
             setOpenModalPreviewWeightTemplate(!openModalPreviewWeightTemplate)
           }
+
+          const onDeleteSchedule = async (id: any) => {
+            try {
+              const params = {
+                partnerAccountId: currentAccount,
+                scheduleId: id
+              }
+              const result = await deleteBudgetScheduleById(params)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
+                fetchScheduleBudgetLog(mode, duration)
+              }
+            } catch (error: any) {
+              console.log(">>> Delete Budget Schedule Error", error)
+              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
+            }
+          }
+
+          const onEditBudgetSchedule = () => {
+            const query = {
+              isEdit: true,
+              campaignIds: Array.isArray(campaignId) ? campaignId : [Number(campaignId)],
+              campaignNames: Array.isArray(campaignName) ? campaignName : [campaignName],
+              isHaveSchedule: status == 0 ? [true] : [false],
+              scheduleId: detailedBySettingId
+            }
+            console.log(">>> query", query)
+            const encodeQueryData = btoa(unescape(encodeURIComponent(JSON.stringify(query))))
+            router.push({
+              pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+              query: {
+                campaigns: encodeQueryData
+              }
+            })
+          }
+
           const renderActionType = () => {
             let action: any = ''
             if (status == SCHEDULE_STATUS.UPCOMING) {
@@ -392,17 +427,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                   action = (
                     <Space size="middle" className='flex justify-center'>
                       <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
-                        <EditOutlined className='text-lg cursor-pointer' 
-                          onClick={() => router.push({
-                            pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-                            query: {
-                              isEdit: true,
-                              campaignIds: campaignId,
-                              campaignNames: campaignName ? campaignName : "",
-                              scheduleId: detailedBySettingId
-                            }
-                          })}
-                        />
+                        <EditOutlined className='text-lg cursor-pointer' onClick={onEditBudgetSchedule} />
                       </Tooltip>
                       <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
                         <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
@@ -416,17 +441,7 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
                 action = (
                   <Space size="middle" className='flex justify-center'>
                     <Tooltip placement="top" title={t('commons.action_type.edit')} arrow={true}>
-                      <EditOutlined className='text-lg cursor-pointer' 
-                        onClick={() => router.push({
-                          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-                          query: {
-                            isEdit: true,
-                            campaignIds: campaignId,
-                            campaignNames: campaignName ? campaignName : "",
-                            scheduleId: detailedBySettingId
-                          }
-                        })}
-                      />
+                      <EditOutlined className='text-lg cursor-pointer' onClick={onEditBudgetSchedule} />
                     </Tooltip>
                     <Tooltip placement="top" title={t('commons.action_type.delete')} arrow={true}>
                       <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteSchedule(id)}/>
@@ -465,22 +480,6 @@ export default function CampaignDetail (props: ICampaignDetailProps) {
             return action
           }
 
-          const onDeleteSchedule = async (id: any) => {
-            try {
-              const params = {
-                partnerAccountId: currentAccount,
-                scheduleId: id
-              }
-              const result = await deleteBudgetScheduleById(params)
-              if (result && result.message == "OK") {
-                notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
-                fetchScheduleBudgetLog(mode, duration)
-              }
-            } catch (error: any) {
-              console.log(">>> Delete Budget Schedule Error", error)
-              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
-            }
-          }
           return (
             <div className='flex justify-center'>
               {renderActionType()}

@@ -290,26 +290,34 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       if (selectedRowKeys == undefined) {
         notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
       } else {
-        router.push({
-          pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
-          query: {
+          const query = {
             campaignIds: selectedRowKeys,
             campaignNames: selectedRowsWithCampaignName,
             isHaveSchedule: selectedRowsWithIsHaveSchedule
           }
-        })
+          const encodeQueryData = btoa(unescape(encodeURIComponent(JSON.stringify(query))))
+          router.push({
+            pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
+            query: {
+              campaigns: encodeQueryData
+            }
+          })
       }
     } else if (value == 5) {
       if (selectedRowKeys == undefined) {
         notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
       } else {
+        const query = {
+          isWeight: true,
+          campaignIds: selectedRowKeys,
+          campaignNames: selectedRowsWithCampaignName,
+          isHaveSchedule: selectedRowsWithIsHaveSchedule
+        }
+        const encodeQueryData = btoa(unescape(encodeURIComponent(JSON.stringify(query))))
         router.push({
           pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/schedule-budget`,
           query: {
-            isWeight: true,
-            campaignIds: selectedRowKeys,
-            campaignNames: selectedRowsWithCampaignName,
-            isHaveSchedule: selectedRowsWithIsHaveSchedule
+            campaigns: encodeQueryData
           }
         })
       }
@@ -562,11 +570,21 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
-          const {id, name} = record
+          const { id, name } = record
+          const goToCampaignLog = () => {
+            const campaign = {
+              id,
+              name
+            }
+            router.push({
+              pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`,
+              query: {campaign: JSON.stringify(campaign)}
+            })
+          }
           return (
             <div className='flex justify-center'>
               <Tooltip placement="top" title={t('commons.action_type.log')} arrow={true}>
-                <FileTextOutlined className='text-lg cursor-pointer' onClick={() => router.push({pathname: `${BREADCRUMB_CAMPAIGN_BUDGET.url}/${id}`, query: { id, name}})}/>
+                <FileTextOutlined className='text-lg cursor-pointer' onClick={goToCampaignLog}/>
               </Tooltip>
             </div>
           )

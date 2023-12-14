@@ -28,6 +28,10 @@
         "from_time": "From Time",
         "to_time": "To Time",
         "all": "All",
+        "close_time_panel": "Close Time Panel",
+        "open_time_panel": "Open Time Panel",
+        "csv": "CSV",
+        "excel": "Excel",
         
         "filter_label": {
             "status": "Status",
@@ -66,7 +70,8 @@
             "confirm": "Confirm",
             "log": "Log",
             "delete": "Delete",
-            "history": "History"
+            "history": "History",
+            "export": "Export"
         },
 
         "weight_type": {
@@ -207,7 +212,14 @@
         "warning_select_at_least_one_campaign": "Please select at least one campaign before saving.",
         "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0",
         "the_time_already_exists": "The time you are selecting already exists.",
-        "schedule_must_be_in_the_future": "The schedule needs to be in the future, not today."
+        "schedule_must_be_in_the_future": "The schedule needs to be in the future, not today.",
+
+        "modal": {
+            "existing_budget_schedule_warning": "Existing Budget Schedule Warning",
+            "view_schedule": "View Schedule",
+            "campaigns_already_have_budget_schedule": "We found following {number} Campaigns already have budget schedule set: ",
+            "warning_overlapped": "* Note: The newer schedule will be applied, if the timing overlapped."
+        }
     },
 
     "update_log_page": {
@@ -231,7 +243,8 @@
 
     "campaign_performance_history_log_page": {
         "title": "Schedule Log: {text} - Performance History",
-        "performance_history": "Performance History"
+        "performance_history": "Performance History",
+        "budget_update": "Budget Update:"
     },
 
     "target_bidding_page": {
