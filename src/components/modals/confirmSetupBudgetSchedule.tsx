@@ -12,14 +12,15 @@ export interface IConfirmSetupBudgetScheduleProps {
   onCancel: any,
   onOk: any,
   scheduledCampaignData: any,
-  loading?: any
+  loading?: any,
+  type: string
 }
 
 
 export default function ConfirmSetupBudgetSchedule (props: IConfirmSetupBudgetScheduleProps) {
   const { t } = useTranslation()
   const { Text } = Typography;
-  const { title, onCancel, onOk, scheduledCampaignData, loading } = props
+  const { title, onCancel, onOk, scheduledCampaignData, loading, type } = props
 
   const columns: any = useMemo(
     () => [
@@ -54,9 +55,11 @@ export default function ConfirmSetupBudgetSchedule (props: IConfirmSetupBudgetSc
     ], [scheduledCampaignData, t]
   )
 
-  const renderTranslateText = (number: any) => {
-    let translate = t("schedule_budget_for_campaign.modal.campaigns_already_have_budget_schedule");
-    return translate.replace("{number}", number);
+  const renderTranslateText = (number: any, text: string) => {
+    let translate = t("schedule_budget_for_campaign.modal.campaigns_already_have_schedule");
+    translate = translate.replace("{text}", text);
+    translate = translate.replace("{number}", number)
+    return translate
   }
 
   return (
@@ -64,7 +67,7 @@ export default function ConfirmSetupBudgetSchedule (props: IConfirmSetupBudgetSc
       <div className='panel-heading flex items-center justify-between'>
         <h2>{title ? title : `${t('weight_template_page.clone_weight_template')}`}</h2>
       </div>
-      <h3 className='my-4'>{renderTranslateText(scheduledCampaignData.length)}</h3>
+      <h3 className='my-4'>{renderTranslateText(scheduledCampaignData.length, type)}</h3>
       <TableGeneral columns={columns} data={scheduledCampaignData ? scheduledCampaignData : []} pagination={false}/>
       <Text>{t("schedule_budget_for_campaign.modal.warning_overlapped")}</Text>
       <div className='form-container'>

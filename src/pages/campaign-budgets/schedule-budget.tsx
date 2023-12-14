@@ -480,6 +480,11 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
     return translate.replace("{text}", text);
   }
 
+  const renderTranslateTitleModal = (text: any) => {
+    let translate = t('schedule_budget_for_campaign.modal.existing_schedule_warning');
+    return translate.replace("{text}", text);
+  }
+
   return (
     <div>
       <div>
@@ -616,7 +621,7 @@ export default function ScheduleBudget (props: IScheduleBudgetProps) {
 
       {openModalWarning && (
         <Modal open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
-          <ConfirmSetupBudgetSchedule loading={loading} title={t('schedule_budget_for_campaign.modal.existing_budget_schedule_warning')} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id) && campaign.isHaveSchedule)}/>
+          <ConfirmSetupBudgetSchedule type={t('commons.budget')} loading={loading} title={renderTranslateTitleModal(t('commons.budget'))} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignBudgets.filter((campaign: any) => campaignIds.includes(campaign.id) && campaign.isHaveSchedule)}/>
         </Modal>
       )}
 

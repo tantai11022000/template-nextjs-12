@@ -176,13 +176,31 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
     }
   }
 
-  const handleConfirmSettingSchedule = () => {
-    handleFinish()
-    setOpenModalWarning(false);
-    notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
-    setTimeout(() => {
-      setStep(3)
-    }, 1000);
+  const handleConfirmSettingSchedule = async () => {
+    setLoading(true)
+    try {
+      if (totalPassed > 0) {
+        const CSVFile = file && file.length && file[0] && file[0].originFileObj ? file[0].originFileObj : null
+        var formData = new FormData();
+        formData.append('file', CSVFile);
+        
+        const result = await uploadBudgetScheduleCSVFile2(partnerAccountId, formData)
+        if (result && result.data && result.data.status == "OK") {
+          notificationSimple(renderTranslateToastifyText(t('update_campaign_schedule_page.schedule_file')), NOTIFICATION_SUCCESS)
+          setOpenModalWarning(false);
+          setLoading(false)
+        }
+        setTimeout(() => {
+          setStep(3)
+        }, 1000);
+      } else {
+        notificationSimple(t('error_messages.field_empty_or_unreadable_and_upload_again'), NOTIFICATION_WARN)
+      }
+    } catch (error: any) {
+      console.log(">>> Upload CSV File Error", error)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
+      setLoading(false)
+    }
   };
 
   const handleCancelSettingSchedule = () => {
@@ -234,6 +252,11 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
   const renderTranslateResultText = (number: any, type: any) => {
     let translate = type == 'campaign' ? t("upload_csv.result_campaigns_change") : t("upload_csv.result_budget_change")
     return translate.replace("{number}", number);
+  }
+
+  const renderTranslateTitleModal = (text: any) => {
+    let translate = t('schedule_budget_for_campaign.modal.existing_schedule_warning');
+    return translate.replace("{text}", text);
   }
 
   const columnsBudgetLog: any = useMemo(
@@ -422,7 +445,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
           <TableGeneral loading={loading} columns={columnsBudgetLog} data={status == 0 || status == undefined ? mappingData : filteredData} pagination={pagination} handleOnChangeTable={handleOnChangeTable}/>
           <div className='w-full flex items-center justify-between'>
             <ActionButton className={'back-button'} iconOnLeft={<LeftOutlined />} label={t('pagination.back')} onClick={() => setStep(1)}/>
-            <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish}/>
+            <ActionButton className={'finish-button'} label={t('commons.action_type.finish')} onClick={handleFinish} disabled={loading}/>
           </div>
         </div>
       ) : step == 3 ? (
@@ -435,7 +458,7 @@ export default function UpdateCampaignBudget (props: IUpdateCampaignBudgetProps)
 
       {openModalWarning && (
         <Modal width={1000} open={openModalWarning} onOk={handleConfirmSettingSchedule} onCancel={handleCancelSettingSchedule} footer={null}>
-          <ConfirmSetupBudgetSchedule title={'Existing Budget Schedule Warning'} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignsHaveSchedule}/>
+          <ConfirmSetupBudgetSchedule type={t('commons.budget')} loading={loading} title={renderTranslateTitleModal(t('commons.budget'))} onCancel={handleCancelSettingSchedule} onOk={handleConfirmSettingSchedule} scheduledCampaignData={campaignsHaveSchedule}/>
         </Modal>
       )}
     </div>

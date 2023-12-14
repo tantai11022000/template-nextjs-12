@@ -5,6 +5,7 @@
         "id": "ID",
         "name": "名前",
         "status": "ステータス",
+        "budget": "予算",
         "description" : "説明",
 
         "bulk_action": "一括操作", 

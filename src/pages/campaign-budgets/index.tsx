@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import qs from 'query-string';
-import { Dropdown, Input, Space, Switch, Tag, Tooltip } from 'antd';
+import { Dropdown, Input, Menu, Space, Switch, Tag, Tooltip } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import TableGeneral from '@/components/table';
-import { changeBudgetCampaign, exportCampaignsCSVFile, getCampaignBudgets } from '@/services/campaign-budgets-services';
+import { changeBudgetCampaign, changeStatusCampaign, exportCampaignsCSVFile, getCampaignBudgets } from '@/services/campaign-budgets-services';
 import { Modal } from 'antd';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, formatNumber, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
@@ -42,28 +42,6 @@ export async function getStaticProps(context: any) {
 export interface ICampaignBudgetsProps {
 }
 
-const STATUSES = [
-  {
-    id: 1,
-    value: 1,
-    label: "Enable"
-  },
-  {
-    id: 2,
-    value: 2,
-    label: "Paused"
-  },
-  {
-    id: 3,
-    value: 3,
-    label: "Archived"
-  }, 
-  {
-    id: 4,
-    value: 4,
-    label: "Other"
-  }, 
-]
 
 const BULK_ACTION = [
   {
@@ -253,6 +231,7 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
       notificationSimple(t('campaign_budget_page.warning_select_at_least_one_campaign'), NOTIFICATION_ERROR)
     }
   }
+
   const handleServerResponse = (excel: any) => {
     const file = new Blob([excel], { type: 'text/csv;charset=utf-8' });
     const fileName = `Export_Campaigns.csv`;
@@ -421,37 +400,89 @@ export default function CampaignBudgets (props: ICampaignBudgetsProps) {
         dataIndex: 'state',
         key: 'state',
         render: (_: any, record: any) => {
-          const items = [
-            { key: '1', label: 'Action 1' },
-            { key: '2', label: 'Action 2' },
-          ];
+          const { id } = record
           const statusData = record.status
-          const renderStatus = () => {
-            let status = ''
-            let type = ''
-            if (statusData == CAMPAIGN_STATUS.ENABLE) {
-              status = t('commons.status_enum.enable')
-              type = 'success'
-            } else if (statusData == CAMPAIGN_STATUS.PAUSED) {
-              status = t('commons.status_enum.paused')
-              type = 'warning'
-            } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
-              status = t('commons.status_enum.archived')
-              type = 'processing'
-            } else if (statusData == CAMPAIGN_STATUS.ENDED) {
-              status = t('commons.status_enum.ended')
-              type = 'error'
-            } else if (statusData == CAMPAIGN_STATUS.OTHER) {
-              status = t('commons.status_enum.other')
-              type = 'default'
+
+          const statusType = {
+            isEnabled: statuses.filter((status: any) => status.label != "ENABLED" && status.label != "All"),
+            isPaused: statuses.filter((status: any) => status.label != "PAUSED" && status.label != "All"),
+            isArchived: statuses.filter((status: any) => status.label != "ARCHIVED" && status.label != "All"),
+            isEnded: statuses.filter((status: any) => status.label != "ENDED" && status.label != "All"),
+            isOther: statuses.filter((status: any) => status.label != "OTHER" && status.label != "All")
+          }
+
+          const renderStatusesDropdown = (statusType: any) => {
+            return (
+              <Menu onClick={({ key }) => onUpdateCampaignStatus(key)}>
+                {statusType.map((status: any) => (
+                  <Menu.Item className='text-center' key={status.value}>{status.label}</Menu.Item>
+                ))}
+              </Menu>
+            )
+          }
+
+          const onUpdateCampaignStatus = async (newStatus: any) => {
+            try {
+              const body = {
+                statuses: [{
+                  status: newStatus,
+                  campaignId: id
+                }],
+                partnerAccountId: currentAccount
+              }
+        
+              const result = await changeStatusCampaign(body)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.status')), NOTIFICATION_SUCCESS)
+                
+                const updatedCampaigns = campaignBudgets.map((campaign: any) => {
+                  if (campaign.id === id) {
+                    return {...campaign, status: newStatus};
+                  }
+                  return campaign;
+                });
+                setCampaignBudgets(updatedCampaigns);
+              }
+            } catch (error: any) {
+              console.log(">>> Update Campaign Status Error", error)
+              notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
             }
-            return <Tag className='text-center uppercase' color={type}>{status} <DownOutlined/></Tag>
+          }
+
+          const renderStatus = () => {
+            let renderStatus = ''
+            let renderType = ''
+            let renderDropdown: any
+            if (statusData == CAMPAIGN_STATUS.ENABLE) {
+              renderStatus = t('commons.status_enum.enable')
+              renderType = 'success'
+              renderDropdown = renderStatusesDropdown(statusType.isEnabled)
+            } else if (statusData == CAMPAIGN_STATUS.PAUSED) {
+              renderStatus = t('commons.status_enum.paused')
+              renderType = 'warning'
+              renderDropdown = renderStatusesDropdown(statusType.isPaused)
+            } else if (statusData == CAMPAIGN_STATUS.ARCHIVED) {
+              renderStatus = t('commons.status_enum.archived')
+              renderType = 'processing'
+              renderDropdown = renderStatusesDropdown(statusType.isArchived)
+            } else if (statusData == CAMPAIGN_STATUS.ENDED) {
+              renderStatus = t('commons.status_enum.ended')
+              renderType = 'error'
+              renderDropdown = renderStatusesDropdown(statusType.isEnded)
+            } else if (statusData == CAMPAIGN_STATUS.OTHER) {
+              renderStatus = t('commons.status_enum.other')
+              renderType = 'default'
+              renderDropdown = renderStatusesDropdown(statusType.isOther)
+            }
+            return (
+              <Dropdown overlay={renderDropdown} placement="bottomCenter" >
+                <a className='tag px-2 font-semibold'><Tag className='text-center uppercase' color={renderType}>{renderStatus} <DownOutlined/></Tag></a>
+              </Dropdown> 
+            )
           }
           return (
             <div className='flex justify-center'>
-              <Dropdown menu={{ items }}>
-                <a className='tag px-2 font-semibold'>{renderStatus()}</a>
-              </Dropdown>
+              {renderStatus()}
             </div>
           );
         }

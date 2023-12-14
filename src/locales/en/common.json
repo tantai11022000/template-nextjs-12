@@ -5,6 +5,7 @@
         "id": "ID",
         "name": "Name",
         "status": "Status",
+        "budget": "Budget",
         "description" : "Description",
 
         "bulk_action": "Bulk Action",
@@ -215,9 +216,9 @@
         "schedule_must_be_in_the_future": "The schedule needs to be in the future, not today.",
 
         "modal": {
-            "existing_budget_schedule_warning": "Existing Budget Schedule Warning",
             "view_schedule": "View Schedule",
-            "campaigns_already_have_budget_schedule": "We found following {number} Campaigns already have budget schedule set: ",
+            "existing_schedule_warning": "Existing {text} Schedule Warning",
+            "campaigns_already_have_schedule": "We found following {number} Campaigns already have {text} schedule set: ",
             "warning_overlapped": "* Note: The newer schedule will be applied, if the timing overlapped."
         }
     },
