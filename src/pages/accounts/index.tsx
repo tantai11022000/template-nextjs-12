@@ -3,7 +3,7 @@ import { Dropdown, Input, Space, Tag } from 'antd';
 import TableGeneral from '@/components/table';
 import { useRouter } from 'next/router';
 import { changeNextPageUrl, notificationSimple, updateUrlQuery } from '@/utils/CommonUtils';
-import { getAllPartnerAccounts, updateAccountStatus } from '@/services/accounts-service';
+import { deleteAccountById, getAllPartnerAccounts, updateAccountStatus } from '@/services/accounts-service';
 import { BREADCRUMB_ACCOUNT } from '@/Constant/index';
 import DashboardLayout from '@/components/nested-layout/DashboardLayout';
 import RootLayout from '@/components/layout';
@@ -17,7 +17,9 @@ import { USER_STATUS } from '@/enums/status';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { NOTIFICATION_ERROR, NOTIFICATION_SUCCESS } from '@/utils/Constants';
-import { setAccountList } from '@/store/account/accountSlice';
+import { setAccountList, setCurrentAccount } from '@/store/account/accountSlice';
+import { getItem, storeItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 export async function getStaticProps(context: any) {
   const { locale } = context
   return {
@@ -34,6 +36,7 @@ export default function Accounts (props: IAccountsProps) {
   const  { t } = useTranslation()
   const router = useRouter()
   const dispatch = useAppDispatch()
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const [loading, setLoading] = useState<boolean>(false)
   const [accounts, setAccounts] = useState<any[]>([])
   const [keyword, setKeyword] = useState<string>("")
@@ -44,7 +47,7 @@ export default function Accounts (props: IAccountsProps) {
   })
 
   useEffect(() => {
-    dispatch(setBreadcrumb({data: [BREADCRUMB_ACCOUNT]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.accounts') , url: '/accounts'}]}))
   }, [])
 
   useEffect(() => {
@@ -68,7 +71,13 @@ export default function Accounts (props: IAccountsProps) {
       const result = await getAllPartnerAccounts(params)
       if (result && result.data) {
         setAccounts(result.data)
-        dispatch(setAccountList({data: result.data}))
+
+        const activeAccounts = result.data.filter((account: any) => account.status == 1)
+        dispatch(setAccountList({data: activeAccounts}))
+
+        const isCurrentAccount = result.data.find((account: any) => account.id == currentAccount)
+        dispatch(setCurrentAccount({data: isCurrentAccount.status == 2 ? activeAccounts[0].id : currentAccount}))
+        storeItem(CURRENT_ACCOUNT, isCurrentAccount.status == 2 ? activeAccounts[0].id : currentAccount)
         setPagination({...pagination, total: result.pagination.total})
       }
       setLoading(false)
@@ -106,7 +115,7 @@ export default function Accounts (props: IAccountsProps) {
       }
     } catch (error: any) {
       console.log(">>> Update Account Status Error", error)
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   };
 
@@ -167,11 +176,29 @@ export default function Accounts (props: IAccountsProps) {
         title: <div className='text-center'>{t('commons.action')}</div>,
         key: 'action',
         render: (_: any, record: any) => {
+          const id = record.id
+
+          const onDeleteAccount = async (id: any) => {
+            try {
+              const params = {
+                partnerAccountId: currentAccount,
+                scheduleId: id
+              }
+              const result = await deleteAccountById(id)
+              if (result && result.message == "OK") {
+                notificationSimple(renderTranslateToastifyText(t('commons.schedule')), NOTIFICATION_SUCCESS)
+                getAllAccounts(keyword)
+              }
+            } catch (error) {
+              
+            }
+          }
+
           return (
             <div className='flex justify-center'>
               <Space size="middle">
-                <EditOutlined className='text-lg cursor-pointer is-link' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${record.id}`)}/>
-                <DeleteOutlined className='text-lg cursor-pointer'/>
+                <EditOutlined className='text-lg cursor-pointer' onClick={() => router.push(`${BREADCRUMB_ACCOUNT.url}/edit/${id}`)}/>
+                <DeleteOutlined className='text-lg cursor-pointer' onClick={() => onDeleteAccount(id)}/>
               </Space>
             </div>
           )

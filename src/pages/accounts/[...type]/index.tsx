@@ -66,18 +66,14 @@ export default function AddAccount (props: IAddAccountProps) {
     setIsEdit(valueEdit)
     if (valueEdit) {
       handleMapEditData()
-    } else {
-      form.setFieldsValue({
-        timeSlot: 1
-      })
     }
   },[router])
 
   useEffect(() => {
-    let breadcrumb = [BREADCRUMB_ACCOUNT];
+    let breadcrumb = [{label: t('breadcrumb.accounts') , url: '/accounts'}];
   
     if (valueEdit) breadcrumb.push({ label: id, url: '' })
-    else breadcrumb.push(BREADCRUMB_ADD)
+    else breadcrumb.push({label: t('breadcrumb.add') , url: ''})
     dispatch(setBreadcrumb({data: breadcrumb}))
   },[valueEdit, id])
 
@@ -149,7 +145,11 @@ export default function AddAccount (props: IAddAccountProps) {
   const onSave = async (value: any) => {
     setFormSubmitted(true);
     setLoading({...loading, isCreate: true})
+    const trimmedName = value && value.name ? value.name.trim() : "";
     try {
+      if (trimmedName == '') {
+        throw new Error(t('account_page.error_messages.name_not_be_empty'));
+      }
       if (valueEdit) {
         await editPartnerAccount(id, value)
         dispatch(editAccount({id, value}))
@@ -164,7 +164,7 @@ export default function AddAccount (props: IAddAccountProps) {
     } catch (error: any) {
       console.log(">>>> Create Account Error", error)
       setLoading({...loading, isCreate: false})
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 
@@ -182,7 +182,7 @@ export default function AddAccount (props: IAddAccountProps) {
       notificationSimple(t('toastify.success.validation'), NOTIFICATION_SUCCESS)
     } catch (error: any) {
       setLoading({...loading, isValid: false})
-      notificationSimple(error.message, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }
   }
 

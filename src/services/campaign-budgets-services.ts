@@ -31,9 +31,49 @@ export const uploadBudgetScheduleCSVFile = async (id: any, body: any) => {
     }
 }
 
+export const uploadBudgetScheduleCSVFile2 = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadBudgetScheduleCSVFile2(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const uploadStatusScheduleCSVFile = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadStatusScheduleCSVFile(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const uploadStatusScheduleCSVFile2 = async (id: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.uploadStatusScheduleCSVFile2(id, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const setScheduleBudgetForCampaigns = async (body: any) => {
     try {
         const response = await campaignBudgetsRepository.setScheduleBudgetForCampaigns(body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getScheduleLog = async (paths: any, params: any, type: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleLog(paths, params, type);
         return handleResponse(response);
 
     } catch (error) {
@@ -51,9 +91,89 @@ export const getScheduleBudgetLog = async (paths: any, params: any) => {
     }
 }
 
+export const getScheduleStatusLog = async (paths: any, params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleStatusLog(paths, params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const changeBudgetCampaign = async (body: any) => {
     try {
         const response = await campaignBudgetsRepository.changeBudgetCampaign(body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const changeStatusCampaign = async (body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.changeStatusCampaign(body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const deleteBudgetScheduleById = async (params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.deleteBudgetScheduleById(params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const deleteStatusScheduleById = async (params: any) => {
+    try {
+        const response = await campaignBudgetsRepository.deleteStatusScheduleById(params);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const getScheduleById = async (id: any) => {
+    try {
+        const response = await campaignBudgetsRepository.getScheduleById(id);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const exportCampaignsCSVFile = async (params: any, body: any) => {
+    try {
+        const response = await campaignBudgetsRepository.exportCampaignsCSVFile(params, body);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const downloadCSVTemplateSchedule = async () => {
+    try {
+        const response = await campaignBudgetsRepository.downloadCSVTemplateSchedule();
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
+export const downloadCSVTemplateStatus = async () => {
+    try {
+        const response = await campaignBudgetsRepository.downloadCSVTemplateStatus();
         return handleResponse(response);
 
     } catch (error) {

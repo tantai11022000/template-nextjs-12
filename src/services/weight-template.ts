@@ -21,6 +21,16 @@ export const getWeightTemplateDetail = async (id: any) => {
     }
 }
 
+export const getTemplateDuplicateName = async (keyword:string) => {
+    try {
+        const response = await weightTemplateRepository.getWeightTemplateDuplicateName(keyword);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}
+
 export const createWeightTemplate = async (body: any) => {
     try {
         const response = await weightTemplateRepository.createWeightTemplate(body);

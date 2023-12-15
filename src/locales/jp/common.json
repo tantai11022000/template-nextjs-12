@@ -5,6 +5,7 @@
         "id": "ID",
         "name": "名前",
         "status": "ステータス",
+        "budget": "予算",
         "description" : "説明",
 
         "bulk_action": "一括操作", 
@@ -22,10 +23,16 @@
         "time": "時間",
         "activated": "有効化済",
         "user": "ユーザー",
+        "schedule": "スケジュール",
         "campaign_name": "キャンペーン名",
         "campaign_id": "キャンペーンID",
         "from_time": "時間から",
         "to_time": "時間に",
+        "all": "全て",
+        "close_time_panel": "時間パネルを閉じる",
+        "open_time_panel": "オープンタイムパネル",
+        "csv": "CSV",
+        "excel": "エクセル",
 
         "filter_label": {
             "status": "ステータス",
@@ -37,10 +44,16 @@
             "enable": "有効にする",
             "archived": "アーカイブ済み",
             "other": "他の",
+            "ended": "終了しました",
 
             "active": "アクティブ",
             "inactive": "非活性",
-            "upcoming": "今後の"
+            "upcoming": "今後の",
+
+            "success": "成功",
+            "fail": "失敗した",
+            "in_process": "処理中",
+            "in_queue": "順番待ち"
         },
 
         "action_type" : {
@@ -55,7 +68,11 @@
             "finish": "完了",
             "add": "追加",
             "update": "アップデート",
-            "confirm": "確認する"
+            "confirm": "確認する",
+            "log": "ログ",
+            "delete": "消去",
+            "history": "歴史",
+            "export": "輸出"
         },
 
         "weight_type": {
@@ -73,6 +90,7 @@
             "added_text": "{text} が正常に追加されました.",
             "removed_text": "{text} は正常に削除されました.",
             "generated_text": "{text} が正常に生成されました.",
+            "uploaded_text": "{text} は正常にアップロードされました.",
 
             "created": "作成完了.",
             "updated": "アップロード完了.",
@@ -84,13 +102,15 @@
             "validation": "検証が成功しました."
         },
         "error": {
-
+            "default_error_message": "エラーが発生しました。しばらくしてから再度実行してください."
         }
     },
 
     "error_messages": {
         "no_selected": "いいえ {text} 選択されました.",
         "file_empty_or_unreadable": "ファイルが空か、読み取りができません.",
+        "field_empty_or_unreadable": "フィールドが空であるか、読み取り不能です.",
+        "field_empty_or_unreadable_and_upload_again": "一部のフィールドが空であるか、読み取り不能です. 修正して再度アップロードしてください.",
         "not_found_page": "このページは見つかりませんでした."
     },
 
@@ -155,14 +175,24 @@
     },
 
     "breadcrumb": {
-
+        "campaign_budgets": "キャンペーンの予算",
+        "target_bidding": "ターゲット入札",
+        "accounts": "アカウント",
+        "weight_template": "ウェイトテンプレート",
+        "add": "追加",
+        "edit": "編集",
+        "schedule_budget": "予算をスケジュールする",
+        "update_budget": "キャンペーン予算を更新する",
+        "update_status": "キャンペーンステータスの更新",
+        "performance_history": "パフォーマンス履歴」"
     },
 
     "campaign_budget_page": {
         "campaign_name": "キャンペーン名",
         "portfolio": "ポートフォリオ",
         "current_budget": "現在の予算",
-        "budget_campaign": "予算キャンペーン"
+        "budget_campaign": "予算キャンペーン",
+        "warning_select_at_least_one_campaign": "エクスポートする前に、少なくとも 1 つのキャンペーンを選択してください."
     },
 
     "schedule_budget_for_campaign": {
@@ -180,7 +210,16 @@
         "daily_with_weight": "毎日の体重テンプレート",
         "weight_template": "ウェイトテンプレート",
         "warning_select_at_least_one_campaign": "保存する前に少なくとも 1 つのキャンペーンを選択してください.",
-        "warning_budget_must_be_greater_than_zero": "予算は0より大きくなければなりません"
+        "warning_budget_must_be_greater_than_zero": "予算は0より大きくなければなりません",
+        "the_time_already_exists": "選択した時刻はすでに存在します.",
+        "schedule_must_be_in_the_future": "スケジュールは今日ではなく将来にする必要があります.",
+
+        "modal": {
+            "existing_budget_schedule_warning": "既存の予算スケジュールの警告",
+            "view_schedule": "スケジュールを見る",
+            "campaigns_already_have_budget_schedule": "次の {number} 個のキャンペーンにすでに予算スケジュールが設定されていることがわかりました.",
+            "warning_overlapped": "* 注意：タイミングが重なった場合は、新しいスケジュールが適用されます."
+        }
     },
 
     "update_log_page": {
@@ -203,7 +242,9 @@
     },
 
     "campaign_performance_history_log_page": {
-        "title": "「スケジュールログ: {text} - パフォーマンス履歴」"
+        "title": "「スケジュールログ: {text} - パフォーマンス履歴」",
+        "performance_history": "パフォーマンス履歴」",
+        "budget_update": "予算更新日:"
     },
 
     "target_bidding_page": {
@@ -226,7 +267,8 @@
             "client_id": "クライアントIDが必要です.",
             "secret_id": "シークレットIDが必要です.",
             "refresh_token": "リフレッシュトークンが必要です.",
-            "who_can_see": "保存する前に少なくとも 1 人のスーパーバイザを選択してください."
+            "who_can_see": "保存する前に少なくとも 1 人のスーパーバイザを選択してください.",
+            "name_not_be_empty": "名前を空にすることはできません"
         }
     },
 
@@ -239,6 +281,8 @@
         "last_updated": "最終更新",
         "action": "アクション",
         "clone_weight_template": "ウェイト テンプレートからクローンを作成します: ",
+        "set_weight_for_daily_budget": "1 日の予算の重みを設定する",
+        "preview_weight_template": "ウェイトテンプレートのプレビュー",
 
         "form": {
             "title": "{action} ウェイトテンプレート",
@@ -253,5 +297,27 @@
             "hour": "時間",
             "time": "時間"
         }
+    },
+
+    "upload_csv": {
+        "status": "ステータス",
+        "campaign_name": "キャンペーン名",
+        "campaign_id": "キャンペーンID",
+        "budget": "予算",
+        "value": "価値",
+        "update_schedule": "更新スケジュール",
+        "mode": "モード",
+        "trend": "トレンド",
+        "weight_template_id": "ウェイトテンプレートID",
+        "rows_passed": "渡された行数",
+        "rows_failed": "行が失敗しました",
+        "new_status": "新しいステータス",
+        "csv_template": "CSVテンプレート",
+        "click_to_download": "クリックしてダウンロード",
+        "validate_status": "ステータスの検証",
+        "result_campaigns_change": "{number} 個のキャンペーンの予算をスケジュールする.",
+        "result_budget_change": "予算の変更は {number} 回あります.",
+        "result_status_change": "ステータス変更は100回あります.",
+        "back_to_campaign": "キャンペーンに戻る"
     }
 }

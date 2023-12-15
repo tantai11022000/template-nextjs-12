@@ -20,3 +20,13 @@ export const getPortfolio = async (id: any) => {
         return Promise.reject(error);
     }
 }
+
+export const getCampaignStatus = async () => {
+    try {
+        const response = await commonsRepository.getCampaignStatus();
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}

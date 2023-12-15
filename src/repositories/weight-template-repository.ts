@@ -10,6 +10,10 @@ export const getAllWeightTemplates = (params: any) => {
 export const getWeightTemplateDetail = (id: any) => {
     return userClient.get(`${weightTemplateUrl}/${id}`);
 }
+
+export const getWeightTemplateDuplicateName = (keyword: string) => {
+    return userClient.get(`${weightTemplateUrl}/duplicate-name?keyword=${keyword}`);
+}
 export const createWeightTemplate = (body: any) => {
     return userClient.post(`${weightTemplateUrl}`, body );
 }

@@ -15,12 +15,13 @@ export interface IFUploadFileProps {
   errorMessage?: string,
   action?: string,
   onUploadFile: any,
-  multiple?: boolean
+  multiple?: boolean,
+  acceptType?: string
 }
 
 export default function FUploadFile (props: IFUploadFileProps) {
   const { t } = useTranslation()
-  const {name, label, action, onUploadFile, multiple, required, errorMessage} = props
+  const {name, label, action, onUploadFile, multiple, required, errorMessage, acceptType} = props
 
   const normFile = (e: any) => {
     console.log('Upload event:', e);
@@ -42,12 +43,12 @@ export default function FUploadFile (props: IFUploadFileProps) {
           message: errorMessage ? errorMessage : 'Please select at least one',
         }]}
       >
-        <Upload.Dragger name="files" maxCount={multiple ? undefined : 1}>
+        <Upload.Dragger name="files" maxCount={multiple ? undefined : 1} beforeUpload={() => false} accept={acceptType}>
           <div className='flex items-end justify-center'>
             <p className="ant-upload-drag-icon"><CloudUploadOutlined /></p>
             <p className="ant-upload-text">{t('update_campaign_schedule_page.main_upload_content')}</p>
           </div>
-          <p className="ant-upload-hint">({t('update_campaign_schedule_page.sub_upload_content')} *.CSV,*.xls,*.xlsx)</p>
+          <p className="ant-upload-hint">({t('update_campaign_schedule_page.sub_upload_content')} *.CSV)</p>
         </Upload.Dragger>
       </Form.Item>
     </Form.Item>

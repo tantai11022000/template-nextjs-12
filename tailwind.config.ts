@@ -22,7 +22,8 @@ const config: Config = {
       'underline': "#E6E6E6",
       'field': "#F7F7F7",
       'blue': "#87CEFA",
-      'red': "#e74c3c"
+      'red': '#F81E1E',
+      'green': '#34B207'
     },
   },
   plugins: [],

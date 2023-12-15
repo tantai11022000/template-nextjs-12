@@ -49,7 +49,7 @@ function WeightTemplate() {
 
   useEffect(() => {
     // mapFirstQuery()
-    dispatch(setBreadcrumb({data: [BREADCRUMB_WEIGHT_TEMPLATE]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}]}))
   },[])
 
   useEffect(() => {
@@ -119,10 +119,11 @@ function WeightTemplate() {
     try {
       const result = await deleteWeightTemplate(id)
       setWeightTemplates((prevTemplates: any) => prevTemplates.filter((template: any) => template.id !== id));
-      notificationSimple(`Delete Weight Template ${name} Success`, NOTIFICATION_SUCCESS)
-    } catch (error) {
+      notificationSimple(renderTranslateToastifyText(t('weight_template_page.weight_template')), NOTIFICATION_SUCCESS)
+      
+    } catch (error: any) {
       console.log(">>> Delete Weight Template Error", error)
-      notificationSimple(`Delete Weight Template ${name} Fail`, NOTIFICATION_ERROR)
+      notificationSimple(error.message ? error.message : t('toastify.error.default_error_message'), NOTIFICATION_ERROR)
     }    
   }
 
@@ -133,6 +134,11 @@ function WeightTemplate() {
 
   const renderTranslateActionButton = (text: any) => {
     let translate = t("commons.action_type.add_text");
+    return translate.replace("{text}", text);
+  }
+
+  const renderTranslateToastifyText = (text: any) => {
+    let translate = t("toastify.success.updated_text")
     return translate.replace("{text}", text);
   }
 

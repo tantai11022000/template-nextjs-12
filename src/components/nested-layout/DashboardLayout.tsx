@@ -1,5 +1,5 @@
 import React from 'react';
-import {  Select } from 'antd';
+import {  Select, Spin } from 'antd';
 import { Layout } from 'antd';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
@@ -11,6 +11,8 @@ import ActionButton from '../commons/buttons/ActionButton';
 import {CloudSyncOutlined} from '@ant-design/icons';
 import { useTranslation } from 'next-i18next';
 import { getSyncData } from '@/services/globals-service';
+import { getItem, storeItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 const DashboardLayout = (props: any) => {
   const { t } = useTranslation()
@@ -19,7 +21,9 @@ const DashboardLayout = (props: any) => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const accountList = useAppSelector(getAccountList);
-  const currentAccount = useAppSelector(getCurrentAccount);
+  const currentAccount = getItem(CURRENT_ACCOUNT)
+  const [currentAcc, setCurrentAcc] = useState<any>(currentAccount)
+  const [loading, setLoading] = useState<boolean>(true)
   const [optionAccount, setOptionAccount] = useState<any[]>([])
   const [menu, setMenu] = useState<string>("campaign-budgets")
   const [showGlobalButton, setShowGlobalButton] = useState<any>({
@@ -51,6 +55,15 @@ const DashboardLayout = (props: any) => {
   }, [router.pathname])
 
   useEffect(() => {
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    setCurrentAcc(currentAccount)
+  }, [currentAccount])
+  
+
+  useEffect(() => {
     const option = accountList.map((account:any) => ({
       value: account.id,
       key: account.id,
@@ -61,6 +74,8 @@ const DashboardLayout = (props: any) => {
 
   const onChangeAccount = (account: any) => {
     dispatch(setCurrentAccount({data: account.value}))
+    storeItem(CURRENT_ACCOUNT, account.value)
+    setCurrentAcc(account.value)
   }
 
   const handleSyncData = async (id: any) => {
@@ -83,7 +98,7 @@ const DashboardLayout = (props: any) => {
             <div className='flex items-center justify-between px-6 py-4 max-h-[36px] bg-[#f5f5f5] max-md:flex-col max-md:items-start'>
               <Breadcrumbs/>
                 {showGlobalButton.partnerAccount &&
-                  <div className='flex items-center max-md: mt-2'>
+                  <div className='flex items-center max-md:mt-2'>
                       <div className='select-filter-container mr-3'>
                         <Select
                           labelInValue
@@ -92,23 +107,25 @@ const DashboardLayout = (props: any) => {
                           placeholder="Select Account"
                           optionFilterProp="label"
                           onChange={onChangeAccount}
-                          value={currentAccount}
+                          value={Number(currentAcc)}
                           options={optionAccount}
                           />
                       </div>
-                    <ActionButton className={'action-button'} iconOnLeft={<CloudSyncOutlined />} label={t('commons.synchronize')} onClick={() => handleSyncData(currentAccount)}/>
+                    <ActionButton className={'action-button'} iconOnLeft={<CloudSyncOutlined />} label={t('commons.synchronize')} onClick={() => handleSyncData(currentAcc)}/>
                   </div>
                 }
                 </div>
           </Layout>
           
-          <div className='m-6 bg-white'>
-            <div className='p-4 panel-container'>
-              {React.Children.map(children, (child) => {
-                return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
-              })}
+          {loading ? <Spin/> : (
+            <div className='m-6 bg-white'>
+              <div className='p-4 panel-container'>
+                {React.Children.map(children, (child) => {
+                  return React.cloneElement(child, { accountList, onPartnerAccountsChange: onChangeAccount });
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <Footer style={{ textAlign: 'left' }}>© 2023 ADTRAN</Footer>
       </Layout>

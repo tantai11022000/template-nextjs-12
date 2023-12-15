@@ -60,3 +60,13 @@ export const updateAccountStatus = async (id: any, body: any) => {
         return Promise.reject(error);
     }
 }
+
+export const deleteAccountById = async (id: any) => {
+    try {
+        const response = await accountsRepository.deleteAccountById(id);
+        return handleResponse(response);
+
+    } catch (error) {
+        return Promise.reject(error);
+    }
+}

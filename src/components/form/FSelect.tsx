@@ -13,13 +13,14 @@ export interface IFSelectProps {
   required?: boolean,
   errorMessage?: string,
   placeholder: string,
+  customCss?: string
 }
 
 export default function FSelect (props: IFSelectProps) {
-  const {name, label, options, placeholder, required, errorMessage} = props
+  const {name, label, options, placeholder, required, errorMessage, customCss} = props
   return (
     <Form.Item
-      className='select-filter-container'
+      className={`select-filter-container ${customCss ? customCss : ""}`}
       name={name}
       label={label}
       rules={[{

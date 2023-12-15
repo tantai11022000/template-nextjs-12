@@ -20,6 +20,8 @@ import { getCurrentAccount } from '@/store/account/accountSlice';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { useTranslation } from 'next-i18next';
 import { TARGET_BIDDING_STATUS } from '@/enums/status';
+import { getItem } from '@/utils/StorageUtils';
+import { CURRENT_ACCOUNT } from '@/utils/StorageKeys';
 
 export async function getStaticProps(context: any) {
   const { locale } = context
@@ -121,7 +123,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   const { t } = useTranslation()
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const currentAccount = useAppSelector(getCurrentAccount)
+  const currentAccount = getItem(CURRENT_ACCOUNT)
   const [loading, setLoading] = useState<boolean>(false);
   const [openModalUpdateStatus, setOpenModalUpdateStatus] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<any>('');
@@ -154,7 +156,7 @@ export default function TargetingBidding (props: ITargetingBiddingProps) {
   useEffect(() => {
     // mapFirstQuery()
     init();
-    dispatch(setBreadcrumb({data: [BREADCRUMB_TARGETING_BIDDING]}))
+    dispatch(setBreadcrumb({data: [{label: t('breadcrumb.target_bidding') , url: '/targeting-bidding'}]}))
   }, [])
 
   useEffect(() => {

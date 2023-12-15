@@ -5,6 +5,7 @@
         "id": "ID",
         "name": "Name",
         "status": "Status",
+        "budget": "Budget",
         "description" : "Description",
 
         "bulk_action": "Bulk Action",
@@ -22,10 +23,16 @@
         "time": "Time",
         "activated": "Activated",
         "user": "User",
+        "schedule": "Schedule",
         "campaign_name": "Campaign Name",
         "campaign_id": "Campaign ID",
         "from_time": "From Time",
         "to_time": "To Time",
+        "all": "All",
+        "close_time_panel": "Close Time Panel",
+        "open_time_panel": "Open Time Panel",
+        "csv": "CSV",
+        "excel": "Excel",
         
         "filter_label": {
             "status": "Status",
@@ -37,10 +44,16 @@
             "enable": "Enable",
             "archived": "Archived",
             "other": "Other",
+            "ended": "Ended",
             
             "active": "Active",
             "inactive": "Inactive",
-            "upcoming": "Upcoming"
+            "upcoming": "Upcoming",
+
+            "success": "Success",
+            "fail": "Fail",
+            "in_process": "In Process",
+            "in_queue": "In Queue"
         },
 
         "action_type" : {
@@ -55,7 +68,11 @@
             "finish": "Finish",
             "add": "Add",
             "update": "Update",
-            "confirm": "Confirm"
+            "confirm": "Confirm",
+            "log": "Log",
+            "delete": "Delete",
+            "history": "History",
+            "export": "Export"
         },
 
         "weight_type": {
@@ -73,6 +90,7 @@
             "added_text": "{text} has been added successfully.",
             "removed_text": "{text} has been removed successfully.",
             "generated_text": "{text} has been generated successfully.",
+            "uploaded_text": "{text} has been uploaded successfully.",
 
             "created": "Created successfully.",
             "updated": "Updated successfully.",
@@ -85,13 +103,15 @@
 
         },
         "error": {
-
+            "default_error_message": "An error occurred. Please try again later."
         }
     },
 
     "error_messages": {
         "no_selected": "No {text} is selected.",
         "file_empty_or_unreadable": "File is empty or unreadable.",
+        "field_empty_or_unreadable": "Field is empty or unreadable.",
+        "field_empty_or_unreadable_and_upload_again": "Some fields are empty or unreadable. Please correct and upload again.",
         "not_found_page": "This page could not be found."
     },
 
@@ -156,14 +176,24 @@
     },
 
     "breadcrumb": {
-
+        "campaign_budgets": "Campaign Budgets",
+        "target_bidding": "Target Bidding",
+        "accounts": "Accounts",
+        "weight_template": "Weight Template",
+        "add": "Add",
+        "edit": "Edit",
+        "schedule_budget": "Schedule Budget",
+        "update_budget": "Update Campaign Budget",
+        "update_status": "Update Campaign Status",
+        "performance_history": "Performance History"
     },
 
     "campaign_budget_page": {
         "campaign_name": "Campaign Name",
         "portfolio": "Portfolio",
         "current_budget": "Current Budget",
-        "budget_campaign": "Budget Campaign"
+        "budget_campaign": "Budget Campaign",
+        "warning_select_at_least_one_campaign": "Please select at least one campaign before exporting."
     },
 
     "schedule_budget_for_campaign": {
@@ -181,7 +211,16 @@
         "daily_with_weight": "Daily with Weight Template",
         "weight_template": "Weight Template",
         "warning_select_at_least_one_campaign": "Please select at least one campaign before saving.",
-        "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0"
+        "warning_budget_must_be_greater_than_zero": "Budget must be greater than 0",
+        "the_time_already_exists": "The time you are selecting already exists.",
+        "schedule_must_be_in_the_future": "The schedule needs to be in the future, not today.",
+
+        "modal": {
+            "view_schedule": "View Schedule",
+            "existing_schedule_warning": "Existing {text} Schedule Warning",
+            "campaigns_already_have_schedule": "We found following {number} Campaigns already have {text} schedule set: ",
+            "warning_overlapped": "* Note: The newer schedule will be applied, if the timing overlapped."
+        }
     },
 
     "update_log_page": {
@@ -204,7 +243,9 @@
     },
 
     "campaign_performance_history_log_page": {
-        "title": "Schedule Log: {text} - Performance History"
+        "title": "Schedule Log: {text} - Performance History",
+        "performance_history": "Performance History",
+        "budget_update": "Budget Update:"
     },
 
     "target_bidding_page": {
@@ -227,7 +268,8 @@
             "client_id": "Client ID is required.",
             "secret_id": "Secret ID is required.",
             "refresh_token": "Refresh Token is required.",
-            "who_can_see": "Please select at least one Supervisor before saving."
+            "who_can_see": "Please select at least one Supervisor before saving.",
+            "name_not_be_empty": "Name can not be empty"
         }
     },
 
@@ -239,6 +281,8 @@
         "last_updated": "Last Updated",
         "action": "Action",
         "clone_weight_template": "Clone from Weight Template: ",
+        "set_weight_for_daily_budget": "Set Weight for daily budget",
+        "preview_weight_template": "Preview Weight Template",
 
         "form": {
             "title": "{action} Weight Template",
@@ -253,5 +297,27 @@
             "hour": "Hours",
             "time": "Time"
         }
+    },
+
+    "upload_csv": {
+        "status": "Status",
+        "campaign_name": "Campaign Name",
+        "campaign_id": "Campaign ID",
+        "budget": "Budget",
+        "value": "Value",
+        "update_schedule": "Update Schedule",
+        "mode": "Mode",
+        "trend": "Trend",
+        "weight_template_id": "Weight Template ID",
+        "rows_passed": "Rows passed",
+        "rows_failed": "Rows failed",
+        "new_status": "New Status",
+        "csv_template": "CSV Template",
+        "click_to_download": "Click to Download",
+        "validate_status": "Validate Status",
+        "result_campaigns_change": "Schedule budget for {number} campaigns.",
+        "result_budget_change": "There will be {number} changes of budgets.",
+        "result_status_change": "There will be {number} changes of statuses.",
+        "back_to_campaign": "Back to Campaign"
     }
 }
